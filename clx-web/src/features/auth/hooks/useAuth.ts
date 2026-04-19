@@ -12,7 +12,7 @@ export function useLogin() {
 
   const login = useCallback(async (data: LoginRequest, rememberMe = false) => {
     // 1. 登录请求
-    const response = await authApi.login(data);
+    const response = await authApi.login({ ...data, rememberMe });
 
     // 2. 登录成功后存储 Token
     if (response.code === 200 && response.data) {

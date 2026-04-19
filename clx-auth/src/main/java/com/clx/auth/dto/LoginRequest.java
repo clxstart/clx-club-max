@@ -4,22 +4,32 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 /**
- * 登录请求DTO。
+ * 登录请求 DTO。
  *
- * <p>使用Java Record定义不可变数据对象，自动生成getter、equals、hashCode、toString。
+ * <p>使用 Java Record 定义不可变数据对象，自动生成 getter、equals、hashCode、toString。
  *
  * <p>验证规则：
  * <ul>
  *   <li>用户名：不能为空，最大50字符</li>
  *   <li>密码：不能为空，最大128字符</li>
+ *   <li>记住我：可选，默认为 false</li>
  * </ul>
  *
- * <p>注意：密码长度限制128字符是因为BCrypt有72字符的输入限制，
- * 超过72字符的部分会被忽略。128字符限制是为了兼容各种密码管理器
- * 生成的超长密码，同时在Service层做最终校验。
+ * <p>请求示例：
+ * <pre>
+ * POST /auth/login
+ * Content-Type: application/json
  *
- * @param username 用户名
+ * // 普通登录
+ * {"username":"admin","password":"admin123"}
+ *
+ * // 记住我登录
+ * {"username":"admin","password":"admin123","rememberMe":true}
+ * </pre>
+ *
+ * @param username 用户名（必填）
  * @param password 密码（明文，仅传输时使用，不会存储）
+ * @param rememberMe 是否记住我（可选，默认 false）
  */
 public record LoginRequest(
         @NotBlank(message = "用户名不能为空")
@@ -28,6 +38,7 @@ public record LoginRequest(
 
         @NotBlank(message = "密码不能为空")
         @Size(max = 128, message = "密码长度不能超过128个字符")
-        String password
-) {
-}
+        String password,
+
+        Boolean rememberMe
+) {}

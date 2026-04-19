@@ -35,14 +35,23 @@ sa-token:
   is-read-header: true
   is-read-cookie: false
   is-read-body: false
-  # Token风格：uuid
-  token-style: uuid
   # Token前缀
   token-prefix: Bearer
   # 是否输出操作日志
   is-log: true
 
+  # ========== JWT 配置（sa-token-jwt 插件） ==========
+  # JWT 密钥：用于签名和验证 Token，建议32+字符
+  # 生产环境请使用环境变量 JWT_SECRET_KEY 设置，不要在配置文件中暴露真实密钥
+  jwt-secret-key: ${JWT_SECRET_KEY:CLX-Community-JWT-Secret-Key-2024-Please-Change-In-Production}
+
 # CORS跨域配置
 cors:
   allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
   allow-credentials: false
+
+clx:
+  auth:
+    remember-me:
+      timeout: ${CLX_REMEMBER_ME_TIMEOUT:2592000}
+      active-timeout: ${CLX_REMEMBER_ME_ACTIVE_TIMEOUT:604800}

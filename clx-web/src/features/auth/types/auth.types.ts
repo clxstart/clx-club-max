@@ -6,6 +6,7 @@
 export interface LoginRequest {
   username: string;
   password: string;
+  rememberMe?: boolean;
 }
 
 /**
@@ -14,6 +15,9 @@ export interface LoginRequest {
 export interface LoginResponse {
   token: string;
   tokenName: string;
+  tokenTimeout?: number;
+  activeTimeout?: number;
+  rememberMe?: boolean;
 }
 
 /**

@@ -37,6 +37,13 @@
             <version>${sa-token.version}</version>
         </dependency>
 
+        <!-- sa-Token 整合 JWT -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-jwt</artifactId>
+            <version>${sa-token-jwt.version}</version>
+        </dependency>
+
         <!-- Redis -->
         <dependency>
             <groupId>com.clx</groupId>

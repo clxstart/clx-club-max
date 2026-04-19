@@ -8,7 +8,7 @@ import com.clx.auth.vo.UserInfoVO;
  */
 public interface AuthService {
 
-    LoginVO login(String username, String password, String clientIp);
+    LoginVO login(String username, String password, boolean rememberMe, String clientIp);
 
     void logout();
 
