@@ -3,20 +3,17 @@ package com.clx.common.core.exception;
 import lombok.Getter;
 
 /**
- * 业务异常
- * 用于业务逻辑中主动抛出的异常
+ * 业务异常。
  */
 @Getter
 public class ServiceException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
-    /** 错误码 */
     private final int code;
 
     public ServiceException(String message) {
-        super(message);
-        this.code = 500;
+        this(400, message);
     }
 
     public ServiceException(int code, String message) {
@@ -25,11 +22,13 @@ public class ServiceException extends RuntimeException {
     }
 
     public ServiceException(String message, Throwable cause) {
-        super(message, cause);
-        this.code = 500;
+        this(400, message, cause);
     }
 
-    // ========== 常见异常静态工厂方法 ==========
+    public ServiceException(int code, String message, Throwable cause) {
+        super(message, cause);
+        this.code = code;
+    }
 
     public static ServiceException of(String message) {
         return new ServiceException(message);
@@ -44,7 +43,7 @@ public class ServiceException extends RuntimeException {
     }
 
     public static ServiceException alreadyExists(String resource) {
-        return new ServiceException(400, resource + "已存在");
+        return new ServiceException(409, resource + "已存在");
     }
 
     public static ServiceException forbidden() {
@@ -54,5 +53,4 @@ public class ServiceException extends RuntimeException {
     public static ServiceException validationFailed(String message) {
         return new ServiceException(400, message);
     }
-
 }

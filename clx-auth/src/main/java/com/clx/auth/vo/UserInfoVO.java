@@ -1,28 +1,22 @@
 package com.clx.auth.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
- * 当前用户信息 VO
+ * 当前用户信息VO。
+ *
+ * <p>通过 GET /auth/me 接口获取的当前登录用户信息。
+ *
+ * @param userId    用户ID
+ * @param username  用户名
+ * @param tokenInfo sa-Token的Token详细信息（包含过期时间、剩余有效期等）
  */
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Schema(description = "当前用户信息")
-public class UserInfoVO {
-
-    @Schema(description = "用户ID")
-    private Long userId;
-
-    @Schema(description = "用户名")
-    private String username;
-
-    @Schema(description = "Token信息")
-    private Object tokenInfo;
-
-}
+public record UserInfoVO(
+        @Schema(description = "用户ID")
+        Long userId,
+        @Schema(description = "用户名")
+        String username,
+        @Schema(description = "Token信息")
+        Object tokenInfo
+) {}

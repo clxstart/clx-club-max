@@ -1,32 +1,16 @@
 package com.clx.auth.service;
 
+import com.clx.auth.vo.LoginVO;
+import com.clx.auth.vo.UserInfoVO;
+
 /**
- * 认证服务接口
+ * 认证服务。
  */
 public interface AuthService {
 
-    /**
-     * 登录验证
-     *
-     * @param username 用户名
-     * @param password 密码
-     * @return Token
-     */
-    String login(String username, String password);
+    LoginVO login(String username, String password, String clientIp);
 
-    /**
-     * 登出
-     */
     void logout();
 
-    /**
-     * 获取当前登录用户ID
-     */
-    Long getLoginUserId();
-
-    /**
-     * 获取当前登录用户名
-     */
-    String getLoginUsername();
-
+    UserInfoVO getCurrentUser();
 }

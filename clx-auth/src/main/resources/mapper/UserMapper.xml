@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 用户Mapper XML映射文件 -->
+<mapper namespace="com.clx.auth.mapper.UserMapper">
+
+    <!-- 用户结果映射：数据库字段 -> Java属性（下划线转驼峰） -->
+    <resultMap id="UserResultMap" type="com.clx.auth.entity.User">
+        <id column="user_id" property="userId"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="nickname" property="nickname"/>
+        <result column="status" property="status"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <!--
+        根据用户名查询用户（登录时使用）
+        只查询未删除的用户，限制1条
+    -->
+    <select id="selectByUsername" resultMap="UserResultMap">
+        SELECT user_id, username, password, nickname, status, is_deleted
+        FROM sys_user
+        WHERE username = #{username}
+          AND is_deleted = 0
+        LIMIT 1
+    </select>
+
+    <!--
+        查询用户角色编码列表
+        关联：sys_user_role -> sys_role
+        条件：角色状态正常(status='0')，角色未删除
+    -->
+    <select id="selectRoleCodesByUserId" resultType="java.lang.String">
+        SELECT DISTINCT r.role_code
+        FROM sys_user_role ur
+        INNER JOIN sys_role r ON r.role_id = ur.role_id
+        WHERE ur.user_id = #{userId}
+          AND r.status = '0'
+          AND r.is_deleted = 0
+          AND r.role_code IS NOT NULL
+          AND r.role_code != ''
+    </select>
+
+    <!--
+        查询用户权限编码列表
+        关联：sys_user_role -> sys_role -> sys_role_permission -> sys_permission
+        条件：角色和权限都状态正常且未删除
+    -->
+    <select id="selectPermissionCodesByUserId" resultType="java.lang.String">
+        SELECT DISTINCT p.permission_code
+        FROM sys_user_role ur
+        INNER JOIN sys_role r ON r.role_id = ur.role_id
+        INNER JOIN sys_role_permission rp ON rp.role_id = r.role_id
+        INNER JOIN sys_permission p ON p.permission_id = rp.permission_id
+        WHERE ur.user_id = #{userId}
+          AND r.status = '0'
+          AND r.is_deleted = 0
+          AND p.status = '0'
+          AND p.is_deleted = 0
+          AND p.permission_code IS NOT NULL
+          AND p.permission_code != ''
+    </select>
+
+    <!--
+        登录成功后更新登录信息
+        更新：最后登录IP、最后登录时间、登录次数+1
+    -->
+    <update id="updateLoginSuccess">
+        UPDATE sys_user
+        SET last_login_ip = #{loginIp},
+            last_login_time = NOW(),
+            login_count = IFNULL(login_count, 0) + 1
+        WHERE user_id = #{userId}
+          AND is_deleted = 0
+    </update>
+
+</mapper>

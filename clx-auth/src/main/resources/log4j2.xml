@@ -1,44 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
-    <!-- 定义颜色 -->
     <Properties>
-        <Property name="COLOR_INFO">ANSI{GREEN}</Property>
-        <Property name="COLOR_WARN">ANSI{YELLOW}</Property>
-        <Property name="COLOR_ERROR">ANSI{RED}</Property>
-        <Property name="COLOR_DEBUG">ANSI{CYAN}</Property>
-        <Property name="COLOR_TRACE">ANSI{MAGENTA}</Property>
-        <Property name="LOG_PATTERN">%style{%d{HH:mm:ss.SSS}}{DIM} %highlight{%5level} %style{---}{DIM} %style{[%15.15t]}{DIM} %style{%-40.40c{1.}}{CYAN} %style{:}{DIM} %msg%n%style{%throwable}{RED}</Property>
+        <Property name="LOG_PATTERN">%d{HH:mm:ss.SSS} %-5level --- [%15.15t] %-40.40c{1.} : %msg%n%throwable</Property>
     </Properties>
 
     <Appenders>
-        <!-- 控制台输出（彩色） -->
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="${LOG_PATTERN}" disableAnsi="false"/>
+            <PatternLayout pattern="${LOG_PATTERN}"/>
         </Console>
     </Appenders>
 
     <Loggers>
-        <!-- 项目日志：DEBUG -->
-        <Logger name="com.clx" level="DEBUG" additivity="false">
+        <Logger name="com.clx" level="INFO" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
 
-        <!-- sa-Token 日志：INFO -->
-        <Logger name="cn.dev33.satoken" level="INFO" additivity="false">
+        <Logger name="org.mybatis" level="WARN" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
 
-        <!-- Spring 框架日志：INFO -->
         <Logger name="org.springframework" level="INFO" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
 
-        <!-- MyBatis-Plus 日志：INFO -->
-        <Logger name="com.baomidou.mybatisplus" level="INFO" additivity="false">
+        <Logger name="cn.dev33.satoken" level="INFO" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
 
-        <!-- 根日志：INFO -->
         <Root level="INFO">
             <AppenderRef ref="Console"/>
         </Root>

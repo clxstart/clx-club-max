@@ -49,7 +49,7 @@
         <onnx-runtime.version>1.17.1</onnx-runtime.version>
 
         <!-- 数据库相关 -->
-        <mybatis-plus.version>3.5.5</mybatis-plus.version>
+        <mybatis-spring-boot.version>3.0.4</mybatis-spring-boot.version>
         <shardingsphere.version>5.4.1</shardingsphere.version>
         <druid.version>1.2.21</druid.version>
 
@@ -138,11 +138,11 @@
             </dependency>
 
             <!-- ========== 数据库 ========== -->
-            <!-- MyBatis-Plus -->
+            <!-- MyBatis Spring Boot Starter -->
             <dependency>
-                <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
-                <version>${mybatis-plus.version}</version>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>${mybatis-spring-boot.version}</version>
             </dependency>
 
             <!-- ShardingSphere -->
