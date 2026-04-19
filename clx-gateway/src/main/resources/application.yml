@@ -1,0 +1,37 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: clx-gateway
+  profiles:
+    active: dev
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        enabled: false
+      config:
+        server-addr: localhost:8848
+        enabled: false
+
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: clx-auth
+          uri: lb://clx-auth
+          predicates:
+            - Path=/auth/**
+        - id: clx-user
+          uri: lb://clx-user
+          predicates:
+            - Path=/user/**
+
+logging:
+  level:
+    com.clx: debug
+    org.springframework.cloud.gateway: info

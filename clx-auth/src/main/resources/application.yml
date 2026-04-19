@@ -1,0 +1,34 @@
+server:
+  port: 9100
+
+spring:
+  application:
+    name: clx-auth
+  profiles:
+    active: dev
+
+  cloud:
+    nacos:
+      discovery:
+        enabled: false
+      config:
+        enabled: false
+
+# ========== sa-Token 配置 ==========
+sa-token:
+  # Token名称
+  token-name: Authorization
+  # Token有效期（秒）- 4小时
+  timeout: ${SA_TOKEN_TIMEOUT:14400}
+  # Token临时有效期（指定时间内无操作则过期）- 2小时
+  active-timeout: ${SA_TOKEN_ACTIVE_TIMEOUT:7200}
+  # 是否允许同一账号多地同时登录
+  is-concurrent: true
+  # Token风格
+  token-style: uuid
+  # 是否输出操作日志
+  is-log: true
+  # 从Header中读取Token
+  is-read-header: true
+  # Token前缀
+  token-prefix: Bearer

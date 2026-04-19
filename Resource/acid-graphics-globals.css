@@ -1,0 +1,76 @@
+/* Acid Graphics Global Styles */
+
+:root {
+  --acid-green: #39ff14;
+  --acid-black: #0a0a0a;
+  --acid-yellow: #e6ff00;
+  --acid-purple: #a020f0;
+  --acid-pink: #ff6ec7;
+  --acid-cyan: #00ffff;
+}
+
+/* Scanline overlay */
+.acid-scanlines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(57, 255, 20, 0.03) 2px,
+    rgba(57, 255, 20, 0.03) 4px
+  );
+  pointer-events: none;
+}
+
+/* Op-Art checkerboard */
+.acid-checkerboard {
+  background-image:
+    linear-gradient(45deg, rgba(57, 255, 20, 0.04) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(57, 255, 20, 0.04) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(57, 255, 20, 0.04) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(57, 255, 20, 0.04) 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+}
+
+/* Chrome text layering - use with data-text attribute */
+.acid-chrome {
+  position: relative;
+}
+.acid-chrome::before {
+  content: attr(data-text);
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  color: var(--acid-purple);
+  opacity: 0.6;
+}
+.acid-chrome::after {
+  content: attr(data-text);
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  color: var(--acid-pink);
+  opacity: 0.5;
+}
+
+/* Fluorescent glow */
+.acid-glow {
+  text-shadow: 0 0 10px var(--acid-green), 0 0 20px var(--acid-green), 0 0 40px var(--acid-green);
+}
+
+/* 3D wireframe grid */
+.acid-wireframe-grid {
+  background-image:
+    linear-gradient(rgba(57, 255, 20, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(57, 255, 20, 0.08) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.acid-graphics-filter { filter: brightness(1.05) contrast(1.02); }
+
+.acid-graphics-hover-lift { transition: transform 0.3s ease; }
+
+.acid-graphics-hover-lift:hover { transform: translateY(-2px); }
