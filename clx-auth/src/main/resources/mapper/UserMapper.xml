@@ -150,4 +150,27 @@
         LIMIT 1
     </select>
 
+    <!--
+        根据手机号查询用户
+        用于手机号登录认证
+    -->
+    <select id="selectByPhone" resultMap="UserResultMap">
+        SELECT user_id, username, password, nickname, status, is_deleted
+        FROM sys_user
+        WHERE phone = #{phone}
+          AND is_deleted = 0
+        LIMIT 1
+    </select>
+
+    <!--
+        检查手机号是否已存在
+        用于手机号登录时检查是否已注册
+    -->
+    <select id="existsByPhone" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM sys_user
+        WHERE phone = #{phone}
+          AND is_deleted = 0
+    </select>
+
 </mapper>

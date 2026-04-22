@@ -119,4 +119,24 @@ public interface UserMapper {
      * @return 用户对象，不存在时返回null
      */
     User selectById(@Param("userId") Long userId);
+
+    /**
+     * 根据手机号查询用户。
+     *
+     * <p>用于手机号登录认证。
+     *
+     * @param phone 手机号
+     * @return 用户对象，不存在时返回null
+     */
+    User selectByPhone(@Param("phone") String phone);
+
+    /**
+     * 检查手机号是否已存在。
+     *
+     * <p>用于手机号登录时检查是否已注册。
+     *
+     * @param phone 手机号
+     * @return true 如果手机号已存在
+     */
+    boolean existsByPhone(@Param("phone") String phone);
 }

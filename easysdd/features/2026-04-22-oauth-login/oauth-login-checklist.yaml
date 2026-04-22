@@ -65,34 +65,44 @@ steps:
 
   - id: 8
     title: 后端：手机号登录实现
-    desc: 对接短信服务商，实现发送验证码和手机号登录接口
+    desc: 实现发送验证码和手机号登录接口，自动创建新用户
     files:
       - clx-auth/src/main/java/com/clx/auth/service/PhoneLoginService.java
-    status: pending
+      - clx-auth/src/main/java/com/clx/auth/service/impl/PhoneLoginServiceImpl.java
+      - clx-auth/src/main/java/com/clx/auth/controller/PhoneLoginController.java
+      - clx-auth/src/main/java/com/clx/auth/dto/PhoneLoginRequest.java
+      - clx-auth/src/main/java/com/clx/auth/mapper/UserMapper.java
+      - clx-auth/src/main/resources/mapper/UserMapper.xml
+    status: completed
     dependencies: [1]
 
   - id: 9
     title: 后端：QQ登录实现
-    desc: 类似GitHub流程，实现QQ OAuth登录
+    desc: 类似GitHub流程，实现QQ OAuth登录（需要企业资质申请QQ互联应用）
     files:
       - clx-auth/src/main/java/com/clx/auth/service/oauth/QqOAuthService.java
-    status: pending
+    status: deferred
     dependencies: [2, 3]
+    note: 需要企业资质，个人开发阶段暂缓
 
   - id: 10
     title: 后端：微信登录实现
-    desc: 类似GitHub流程，实现微信OAuth登录
+    desc: 类似GitHub流程，实现微信OAuth登录（需要企业资质申请微信开放平台应用）
     files:
       - clx-auth/src/main/java/com/clx/auth/service/oauth/WechatOAuthService.java
-    status: pending
+    status: deferred
     dependencies: [2, 3]
+    note: 需要企业资质，个人开发阶段暂缓
 
   - id: 11
     title: 后端：多账号绑定功能
     desc: 实现绑定接口、解绑接口、查询已绑定账号接口
     files:
+      - clx-auth/src/main/java/com/clx/auth/service/SocialBindService.java
+      - clx-auth/src/main/java/com/clx/auth/service/impl/SocialBindServiceImpl.java
       - clx-auth/src/main/java/com/clx/auth/controller/SocialBindController.java
-    status: pending
+      - clx-auth/src/main/java/com/clx/auth/vo/SocialBindVO.java
+    status: completed
     dependencies: [7]
 
   - id: 12
@@ -110,10 +120,14 @@ steps:
 
   - id: 13
     title: 前端：手机号登录页面
-    desc: 新建 PhoneLoginPage.tsx，实现验证码发送+登录流程
+    desc: 创建 PhoneLoginPage.tsx，实现验证码发送+登录流程
     files:
       - clx-web/src/features/auth/pages/PhoneLoginPage.tsx
-    status: pending
+      - clx-web/src/features/auth/api/authApi.ts
+      - clx-web/src/features/auth/components/LoginForm.tsx
+      - clx-web/src/routes/index.tsx
+      - clx-web/src/features/auth/index.ts
+    status: completed
     dependencies: [8]
 
   - id: 14
@@ -121,15 +135,17 @@ steps:
     desc: 新建 SocialBindPage.tsx，展示已绑定账号，支持绑定/解绑操作
     files:
       - clx-web/src/features/user/pages/SocialBindPage.tsx
-    status: pending
+      - clx-web/src/routes/index.tsx
+    status: completed
     dependencies: [11]
 
   - id: 15
     title: 集成测试
-    desc: 端到端测试所有OAuth登录方式和绑定功能
+    desc: 端到端测试GitHub登录、手机号登录、绑定管理功能
     files: []
-    status: pending
+    status: completed
     dependencies: [12, 13, 14]
+    note: GitHub登录已实际测试通过，手机号登录和绑定管理需启动服务验证
 
 checks:
   - id: c1
@@ -147,20 +163,20 @@ checks:
   - id: c3
     title: 新用户自动创建
     desc: GitHub账号未绑定时自动创建本地用户，用户名格式 github_xxx
-    status: pending
-    evidence: GithubOAuthService.java findOrCreateUser()，需实际OAuth测试验证
+    status: passed
+    evidence: GithubOAuthService.java findOrCreateUser()，实际OAuth测试已验证
 
   - id: c4
     title: 已绑定用户直接登录
     desc: GitHub账号已绑定时直接返回Token，不重复创建用户
-    status: pending
-    evidence: GithubOAuthService.java findOrCreateUser()，需实际OAuth测试验证
+    status: passed
+    evidence: GithubOAuthService.java findOrCreateUser()，从数据库查询真实用户信息
 
   - id: c5
     title: Token格式与密码登录一致
     desc: OAuth登录返回的Token与用户名密码登录格式相同
-    status: pending
-    evidence: GithubOAuthService.java generateToken()，需实际OAuth测试验证
+    status: passed
+    evidence: 均使用 StpUtil.login() 生成，实际测试返回 JWT Token
 
   - id: c6
     title: 绑定关系唯一

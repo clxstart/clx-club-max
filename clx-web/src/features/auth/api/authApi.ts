@@ -101,6 +101,13 @@ export const authApi = {
   getGithubAuthorizeUrl: () => {
     return request.get<ApiResponse<string>>(API_ENDPOINTS.AUTH.OAUTH.GITHUB_AUTHORIZE);
   },
+
+  /**
+   * 手机号登录
+   */
+  phoneLogin: (data: { phone: string; smsCode: string }) => {
+    return request.post<ApiResponse<LoginResponse>>('/auth/phone/login', data);
+  },
 };
 
 export default authApi;

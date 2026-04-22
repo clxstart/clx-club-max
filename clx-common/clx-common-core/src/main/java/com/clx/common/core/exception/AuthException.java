@@ -67,4 +67,8 @@ public class AuthException extends RuntimeException {
     public static AuthException emailCodeError() {
         return new AuthException(ResponseCode.EMAIL_CODE_ERROR);
     }
+
+    public static AuthException smsCodeError() {
+        return new AuthException(ResponseCode.SMS_CODE_ERROR);
+    }
 }
