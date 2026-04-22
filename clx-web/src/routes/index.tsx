@@ -1,7 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { AuthLayout, MainLayout } from '@/layouts';
 import { AuthGuard } from './guards';
-import { LoginPage, RegisterPage, ForgotPasswordPage } from '@/features/auth';
+import { LoginPage, RegisterPage, ForgotPasswordPage, OAuthCallbackPage } from '@/features/auth';
 
 // 路由配置
 export const router = createBrowserRouter([
@@ -24,6 +24,14 @@ export const router = createBrowserRouter([
     element: <AuthLayout />,
     children: [
       { index: true, element: <ForgotPasswordPage /> },
+    ],
+  },
+  {
+    // OAuth 回调路由（使用 /oauth-callback 避免被代理到后端）
+    path: '/oauth-callback',
+    element: <AuthLayout />,
+    children: [
+      { index: true, element: <OAuthCallbackPage /> },
     ],
   },
   {

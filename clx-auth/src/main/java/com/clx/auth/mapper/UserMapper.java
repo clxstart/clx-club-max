@@ -109,4 +109,14 @@ public interface UserMapper {
      * @return 影响行数
      */
     int updatePasswordByEmail(@Param("email") String email, @Param("newPassword") String newPassword);
+
+    /**
+     * 根据用户ID查询用户。
+     *
+     * <p>用于OAuth登录时获取已绑定用户的信息。
+     *
+     * @param userId 用户ID
+     * @return 用户对象，不存在时返回null
+     */
+    User selectById(@Param("userId") Long userId);
 }

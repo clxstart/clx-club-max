@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+    社交账号绑定 Mapper XML 映射文件
+    对应表：sys_social_bind
+-->
+<mapper namespace="com.clx.auth.mapper.SocialBindMapper">
+
+    <!--
+        结果映射：数据库字段 -> Java属性
+        注意：使用驼峰命名映射
+    -->
+    <resultMap id="SocialBindResultMap" type="com.clx.auth.entity.SocialBind">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="social_type" property="socialType"/>
+        <result column="social_id" property="socialId"/>
+        <result column="social_name" property="socialName"/>
+        <result column="social_avatar" property="socialAvatar"/>
+        <result column="access_token" property="accessToken"/>
+        <result column="refresh_token" property="refreshToken"/>
+        <result column="token_expire_time" property="tokenExpireTime"/>
+        <result column="bind_time" property="bindTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!--
+        根据平台类型和社交ID查询绑定关系
+        用途：OAuth登录时判断第三方账号是否已绑定
+        条件：social_type + social_id（唯一索引）
+    -->
+    <select id="selectBySocialTypeAndId" resultMap="SocialBindResultMap">
+        SELECT id, user_id, social_type, social_id, social_name, social_avatar,
+               access_token, refresh_token, token_expire_time, bind_time, update_time
+        FROM sys_social_bind
+        WHERE social_type = #{socialType}
+          AND social_id = #{socialId}
+        LIMIT 1
+    </select>
+
+    <!--
+        根据用户ID查询所有绑定的第三方账号
+        用途：个人中心展示已绑定的账号
+        排序：按创建时间倒序，最新的在前
+    -->
+    <select id="selectByUserId" resultMap="SocialBindResultMap">
+        SELECT id, user_id, social_type, social_id, social_name, social_avatar,
+               access_token, refresh_token, token_expire_time, bind_time, update_time
+        FROM sys_social_bind
+        WHERE user_id = #{userId}
+        ORDER BY bind_time DESC
+    </select>
+
+    <!--
+        根据用户ID和平台类型查询绑定关系
+        用途：检查用户是否已绑定特定平台
+    -->
+    <select id="selectByUserIdAndType" resultMap="SocialBindResultMap">
+        SELECT id, user_id, social_type, social_id, social_name, social_avatar,
+               access_token, refresh_token, token_expire_time, bind_time, update_time
+        FROM sys_social_bind
+        WHERE user_id = #{userId}
+          AND social_type = #{socialType}
+        LIMIT 1
+    </select>
+
+    <!--
+        创建新的绑定关系
+        用途：新用户第三方登录时创建绑定
+        注意：id 是自增的，不需要设置
+    -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sys_social_bind (
+            user_id,
+            social_type,
+            social_id,
+            social_name,
+            social_avatar,
+            access_token,
+            refresh_token,
+            token_expire_time,
+            bind_time,
+            update_time
+        ) VALUES (
+            #{userId},
+            #{socialType},
+            #{socialId},
+            #{socialName},
+            #{socialAvatar},
+            #{accessToken},
+            #{refreshToken},
+            #{tokenExpireTime},
+            NOW(),
+            NOW()
+        )
+    </insert>
+
+    <!--
+        更新绑定信息
+        用途：刷新token或更新用户信息
+        只更新非空字段
+    -->
+    <update id="update">
+        UPDATE sys_social_bind
+        <set>
+            <if test="socialName != null">social_name = #{socialName},</if>
+            <if test="socialAvatar != null">social_avatar = #{socialAvatar},</if>
+            <if test="accessToken != null">access_token = #{accessToken},</if>
+            <if test="refreshToken != null">refresh_token = #{refreshToken},</if>
+            <if test="tokenExpireTime != null">token_expire_time = #{tokenExpireTime},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!--
+        删除绑定关系
+        用途：用户解绑第三方账号
+    -->
+    <delete id="deleteById">
+        DELETE FROM sys_social_bind
+        WHERE id = #{id}
+    </delete>
+
+</mapper>

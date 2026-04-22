@@ -138,4 +138,16 @@
           AND is_deleted = 0
     </update>
 
+    <!--
+        根据用户ID查询用户
+        用于OAuth登录时获取已绑定用户的信息
+    -->
+    <select id="selectById" resultMap="UserResultMap">
+        SELECT user_id, username, password, nickname, status, is_deleted
+        FROM sys_user
+        WHERE user_id = #{userId}
+          AND is_deleted = 0
+        LIMIT 1
+    </select>
+
 </mapper>

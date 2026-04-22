@@ -13,6 +13,11 @@ export const API_ENDPOINTS = {
     SMS_CODE_SEND: '/auth/sms-code/send',
     PASSWORD_RESET_SEND: '/auth/password-reset/send',
     PASSWORD_RESET_CONFIRM: '/auth/password-reset/confirm',
+    // OAuth 第三方登录
+    OAUTH: {
+      GITHUB_AUTHORIZE: '/auth/oauth/github/authorize',
+      GITHUB_CALLBACK: '/auth/oauth/github/callback',
+    },
   },
 
   // ========== 用户相关 ==========

@@ -89,6 +89,18 @@ export const authApi = {
   confirmPasswordReset: (data: PasswordResetConfirmRequest) => {
     return request.post<ApiResponse<void>>(API_ENDPOINTS.AUTH.PASSWORD_RESET_CONFIRM, data);
   },
+
+  /**
+   * ========== OAuth 第三方登录 ==========
+   */
+
+  /**
+   * 获取 GitHub OAuth 授权 URL
+   * 返回授权 URL，前端需要跳转到这个地址让用户授权
+   */
+  getGithubAuthorizeUrl: () => {
+    return request.get<ApiResponse<string>>(API_ENDPOINTS.AUTH.OAUTH.GITHUB_AUTHORIZE);
+  },
 };
 
 export default authApi;

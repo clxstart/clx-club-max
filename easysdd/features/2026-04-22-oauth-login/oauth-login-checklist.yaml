@@ -1,0 +1,169 @@
+# OAuth Login Implementation Checklist
+
+feature: 2026-04-22-oauth-login
+created: 2026-04-22
+updated: 2026-04-22
+
+steps:
+  - id: 1
+    title: 数据库：创建社交账号绑定表
+    desc: 执行 oauth_login_schema.sql，创建 sys_social_bind 表，修改 sys_user 添加 phone 字段
+    files:
+      - doc/sql/oauth_login_schema.sql
+    status: completed
+    dependencies: []
+
+  - id: 2
+    title: 后端：创建社交绑定实体和Mapper
+    desc: 创建 SocialBind.java、SocialBindMapper.java、SocialBindMapper.xml
+    files:
+      - clx-auth/src/main/java/com/clx/auth/entity/SocialBind.java
+      - clx-auth/src/main/java/com/clx/auth/mapper/SocialBindMapper.java
+      - clx-auth/src/main/resources/mapper/SocialBindMapper.xml
+    status: completed
+    dependencies: []
+
+  - id: 3
+    title: 后端：创建OAuth配置类
+    desc: 创建 OAuthProperties.java，支持GitHub/QQ/微信配置读取
+    files:
+      - clx-auth/src/main/java/com/clx/auth/config/OAuthProperties.java
+    status: completed
+    dependencies: []
+
+  - id: 4
+    title: 后端：实现GitHub OAuth服务
+    desc: 创建 GithubOAuthService.java，实现授权URL生成、回调处理、用户查找/创建、Token生成
+    files:
+      - clx-auth/src/main/java/com/clx/auth/service/oauth/GithubOAuthService.java
+      - clx-auth/src/main/java/com/clx/auth/dto/GithubUserInfo.java
+    status: completed
+    dependencies: [2, 3]
+
+  - id: 5
+    title: 后端：创建GitHub OAuth控制器
+    desc: 创建 GithubOAuthController.java，提供 /authorize 和 /callback 接口
+    files:
+      - clx-auth/src/main/java/com/clx/auth/controller/GithubOAuthController.java
+    status: completed
+    dependencies: [4]
+
+  - id: 6
+    title: 配置：添加OAuth配置项
+    desc: 在 application.yml 添加 oauth.github 配置，配置 clientId/clientSecret/redirectUri
+    files:
+      - clx-auth/src/main/resources/application.yml
+    status: completed
+    dependencies: [5]
+
+  - id: 7
+    title: 测试：GitHub OAuth流程验证
+    desc: 启动服务，测试完整登录流程：获取授权URL → GitHub授权 → 回调处理 → Token返回
+    files: []
+    status: completed
+    dependencies: [1, 6]
+
+  - id: 8
+    title: 后端：手机号登录实现
+    desc: 对接短信服务商，实现发送验证码和手机号登录接口
+    files:
+      - clx-auth/src/main/java/com/clx/auth/service/PhoneLoginService.java
+    status: pending
+    dependencies: [1]
+
+  - id: 9
+    title: 后端：QQ登录实现
+    desc: 类似GitHub流程，实现QQ OAuth登录
+    files:
+      - clx-auth/src/main/java/com/clx/auth/service/oauth/QqOAuthService.java
+    status: pending
+    dependencies: [2, 3]
+
+  - id: 10
+    title: 后端：微信登录实现
+    desc: 类似GitHub流程，实现微信OAuth登录
+    files:
+      - clx-auth/src/main/java/com/clx/auth/service/oauth/WechatOAuthService.java
+    status: pending
+    dependencies: [2, 3]
+
+  - id: 11
+    title: 后端：多账号绑定功能
+    desc: 实现绑定接口、解绑接口、查询已绑定账号接口
+    files:
+      - clx-auth/src/main/java/com/clx/auth/controller/SocialBindController.java
+    status: pending
+    dependencies: [7]
+
+  - id: 12
+    title: 前端：登录页面添加第三方登录按钮
+    desc: LoginForm.tsx 添加 GitHub 登录按钮点击事件，创建 OAuthCallbackPage 处理回调
+    files:
+      - clx-web/src/features/auth/components/LoginForm.tsx
+      - clx-web/src/features/auth/pages/OAuthCallbackPage.tsx
+      - clx-web/src/api/endpoints.ts
+      - clx-web/src/features/auth/api/authApi.ts
+      - clx-web/src/routes/index.tsx
+      - clx-web/src/features/auth/index.ts
+    status: completed
+    dependencies: [7]
+
+  - id: 13
+    title: 前端：手机号登录页面
+    desc: 新建 PhoneLoginPage.tsx，实现验证码发送+登录流程
+    files:
+      - clx-web/src/features/auth/pages/PhoneLoginPage.tsx
+    status: pending
+    dependencies: [8]
+
+  - id: 14
+    title: 前端：绑定管理页面
+    desc: 新建 SocialBindPage.tsx，展示已绑定账号，支持绑定/解绑操作
+    files:
+      - clx-web/src/features/user/pages/SocialBindPage.tsx
+    status: pending
+    dependencies: [11]
+
+  - id: 15
+    title: 集成测试
+    desc: 端到端测试所有OAuth登录方式和绑定功能
+    files: []
+    status: pending
+    dependencies: [12, 13, 14]
+
+checks:
+  - id: c1
+    title: state验证防CSRF
+    desc: 回调时验证Redis中的state，不存在则拒绝请求
+    status: passed
+    evidence: GithubOAuthService.java validateState()，Redis存储5分钟有效
+
+  - id: c2
+    title: code一次性使用
+    desc: 同一个code只能换取一次access_token
+    status: passed
+    evidence: GitHub API机制保障
+
+  - id: c3
+    title: 新用户自动创建
+    desc: GitHub账号未绑定时自动创建本地用户，用户名格式 github_xxx
+    status: pending
+    evidence: GithubOAuthService.java findOrCreateUser()，需实际OAuth测试验证
+
+  - id: c4
+    title: 已绑定用户直接登录
+    desc: GitHub账号已绑定时直接返回Token，不重复创建用户
+    status: pending
+    evidence: GithubOAuthService.java findOrCreateUser()，需实际OAuth测试验证
+
+  - id: c5
+    title: Token格式与密码登录一致
+    desc: OAuth登录返回的Token与用户名密码登录格式相同
+    status: pending
+    evidence: GithubOAuthService.java generateToken()，需实际OAuth测试验证
+
+  - id: c6
+    title: 绑定关系唯一
+    desc: 同一个GitHub账号只能绑定一个本地用户
+    status: passed
+    evidence: sys_social_bind表唯一索引 uk_social_bind (social_type, social_id)

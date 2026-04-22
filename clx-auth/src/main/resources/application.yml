@@ -68,3 +68,18 @@ clx:
     remember-me:
       timeout: ${CLX_REMEMBER_ME_TIMEOUT:2592000}
       active-timeout: ${CLX_REMEMBER_ME_ACTIVE_TIMEOUT:604800}
+
+# ========== OAuth 第三方登录配置 ==========
+oauth:
+  github:
+    client-id: ${GITHUB_CLIENT_ID:}
+    client-secret: ${GITHUB_CLIENT_SECRET:}
+    redirect-uri: ${GITHUB_REDIRECT_URI:http://localhost:9100/auth/oauth/github/callback}
+  qq:
+    app-id: ${QQ_APP_ID:}
+    app-key: ${QQ_APP_KEY:}
+    redirect-uri: ${QQ_REDIRECT_URI:http://localhost:9100/auth/oauth/qq/callback}
+  wechat:
+    app-id: ${WECHAT_APP_ID:}
+    app-secret: ${WECHAT_APP_SECRET:}
+    redirect-uri: ${WECHAT_REDIRECT_URI:http://localhost:9100/auth/oauth/wechat/callback}

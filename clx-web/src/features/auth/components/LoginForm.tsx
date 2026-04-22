@@ -5,6 +5,22 @@ import { useLogin } from '../hooks/useAuth';
 
 type StatusType = 'success' | 'error' | 'loading' | null;
 
+/**
+ * GitHub 登录按钮点击处理
+ * 获取授权 URL 并跳转到 GitHub 授权页面
+ */
+const handleGithubLogin = async () => {
+  try {
+    const response = await authApi.getGithubAuthorizeUrl();
+    if (response.code === 200 && response.data) {
+      // 跳转到 GitHub 授权页面
+      window.location.href = response.data;
+    }
+  } catch (error) {
+    console.error('获取 GitHub 授权 URL 失败:', error);
+  }
+};
+
 export const LoginForm: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -268,7 +284,12 @@ export const LoginForm: React.FC = () => {
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.65c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
               </svg>
             </button>
-            <button type="button" className="auth-social-button" aria-label="GitHub 登录">
+            <button
+              type="button"
+              className="auth-social-button"
+              aria-label="GitHub 登录"
+              onClick={handleGithubLogin}
+            >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.49.5.09.68-.22.68-.48l-.01-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.15-1.11-1.46-1.11-1.46-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02.8-.22 1.65-.33 2.5-.33.85 0 1.7.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85l-.01 2.75c0 .26.18.58.69.48C19.14 20.16 22 16.42 22 12c0-5.52-4.48-10-10-10z" />
               </svg>

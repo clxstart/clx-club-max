@@ -33,3 +33,4 @@ export { ForgotPasswordForm } from './components/ForgotPasswordForm';
 export { LoginPage } from './pages/LoginPage';
 export { RegisterPage } from './pages/RegisterPage';
 export { ForgotPasswordPage } from './pages/ForgotPasswordPage';
+export { OAuthCallbackPage } from './pages/OAuthCallbackPage';
