@@ -1,3 +1,6 @@
+server:
+  port: 9100
+
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -17,6 +20,20 @@ spring:
           max-idle: 8
           min-idle: 0
           max-wait: -1ms
+
+  # ========== 邮件配置（QQ邮箱）==========
+  mail:
+    host: smtp.qq.com
+    port: 587
+    username: echoecho_2024@qq.com
+    password: unyxgvpnkkfpdaef
+    from: echoecho_2024@qq.com
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 mybatis:
   mapper-locations: classpath:/mapper/*.xml

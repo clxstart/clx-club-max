@@ -1,9 +1,12 @@
 package com.clx.common.core.exception;
 
+import com.clx.common.core.code.ResponseCode;
 import lombok.Getter;
 
 /**
  * 认证异常。
+ *
+ * <p>使用 ResponseCode 枚举确保错误码统一。
  */
 @Getter
 public class AuthException extends RuntimeException {
@@ -12,8 +15,14 @@ public class AuthException extends RuntimeException {
 
     private final int code;
 
-    public AuthException(String message) {
-        this(401, message);
+    public AuthException(ResponseCode responseCode) {
+        super(responseCode.getMessage());
+        this.code = responseCode.getCode();
+    }
+
+    public AuthException(ResponseCode responseCode, String customMessage) {
+        super(customMessage);
+        this.code = responseCode.getCode();
     }
 
     public AuthException(int code, String message) {
@@ -21,35 +30,41 @@ public class AuthException extends RuntimeException {
         this.code = code;
     }
 
+    // ========== 静态工厂方法 ==========
+
     public static AuthException unauthorized() {
-        return new AuthException(401, "请先登录");
+        return new AuthException(ResponseCode.UNAUTHORIZED);
     }
 
     public static AuthException invalidToken() {
-        return new AuthException(401, "Token无效或已过期");
+        return new AuthException(ResponseCode.TOKEN_INVALID);
     }
 
     public static AuthException tokenExpired() {
-        return new AuthException(401, "Token已过期，请重新登录");
+        return new AuthException(ResponseCode.TOKEN_EXPIRED);
     }
 
     public static AuthException loginFailed() {
-        return new AuthException(401, "用户名或密码错误");
+        return new AuthException(ResponseCode.LOGIN_FAILED);
     }
 
     public static AuthException accountLocked() {
-        return new AuthException(423, "账号已被锁定");
+        return new AuthException(ResponseCode.ACCOUNT_LOCKED);
     }
 
     public static AuthException accountDisabled() {
-        return new AuthException(403, "账号已被禁用");
-    }
-
-    public static AuthException passwordExpired() {
-        return new AuthException(403, "密码已过期，请修改密码");
+        return new AuthException(ResponseCode.ACCOUNT_DISABLED);
     }
 
     public static AuthException tooManyAttempts() {
-        return new AuthException(429, "登录失败次数过多，请30分钟后再试");
+        return new AuthException(ResponseCode.TOO_MANY_LOGIN_ATTEMPTS);
+    }
+
+    public static AuthException captchaError() {
+        return new AuthException(ResponseCode.CAPTCHA_ERROR);
+    }
+
+    public static AuthException emailCodeError() {
+        return new AuthException(ResponseCode.EMAIL_CODE_ERROR);
     }
 }

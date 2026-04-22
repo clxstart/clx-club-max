@@ -34,6 +34,12 @@ public class User {
     /** 昵称，用户显示名称 */
     private String nickname;
 
+    /** 邮箱 */
+    private String email;
+
+    /** 手机号 */
+    private String phone;
+
     /** 状态：0正常，1禁用，2锁定 */
     private String status;
 
@@ -72,6 +78,22 @@ public class User {
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getStatus() {

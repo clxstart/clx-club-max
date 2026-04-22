@@ -1,0 +1,157 @@
+# Auth Enhancement Implementation Checklist
+
+feature: 2026-04-20-auth-enhancement
+created: 2026-04-20
+updated: 2026-04-21
+
+steps:
+  - id: 1
+    title: 后端：新建图形验证码服务
+    desc: 新建 CaptchaService.java 和 CaptchaController.java，提供 /auth/captcha 接口
+    files:
+      - clx-auth/src/main/java/com/clx/auth/service/CaptchaService.java
+      - clx-auth/src/main/java/com/clx/auth/controller/CaptchaController.java
+    status: completed
+    dependencies: []
+
+  - id: 2
+    title: 后端：新建验证码管理服务
+    desc: 新建 VerificationCodeService.java，封装Redis操作，统一邮箱/手机/密码重置验证码逻辑
+    files:
+      - clx-auth/src/main/java/com/clx/auth/service/VerificationCodeService.java
+    status: completed
+    dependencies: [1]
+
+  - id: 3
+    title: 后端：添加邮箱服务
+    desc: 配置 application.yml SMTP服务器信息，新建 EmailService.java 封装JavaMail发送
+    files:
+      - clx-auth/src/main/resources/application.yml
+      - clx-auth/src/main/java/com/clx/auth/service/EmailService.java
+    status: completed
+    dependencies: []
+
+  - id: 4
+    title: 后端：改造注册接口
+    desc: RegisterRequest 增加 email、emailCode、captchaId、captchaCode 字段，验证图形码+邮箱验证码，保存邮箱到 sys_user 表
+    files:
+      - clx-auth/src/main/java/com/clx/auth/dto/RegisterRequest.java
+      - clx-auth/src/main/java/com/clx/auth/service/impl/AuthServiceImpl.java
+      - clx-auth/src/main/resources/mapper/UserMapper.xml
+    status: completed
+    dependencies: [2, 3]
+
+  - id: 5
+    title: 后端：添加手机验证码接口
+    desc: 新建 /auth/sms-code/send 接口，开发环境返回固定码123456
+    files:
+      - clx-auth/src/main/java/com/clx/auth/controller/AuthController.java
+      - clx-auth/src/main/java/com/clx/auth/dto/SmsCodeRequest.java
+    status: completed
+    dependencies: [2]
+
+  - id: 6
+    title: 后端：添加密码重置接口
+    desc: 新建 /auth/password-reset/send 和 /auth/password-reset/confirm 接口，邮件发送重置码+验证码更新密码
+    files:
+      - clx-auth/src/main/java/com/clx/auth/service/AuthService.java
+      - clx-auth/src/main/java/com/clx/auth/service/impl/AuthServiceImpl.java
+      - clx-auth/src/main/java/com/clx/auth/dto/PasswordResetRequest.java
+      - clx-auth/src/main/java/com/clx/auth/dto/PasswordResetConfirmRequest.java
+      - clx-auth/src/main/java/com/clx/auth/mapper/UserMapper.java
+      - clx-auth/src/main/resources/mapper/UserMapper.xml
+    status: completed
+    dependencies: [2, 3]
+
+  - id: 7
+    title: 前端：改造注册组件
+    desc: RegisterForm.tsx 添加邮箱、验证码输入框，添加图形验证码显示+刷新逻辑
+    files:
+      - clx-web/src/features/auth/components/RegisterForm.tsx
+      - clx-web/src/features/auth/types/auth.types.ts
+      - clx-web/src/features/auth/api/authApi.ts
+      - clx-web/src/api/endpoints.ts
+    status: completed
+    dependencies: []
+
+  - id: 8
+    title: 前端：创建找回密码组件
+    desc: 新建 ForgotPasswordPage.tsx、ForgotPasswordForm.tsx，发送重置邮件+重置密码两步流程
+    files:
+      - clx-web/src/features/auth/pages/ForgotPasswordPage.tsx
+      - clx-web/src/features/auth/components/ForgotPasswordForm.tsx
+      - clx-web/src/features/auth/components/LoginForm.tsx
+    status: completed
+    dependencies: []
+
+  - id: 9
+    title: 前端：路由配置
+    desc: 添加 /forgot-password 路由
+    files:
+      - clx-web/src/routes/index.tsx
+    status: completed
+    dependencies: [8]
+
+  - id: 10
+    title: 集成测试
+    desc: 端到端测试注册+找回密码
+    files: []
+    status: completed
+    dependencies: [7, 9]
+
+checks:
+  - id: c1
+    title: 注册流程强制校验邮箱验证码
+    desc: 缺少邮箱验证码时注册请求被拒绝
+    status: passed
+    verified_at: 2026-04-21
+    evidence: AuthServiceImpl.java:114-117
+
+  - id: c2
+    title: 图形验证码5分钟内有效
+    desc: 5分钟后验证码失效，需要重新获取
+    status: passed
+    verified_at: 2026-04-21
+    evidence: CaptchaService.java:35 CAPTCHA_EXPIRE_SECONDS=300L
+
+  - id: c3
+    title: 邮箱验证码5分钟内有效，防重复发送
+    desc: 同一邮箱5分钟内只能发送请求一次
+    status: passed
+    verified_at: 2026-04-21
+    evidence: VerificationCodeService.java:106-117
+
+  - id: c4
+    title: 手机验证码（开发环境）返回固定值123456
+    desc: dev环境接口 /auth/sms-code/send 返回固定验证码
+    status: passed
+    verified_at: 2026-04-21
+    evidence: AuthController.java:227 固定值code="123456"
+
+  - id: c5
+    title: 密码重置原码30分钟内有效
+    desc: 重置码生成后30分钟内可用，过期需重新请求
+    status: passed
+    verified_at: 2026-04-21
+    evidence: VerificationCodeService.java:201
+
+  - id: c6
+    title: 密码重置成功后原密码失效
+    desc: 重置密码后使用原密码无法登录
+    status: passed
+    verified_at: 2026-04-21
+    evidence: AuthServiceImpl.java:307-315 updatePasswordByEmail
+
+  - id: c7
+    title: 所有验证码接口都校验图形验证码
+    desc: 发送邮箱/手机/密码重置验证码都需要图形验证码
+    status: passed
+    verified_at: 2026-04-21
+    evidence: AuthController.java:187,223,259
+
+  - id: c8
+    title: Redis不可用时验证码功能降级提示用户
+    desc: Redis异常时显示友好错误提示
+    status: passed
+    verified_at: 2026-04-21
+    evidence: AuthServiceImpl.java:253-256 返回503

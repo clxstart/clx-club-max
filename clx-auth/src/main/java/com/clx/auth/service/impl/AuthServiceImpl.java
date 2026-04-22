@@ -7,7 +7,10 @@ import com.clx.auth.config.RememberMeProperties;
 import com.clx.auth.entity.User;
 import com.clx.auth.mapper.UserMapper;
 import com.clx.auth.service.AuthService;
+import com.clx.auth.service.CaptchaService;
+import com.clx.auth.service.VerificationCodeService;
 import com.clx.auth.vo.LoginVO;
+import com.clx.auth.vo.RegisterVO;
 import com.clx.auth.vo.UserInfoVO;
 import com.clx.common.core.constant.SecurityConstants;
 import com.clx.common.core.constant.TokenConstants;
@@ -20,106 +23,48 @@ import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 /**
  * 认证服务实现。
- *
- * <p>核心功能：
- * <ul>
- *   <li>用户登录验证（用户名 + 密码）</li>
- *   <li>"记住我"功能（延长 Token 有效期）</li>
- *   <li>登录失败次数限制（防止暴力破解）</li>
- *   <li>用户登出</li>
- *   <li>获取当前登录用户信息</li>
- * </ul>
- *
- * <p>安全措施：
- * <ul>
- *   <li>时序攻击防护：用户不存在时也执行密码哈希比较</li>
- *   <li>错误信息统一：防止用户名枚举</li>
- *   <li>登录失败锁定：连续失败5次后锁定30分钟</li>
- *   <li>密码使用 BCrypt 加密存储</li>
- *   <li>Token 使用 JWT 格式（整合 sa-token-jwt）</li>
- * </ul>
- *
- * @see AuthService 认证服务接口
- * @see StpUtil sa-Token 用户操作工具
- * @see RememberMeProperties "记住我"配置
  */
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    /**
-     * 假密码哈希值（时序攻击防护）。
-     *
-     * <p>当用户不存在时，使用此假密码执行 BCrypt 匹配，
-     * 使响应时间与真实用户登录失败一致，
-     * 攻击者无法通过响应时间判断用户是否存在。
-     */
     private static final String DUMMY_PASSWORD_HASH =
             "$2a$10$cX1Bgw3VdxwApyokYRF3B.iYYKD5IOu/8siinuC.M6NkQSIW7A4we";
 
-    /** 用户数据访问 */
     private final UserMapper userMapper;
-
-    /** BCrypt 密码加密器 */
     private final BCryptPasswordEncoder passwordEncoder;
-
-    /** Redis 操作模板（用于存储登录失败计数） */
     private final StringRedisTemplate redisTemplate;
-
-    /** sa-Token 配置（获取默认超时时间） */
     private final SaTokenConfig saTokenConfig;
-
-    /** "记住我"配置 */
     private final RememberMeProperties rememberMeProperties;
+    private final CaptchaService captchaService;
+    private final VerificationCodeService verificationCodeService;
 
-    /**
-     * 用户登录。
-     *
-     * <p>处理流程：
-     * <ol>
-     *   <li>标准化用户名（去空格、小写）</li>
-     *   <li>检查是否被锁定（连续失败5次）</li>
-     *   <li>查询用户并验证密码（含时序攻击防护）</li>
-     *   <li>检查用户状态（删除、禁用、锁定）</li>
-     *   <li>根据 rememberMe 计算 Token 有效期</li>
-     *   <li>调用 sa-Token 完成登录</li>
-     *   <li>清除失败计数，更新登录信息</li>
-     * </ol>
-     *
-     * @param username 用户名
-     * @param password 密码（明文）
-     * @param rememberMe 是否勾选"记住我"
-     * @param clientIp 客户端IP地址
-     * @return 登录结果（JWT Token、有效期信息）
-     * @throws AuthException 登录失败
-     */
     @Override
-    public LoginVO login(String username, String password, boolean rememberMe, String clientIp) {
-        // 1. 标准化用户名
+    public LoginVO login(String username, String password, String captchaId, String captchaCode,
+                         boolean rememberMe, String clientIp) {
         String normalizedUsername = normalizeUsername(username);
         String attemptKey = getAttemptKey(normalizedUsername);
 
-        // 2. 检查登录锁定状态
         checkLoginLock(attemptKey);
 
-        // 3. 查询用户
-        User user = userMapper.selectByUsername(normalizedUsername);
+        if (!captchaService.verifyCaptchaCode(captchaId, captchaCode)) {
+            throw AuthException.captchaError();
+        }
 
-        // 4. 密码验证（含时序攻击防护）
+        User user = userMapper.selectByUsername(normalizedUsername);
         if (!isPasswordMatched(user, password)) {
             recordFailure(attemptKey);
             throw AuthException.loginFailed();
         }
 
-        // 5. 检查用户状态
         if (user.isDeleted()) {
             recordFailure(attemptKey);
             throw AuthException.loginFailed();
@@ -131,27 +76,22 @@ public class AuthServiceImpl implements AuthService {
             throw AuthException.accountLocked();
         }
 
-        // 6. 计算 Token 有效期
         long loginTimeout = resolveLoginTimeout(rememberMe);
         long activeTimeout = resolveActiveTimeout(rememberMe, loginTimeout);
 
-        // 7. sa-Token 登录（JWT 格式）
         StpUtil.login(user.getUserId(), SaLoginModel.create()
                 .setTimeout(loginTimeout)
                 .setActiveTimeout(activeTimeout)
                 .setIsLastingCookie(rememberMe));
 
-        // 8. 存储会话信息
         StpUtil.getSession().set("username", user.getUsername());
         StpUtil.getSession().set("nickname", user.getNickname());
+        StpUtil.getSession().set("rememberMe", rememberMe);
 
-        // 9. 清除失败计数，更新登录信息
         clearFailures(attemptKey);
         userMapper.updateLoginSuccess(user.getUserId(), clientIp);
 
-        log.info("用户登录成功: username={}, userId={}, ip={}, rememberMe={}, timeout={}, activeTimeout={}",
-                user.getUsername(), user.getUserId(), clientIp, rememberMe, loginTimeout, activeTimeout);
-
+        log.info("用户登录成功: username={}, userId={}, ip={}", user.getUsername(), user.getUserId(), clientIp);
         return new LoginVO(
                 StpUtil.getTokenValue(),
                 SecurityConstants.TOKEN_HEADER,
@@ -161,11 +101,70 @@ public class AuthServiceImpl implements AuthService {
         );
     }
 
-    /**
-     * 用户登出。
-     *
-     * <p>清除当前用户的会话信息，JWT Token 立即失效。
-     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public RegisterVO register(String username, String password, String confirmPassword,
+                               String nickname, String email, String emailCode, String clientIp) {
+        String normalizedUsername = normalizeUsername(username);
+
+        if (!verificationCodeService.verifyEmailCode(email, emailCode)) {
+            throw AuthException.emailCodeError();
+        }
+
+        if (!password.equals(confirmPassword)) {
+            throw ServiceException.validationFailed("两次输入的密码不一致");
+        }
+
+        if (userMapper.existsByUsername(normalizedUsername)) {
+            throw ServiceException.alreadyExists("用户名");
+        }
+
+        if (userMapper.existsByEmail(email)) {
+            throw ServiceException.alreadyExists("邮箱");
+        }
+
+        String encodedPassword = passwordEncoder.encode(password);
+        Long userId = generateUserId();
+        String finalNickname = (nickname == null || nickname.isBlank())
+                ? normalizedUsername
+                : nickname.trim();
+
+        User user = new User();
+        user.setUserId(userId);
+        user.setUsername(normalizedUsername);
+        user.setPassword(encodedPassword);
+        user.setNickname(finalNickname);
+        user.setEmail(email);
+
+        int inserted = userMapper.insert(user);
+        if (inserted <= 0) {
+            throw new ServiceException(500, "用户创建失败");
+        }
+
+        long loginTimeout = saTokenConfig.getTimeout();
+        long activeTimeout = saTokenConfig.getActiveTimeout();
+
+        StpUtil.login(userId, SaLoginModel.create()
+                .setTimeout(loginTimeout)
+                .setActiveTimeout(activeTimeout));
+
+        StpUtil.getSession().set("username", normalizedUsername);
+        StpUtil.getSession().set("nickname", finalNickname);
+        StpUtil.getSession().set("email", email);
+
+        userMapper.updateLoginSuccess(userId, clientIp);
+        log.info("用户注册成功: username={}, userId={}, email={}", normalizedUsername, userId, email);
+
+        return new RegisterVO(
+                userId,
+                normalizedUsername,
+                StpUtil.getTokenValue(),
+                SecurityConstants.TOKEN_HEADER,
+                loginTimeout,
+                activeTimeout
+        );
+    }
+
     @Override
     public void logout() {
         if (StpUtil.isLogin()) {
@@ -173,12 +172,6 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    /**
-     * 获取当前登录用户信息。
-     *
-     * @return 用户信息VO
-     * @throws cn.dev33.satoken.exception.NotLoginException 如果用户未登录
-     */
     @Override
     public UserInfoVO getCurrentUser() {
         StpUtil.checkLogin();
@@ -189,24 +182,54 @@ public class AuthServiceImpl implements AuthService {
         );
     }
 
-    /**
-     * 标准化用户名（去空格、转小写）。
-     */
+    @Override
+    public LoginVO refreshToken() {
+        StpUtil.checkLogin();
+
+        Long userId = StpUtil.getLoginIdAsLong();
+        StpUtil.renewTimeout(saTokenConfig.getTimeout());
+
+        Boolean rememberMe = (Boolean) StpUtil.getSession().get("rememberMe");
+        boolean isRememberMe = Boolean.TRUE.equals(rememberMe);
+
+        long timeout = isRememberMe ? rememberMeProperties.getTimeout() : saTokenConfig.getTimeout();
+        long activeTimeout = isRememberMe ? rememberMeProperties.getActiveTimeout() : saTokenConfig.getActiveTimeout();
+
+        log.info("Token 刷新成功: userId={}", userId);
+        return new LoginVO(
+                StpUtil.getTokenValue(),
+                SecurityConstants.TOKEN_HEADER,
+                timeout,
+                activeTimeout,
+                isRememberMe
+        );
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return userMapper.existsByEmail(email);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void resetPassword(String email, String newPassword) {
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        int updated = userMapper.updatePasswordByEmail(email, encodedPassword);
+        if (updated <= 0) {
+            throw ServiceException.notFound("邮箱对应的用户");
+        }
+        log.info("密码重置成功: email={}", email);
+    }
+
     private String normalizeUsername(String username) {
         return username == null ? "" : username.trim().toLowerCase(Locale.ROOT);
     }
 
-    /**
-     * 密码匹配验证（含时序攻击防护）。
-     */
     private boolean isPasswordMatched(User user, String rawPassword) {
         String encodedPassword = user == null ? DUMMY_PASSWORD_HASH : user.getPassword();
         return passwordEncoder.matches(rawPassword, encodedPassword) && user != null;
     }
 
-    /**
-     * 检查登录锁定状态。
-     */
     private void checkLoginLock(String attemptKey) {
         Long count = readFailureCount(attemptKey);
         if (count >= TokenConstants.MAX_LOGIN_ATTEMPT) {
@@ -214,9 +237,6 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    /**
-     * 读取失败计数。
-     */
     private Long readFailureCount(String attemptKey) {
         try {
             String value = redisTemplate.opsForValue().get(attemptKey);
@@ -232,9 +252,6 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    /**
-     * 记录登录失败。
-     */
     private void recordFailure(String attemptKey) {
         try {
             Long count = redisTemplate.opsForValue().increment(attemptKey);
@@ -246,9 +263,6 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    /**
-     * 清除失败计数。
-     */
     private void clearFailures(String attemptKey) {
         try {
             redisTemplate.delete(attemptKey);
@@ -257,40 +271,27 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    /**
-     * 构建失败计数的 Redis key。
-     */
     private String getAttemptKey(String normalizedUsername) {
         return TokenConstants.LOGIN_ATTEMPT_KEY + normalizedUsername;
     }
 
-    /**
-     * 计算登录 Token 的绝对有效期。
-     *
-     * @param rememberMe 是否勾选"记住我"
-     * @return 有效期（秒）
-     */
     private long resolveLoginTimeout(boolean rememberMe) {
         return rememberMe ? rememberMeProperties.getTimeout() : saTokenConfig.getTimeout();
     }
 
-    /**
-     * 计算登录 Token 的活跃有效期。
-     *
-     * <p>活跃有效期不能超过绝对有效期。
-     *
-     * @param rememberMe 是否勾选"记住我"
-     * @param loginTimeout 绝对有效期
-     * @return 活跃有效期（秒）
-     */
     private long resolveActiveTimeout(boolean rememberMe, long loginTimeout) {
         long activeTimeout = rememberMe
                 ? rememberMeProperties.getActiveTimeout()
                 : saTokenConfig.getActiveTimeout();
-        // 活跃有效期不能超过绝对有效期
         if (loginTimeout > 0 && activeTimeout > loginTimeout) {
             return loginTimeout;
         }
         return activeTimeout;
+    }
+
+    private Long generateUserId() {
+        long timestamp = System.currentTimeMillis();
+        int random = (int) (Math.random() * 1000);
+        return timestamp * 1000 + random;
     }
 }

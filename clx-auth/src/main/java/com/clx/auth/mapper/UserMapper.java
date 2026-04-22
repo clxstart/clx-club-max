@@ -17,6 +17,8 @@ import java.util.List;
  *   <li>selectRoleCodesByUserId：查询用户拥有的角色编码列表</li>
  *   <li>selectPermissionCodesByUserId：查询用户拥有的权限编码列表</li>
  *   <li>updateLoginSuccess：登录成功后更新登录信息</li>
+ *   <li>insert：插入新用户（注册时使用）</li>
+ *   <li>existsByUsername：检查用户名是否存在</li>
  * </ul>
  *
  * @see User 用户实体
@@ -66,4 +68,45 @@ public interface UserMapper {
      * @return 影响行数
      */
     int updateLoginSuccess(@Param("userId") Long userId, @Param("loginIp") String loginIp);
+
+    /**
+     * 插入新用户。
+     *
+     * <p>用于用户注册，插入用户基本信息。
+     *
+     * @param user 用户对象（包含 userId, username, password, nickname）
+     * @return 影响行数
+     */
+    int insert(User user);
+
+    /**
+     * 检查用户名是否已存在。
+     *
+     * <p>用于注册时唯一性校验，避免重复注册。
+     *
+     * @param username 用户名
+     * @return true 如果用户名已存在
+     */
+    boolean existsByUsername(@Param("username") String username);
+
+    /**
+     * 检查邮箱是否已存在。
+     *
+     * <p>用于注册时唯一性校验。
+     *
+     * @param email 邮箱地址
+     * @return true 如果邮箱已存在
+     */
+    boolean existsByEmail(@Param("email") String email);
+
+    /**
+     * 根据邮箱更新密码。
+     *
+     * <p>用于密码重置功能。
+     *
+     * @param email 邮箱地址
+     * @param newPassword 新密码（已加密）
+     * @return 影响行数
+     */
+    int updatePasswordByEmail(@Param("email") String email, @Param("newPassword") String newPassword);
 }

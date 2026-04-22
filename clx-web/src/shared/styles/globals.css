@@ -194,6 +194,102 @@ body {
   background: linear-gradient(90deg, transparent, rgba(57, 255, 20, 0.3), transparent);
 }
 
+.auth-section-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  color: rgba(57, 255, 20, 0.42);
+  font-size: 12px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+.auth-section-divider::before,
+.auth-section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  animation: dividerPulse 2.8s ease-in-out infinite;
+}
+
+.auth-section-divider::before {
+  background: linear-gradient(90deg, transparent, rgba(57, 255, 20, 0.1), rgba(57, 255, 20, 0.36));
+}
+
+.auth-section-divider::after {
+  background: linear-gradient(90deg, rgba(57, 255, 20, 0.36), rgba(57, 255, 20, 0.1), transparent);
+  animation-delay: 0.45s;
+}
+
+.auth-social-list {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.auth-social-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  border: 1px solid rgba(57, 255, 20, 0.18);
+  background: rgba(57, 255, 20, 0.04);
+  color: rgba(57, 255, 20, 0.62);
+  box-shadow:
+    inset 0 0 0 1px rgba(57, 255, 20, 0.04),
+    0 10px 20px rgba(0, 0, 0, 0.2);
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    background-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.auth-social-button:hover {
+  transform: translateY(-2px);
+  border-color: rgba(57, 255, 20, 0.45);
+  background: rgba(57, 255, 20, 0.08);
+  color: #39ff14;
+  box-shadow:
+    0 14px 28px rgba(0, 0, 0, 0.24),
+    0 0 18px rgba(57, 255, 20, 0.08);
+}
+
+.auth-social-button:focus-visible {
+  outline: none;
+  border-color: rgba(57, 255, 20, 0.55);
+  box-shadow:
+    0 0 0 3px rgba(57, 255, 20, 0.12),
+    0 14px 28px rgba(0, 0, 0, 0.24);
+}
+
+.auth-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(57, 255, 20, 0.12);
+}
+
+@keyframes dividerPulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.9; }
+}
+
+@media (max-width: 480px) {
+  .auth-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
 /* ===== 状态消息 ===== */
 .status-success {
   background: rgba(57, 255, 20, 0.1);
@@ -653,6 +749,9 @@ body {
   animation: scanLine 4s linear infinite;
   pointer-events: none;
   z-index: 1;
+  /* GPU 加速 */
+  will-change: top, opacity;
+  transform: translateZ(0);
 }
 
 @keyframes scanLine {

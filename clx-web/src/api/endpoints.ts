@@ -4,9 +4,15 @@ export const API_ENDPOINTS = {
   // ========== 认证相关 ==========
   AUTH: {
     LOGIN: '/auth/login',
+    REGISTER: '/auth/register',
     LOGOUT: '/auth/logout',
     ME: '/auth/me',
     REFRESH: '/auth/refresh',
+    CAPTCHA: '/auth/captcha',
+    EMAIL_CODE_SEND: '/auth/email-code/send',
+    SMS_CODE_SEND: '/auth/sms-code/send',
+    PASSWORD_RESET_SEND: '/auth/password-reset/send',
+    PASSWORD_RESET_CONFIRM: '/auth/password-reset/confirm',
   },
 
   // ========== 用户相关 ==========

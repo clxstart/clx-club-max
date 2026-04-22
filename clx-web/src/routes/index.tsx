@@ -1,7 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { AuthLayout, MainLayout } from '@/layouts';
 import { AuthGuard } from './guards';
-import { LoginPage } from '@/features/auth';
+import { LoginPage, RegisterPage, ForgotPasswordPage } from '@/features/auth';
 
 // 路由配置
 export const router = createBrowserRouter([
@@ -10,6 +10,20 @@ export const router = createBrowserRouter([
     element: <AuthLayout />,
     children: [
       { index: true, element: <LoginPage /> },
+    ],
+  },
+  {
+    path: '/register',
+    element: <AuthLayout />,
+    children: [
+      { index: true, element: <RegisterPage /> },
+    ],
+  },
+  {
+    path: '/forgot-password',
+    element: <AuthLayout />,
+    children: [
+      { index: true, element: <ForgotPasswordPage /> },
     ],
   },
   {

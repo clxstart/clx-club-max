@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authApi } from '../api/authApi';
 import { useAuthStore } from '../store/authStore';
-import type { LoginRequest } from '../types/auth.types';
+import type { LoginRequest, RegisterRequest } from '../types/auth.types';
 
 /**
  * 登录 Hook
@@ -37,6 +37,41 @@ export function useLogin() {
 }
 
 /**
+ * 注册 Hook
+ */
+export function useRegister() {
+  const { setToken, setUser } = useAuthStore();
+  const navigate = useNavigate();
+
+  const register = useCallback(async (data: RegisterRequest) => {
+    // 1. 注册请求
+    const response = await authApi.register(data);
+
+    // 2. 注册成功后自动登录
+    if (response.code === 200 && response.data) {
+      setToken(response.data.token, response.data.tokenName, false);
+
+      // 3. 获取用户信息
+      try {
+        const userResponse = await authApi.getCurrentUser();
+        if (userResponse.code === 200 && userResponse.data) {
+          setUser(userResponse.data);
+        }
+      } catch {
+        console.warn('获取用户信息失败，但注册成功');
+      }
+
+      // 4. 跳转首页
+      navigate('/');
+    }
+
+    return response;
+  }, [setToken, setUser, navigate]);
+
+  return { register };
+}
+
+/**
  * 登出 Hook
  */
 export function useLogout() {
@@ -65,4 +100,4 @@ export function useAuth() {
   };
 }
 
-export default { useLogin, useLogout, useAuth };
+export default { useLogin, useRegister, useLogout, useAuth };

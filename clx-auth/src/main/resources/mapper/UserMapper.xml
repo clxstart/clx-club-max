@@ -75,4 +75,67 @@
           AND is_deleted = 0
     </update>
 
+    <!--
+        插入新用户（注册时使用）
+        必填字段：user_id, username, password, nickname, email
+        系统自动填充：status='0'（正常），is_deleted=0，create_time
+    -->
+    <insert id="insert">
+        INSERT INTO sys_user (
+            user_id,
+            username,
+            password,
+            nickname,
+            email,
+            status,
+            is_deleted,
+            create_time
+        ) VALUES (
+            #{userId},
+            #{username},
+            #{password},
+            #{nickname},
+            #{email},
+            '0',
+            0,
+            NOW()
+        )
+    </insert>
+
+    <!--
+        检查用户名是否已存在
+        用于注册时唯一性校验
+        返回：true 如果用户名已存在
+    -->
+    <select id="existsByUsername" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM sys_user
+        WHERE username = #{username}
+          AND is_deleted = 0
+    </select>
+
+    <!--
+        检查邮箱是否已存在
+        用于注册时唯一性校验
+        返回：true 如果邮箱已存在
+    -->
+    <select id="existsByEmail" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM sys_user
+        WHERE email = #{email}
+          AND is_deleted = 0
+    </select>
+
+    <!--
+        根据邮箱更新密码
+        用于密码重置功能
+    -->
+    <update id="updatePasswordByEmail">
+        UPDATE sys_user
+        SET password = #{newPassword},
+            update_time = NOW()
+        WHERE email = #{email}
+          AND is_deleted = 0
+    </update>
+
 </mapper>
