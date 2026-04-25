@@ -1,0 +1,163 @@
+# Frontend Integration Checklist
+# Generated from: frontend-integration-design.md
+# Feature: 2026-04-24-frontend-integration
+# Status: approved
+
+meta:
+  feature: 2026-04-24-frontend-integration
+  created_at: 2026-04-24
+  design_file: frontend-integration-design.md
+
+# 推进步骤（来自设计文件第3节）
+steps:
+  - id: step-01
+    desc: "API 层扩展：补充 endpoints、扩展 postApi、新建 commentApi 和 searchApi"
+    status: done
+    exit_signal: "TypeScript 编译无错误，API 方法可调用"
+
+  - id: step-02
+    desc: "发帖功能：CreatePostModal 组件、导航栏发帖按钮、发帖成功刷新列表"
+    status: done
+    exit_signal: "点击发帖按钮弹出 Modal，填写内容提交后首页能看到新帖子"
+
+  - id: step-03
+    desc: "点赞功能：PostCard 和 PostDetailPage 添加点赞按钮，状态切换和数量更新"
+    status: done
+    exit_signal: "点赞按钮可点击，状态切换，数量实时更新"
+
+  - id: step-04
+    desc: "帖子编辑/删除：编辑复用 Modal、删除确认框、作者权限判断"
+    status: done
+    exit_signal: "作者能看到编辑/删除按钮，编辑保存成功，删除后帖子消失"
+
+  - id: step-05
+    desc: "评论功能：CommentItem、CommentList 组件、详情页集成"
+    status: done
+    exit_signal: "详情页能看到评论列表，能发表评论，能删除自己的评论"
+
+  - id: step-06
+    desc: "评论点赞：CommentItem 添加点赞按钮"
+    status: done
+    exit_signal: "评论点赞按钮可点击，状态切换"
+
+  - id: step-07
+    desc: "搜索功能：SearchPage、SearchBar、HotKeywords、SearchResultTabs、路由配置"
+    status: done
+    exit_signal: "点击搜索图标进入搜索页，输入关键词能看到结果，能看到热词"
+
+  - id: step-08
+    desc: "验证与细节：代理配置确认、浏览器验证、响应式适配"
+    status: done
+    exit_signal: "所有功能浏览器验证通过，移动端可用"
+
+# 验收检查项（来自设计文件验收点和明确不做）
+checks:
+  # 范围守护（来自"明确不做"）
+  scope:
+    - id: scope-01
+      desc: "无二级评论回复输入框"
+      verify: "评论输入框只有一级评论，无 parentId 选择"
+      status: passed
+
+    - id: scope-02
+      desc: "无用户中心/个人主页"
+      verify: "无 /user 或 /profile 路由"
+      status: passed
+
+    - id: scope-03
+      desc: "无消息/通知页面"
+      verify: "无 /message 或 /notification 路由"
+      status: passed
+
+    - id: scope-04
+      desc: "无管理后台"
+      verify: "无 /admin 路由"
+      status: passed
+
+    - id: scope-05
+      desc: "无富文本编辑器"
+      verify: "发帖使用 textarea，无富文本组件"
+      status: passed
+
+  # 接口一致性
+  api:
+    - id: api-01
+      desc: "发帖调用 POST /post/create"
+      verify: "提交表单调用正确端点"
+      status: passed
+
+    - id: api-02
+      desc: "点赞调用 POST /post/{id}/like"
+      verify: "点击点赞按钮调用正确端点"
+      status: passed
+
+    - id: api-03
+      desc: "评论列表调用 GET /post/{postId}/comments"
+      verify: "详情页加载评论数据"
+      status: passed
+
+    - id: api-04
+      desc: "搜索调用 POST /search/aggregate"
+      verify: "搜索页提交关键词调用正确端点"
+      status: passed
+
+    - id: api-05
+      desc: "删除需要确认"
+      verify: "删除帖子/评论前有 Modal 确认框"
+      status: passed
+
+  # 权限与状态
+  auth:
+    - id: auth-01
+      desc: "编辑/删除按钮仅作者可见"
+      verify: "非作者看不到编辑/删除按钮"
+      status: passed
+
+    - id: auth-02
+      desc: "点赞状态同步"
+      verify: "首页点赞后进入详情页状态一致"
+      status: passed
+
+    - id: auth-03
+      desc: "删除评论仅作者可操作"
+      verify: "非作者看不到评论删除按钮"
+      status: passed
+
+  # 视觉风格
+  style:
+    - id: style-01
+      desc: "使用 Neumorphism 风格"
+      verify: "新组件使用 NeuButton/NeuInput/NeuCard"
+      status: passed
+
+    - id: style-02
+      desc: "Modal 使用 Neumorphism 样式"
+      verify: "CreatePostModal 和删除确认框符合风格"
+      status: passed
+
+  # 测试覆盖
+  test:
+    - id: test-01
+      desc: "发帖流程"
+      verify: "点击发帖 → 填写 → 提交成功 → 看到新帖子"
+      status: passed
+
+    - id: test-02
+      desc: "点赞流程"
+      verify: "点击点赞 → 状态变化 → 数量更新"
+      status: passed
+
+    - id: test-03
+      desc: "编辑删除流程"
+      verify: "编辑保存成功，删除确认后消失"
+      status: passed
+
+    - id: test-04
+      desc: "评论流程"
+      verify: "发表评论成功，删除评论成功"
+      status: passed
+
+    - id: test-05
+      desc: "搜索流程"
+      verify: "输入关键词 → 看到结果 → 点击热词搜索"
+      status: passed

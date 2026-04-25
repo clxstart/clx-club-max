@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clx.post.mapper.PostMapper">
+
+    <resultMap id="PostResultMap" type="com.clx.post.entity.Post">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="summary" property="summary"/>
+        <result column="author_id" property="authorId"/>
+        <result column="author_name" property="authorName"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="view_count" property="viewCount"/>
+        <result column="like_count" property="likeCount"/>
+        <result column="comment_count" property="commentCount"/>
+        <result column="is_top" property="isTop"/>
+        <result column="is_essence" property="isEssence"/>
+        <result column="status" property="status"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="BaseColumns">
+        id, title, content, summary, author_id, author_name, category_id, category_name,
+        view_count, like_count, comment_count, is_top, is_essence, status, is_deleted,
+        create_time, update_time
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO post (title, content, summary, author_id, author_name, category_id, category_name, status)
+        VALUES (#{title}, #{content}, #{summary}, #{authorId}, #{authorName}, #{categoryId}, #{categoryName}, #{status})
+    </insert>
+
+    <select id="selectById" resultMap="PostResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM post
+        WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <update id="update">
+        UPDATE post
+        SET title = #{title},
+            content = #{content},
+            summary = #{summary},
+            category_id = #{categoryId},
+            category_name = #{categoryName},
+            update_time = NOW()
+        WHERE id = #{id} AND is_deleted = 0
+    </update>
+
+    <update id="deleteById">
+        UPDATE post SET is_deleted = 1, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <select id="selectList" resultMap="PostResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM post
+        WHERE is_deleted = 0 AND status = '0'
+        <if test="categoryId != null">
+            AND category_id = #{categoryId}
+        </if>
+        <if test="tagId != null">
+            AND EXISTS (SELECT 1 FROM post_tag WHERE post_tag.post_id = post.id AND post_tag.tag_id = #{tagId})
+        </if>
+        <choose>
+            <when test="sort == 'hot'">
+                ORDER BY like_count DESC, create_time DESC
+            </when>
+            <otherwise>
+                ORDER BY is_top DESC, create_time DESC
+            </otherwise>
+        </choose>
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="selectCount" resultType="int">
+        SELECT COUNT(*)
+        FROM post
+        WHERE is_deleted = 0 AND status = '0'
+        <if test="categoryId != null">
+            AND category_id = #{categoryId}
+        </if>
+        <if test="tagId != null">
+            AND EXISTS (SELECT 1 FROM post_tag WHERE post_tag.post_id = post.id AND post_tag.tag_id = #{tagId})
+        </if>
+    </select>
+
+    <update id="incrementViewCount">
+        UPDATE post SET view_count = view_count + 1 WHERE id = #{id}
+    </update>
+
+    <update id="incrementLikeCount">
+        UPDATE post SET like_count = like_count + 1 WHERE id = #{id}
+    </update>
+
+    <update id="decrementLikeCount">
+        UPDATE post SET like_count = like_count - 1 WHERE id = #{id} AND like_count > 0
+    </update>
+
+    <update id="updateLikeCount">
+        UPDATE post SET like_count = #{likeCount} WHERE id = #{id}
+    </update>
+
+    <update id="incrementCommentCount">
+        UPDATE post SET comment_count = comment_count + 1 WHERE id = #{id}
+    </update>
+
+    <update id="decrementCommentCount">
+        UPDATE post SET comment_count = comment_count - 1 WHERE id = #{id} AND comment_count > 0
+    </update>
+
+    <select id="search" resultMap="PostResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM post
+        WHERE is_deleted = 0 AND status = '0'
+          AND (title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%'))
+        ORDER BY create_time DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="searchCount" resultType="int">
+        SELECT COUNT(*)
+        FROM post
+        WHERE is_deleted = 0 AND status = '0'
+          AND (title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%'))
+    </select>
+
+    <select id="selectHot" resultMap="PostResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM post
+        WHERE is_deleted = 0 AND status = '0'
+        ORDER BY like_count DESC, create_time DESC
+        LIMIT #{limit}
+    </select>
+
+</mapper>

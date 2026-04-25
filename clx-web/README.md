@@ -1,73 +1,30 @@
-# React + TypeScript + Vite
+# CLX Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+基于 `stype` 新拟物风格搭建的 React 前端，默认通过 `clx-gateway` 的 `http://localhost:8080` 访问后端接口。
 
-Currently, two official plugins are available:
+## 启动
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cd clx-web
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+如需直连其他后端地址，复制 `.env.example` 为 `.env` 并设置：
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+VITE_API_BASE_URL=http://localhost:8080
 ```
+
+## 已对接接口
+
+- 认证：登录、注册、退出、当前用户、刷新 Token、验证码、邮箱码、短信码、密码重置、手机号登录。
+- OAuth/绑定：授权地址、绑定列表、解绑、绑定回调入口封装。
+- 内容：帖子创建、更新、删除、详情、列表、站内搜索、热门帖子。
+- 互动：评论列表、发表评论、删除评论、帖子点赞/取消、评论点赞/取消。
+- 分类标签：分类列表、标签列表。
+- 搜索：聚合搜索、单类搜索、搜索建议、热门关键词。
+
+## 注意
+
+`clx-gateway` 已补充 `/post/**`、`/category/**`、`/tag/**`、`/comment/**`、`/search/**` 路由。后端服务启动后，前端 Vite 代理会把这些路径转到网关。

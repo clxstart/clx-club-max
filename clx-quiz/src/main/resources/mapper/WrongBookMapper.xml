@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clx.quiz.mapper.WrongBookMapper">
+
+    <resultMap id="WrongBookResultMap" type="com.clx.quiz.entity.WrongBook">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="subject_id" property="subjectId"/>
+        <result column="wrong_count" property="wrongCount"/>
+        <result column="last_wrong_time" property="lastWrongTime"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO wrong_book (user_id, subject_id, wrong_count, last_wrong_time, created_by)
+        VALUES (#{userId}, #{subjectId}, #{wrongCount}, #{lastWrongTime}, #{createdBy})
+    </insert>
+
+    <update id="update">
+        UPDATE wrong_book
+        SET wrong_count = #{wrongCount},
+            last_wrong_time = #{lastWrongTime},
+            update_by = #{updateBy}
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectByUserAndSubject" resultMap="WrongBookResultMap">
+        SELECT * FROM wrong_book
+        WHERE user_id = #{userId} AND subject_id = #{subjectId} AND is_deleted = 0
+    </select>
+
+    <select id="selectPage" resultMap="WrongBookResultMap">
+        SELECT * FROM wrong_book
+        WHERE user_id = #{userId} AND is_deleted = 0
+        ORDER BY last_wrong_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT COUNT(*) FROM wrong_book
+        WHERE user_id = #{userId} AND is_deleted = 0
+    </select>
+
+    <update id="deleteById">
+        UPDATE wrong_book SET is_deleted = 1 WHERE id = #{id}
+    </update>
+
+</mapper>

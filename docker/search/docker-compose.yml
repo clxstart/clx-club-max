@@ -1,0 +1,53 @@
+# CLX 聚合搜索基础设施
+# Elasticsearch + RabbitMQ（先启动这两个）
+# Kibana 可选，Canal 步骤9部署
+
+services:
+  # Elasticsearch 8.x
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: clx-es
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9201:9200"
+      - "9301:9300"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - clx-network
+
+  # RabbitMQ（消息队列）
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: clx-rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=clx
+      - RABBITMQ_DEFAULT_PASSWORD=clx123
+    ports:
+      - "5672:5672"    # AMQP
+      - "15672:15672"  # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmqctl status || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - clx-network
+
+volumes:
+  es_data:
+  rabbitmq_data:
+
+networks:
+  clx-network:
+    driver: bridge

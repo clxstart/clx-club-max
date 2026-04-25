@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clx.quiz.mapper.PracticeMapper">
+
+    <resultMap id="PracticeResultMap" type="com.clx.quiz.entity.Practice">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="total_count" property="totalCount"/>
+        <result column="correct_count" property="correctCount"/>
+        <result column="correct_rate" property="correctRate"/>
+        <result column="time_used" property="timeUsed"/>
+        <result column="status" property="status"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO practice (user_id, total_count, status, created_by)
+        VALUES (#{userId}, #{totalCount}, #{status}, #{createdBy})
+    </insert>
+
+    <update id="update">
+        UPDATE practice
+        SET correct_count = #{correctCount},
+            correct_rate = #{correctRate},
+            time_used = #{timeUsed},
+            status = #{status},
+            update_by = #{updateBy}
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectById" resultMap="PracticeResultMap">
+        SELECT * FROM practice WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+</mapper>

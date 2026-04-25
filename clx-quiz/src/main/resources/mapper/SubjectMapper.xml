@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clx.quiz.mapper.SubjectMapper">
+
+    <resultMap id="SubjectResultMap" type="com.clx.quiz.entity.Subject">
+        <id column="id" property="id"/>
+        <result column="subject_name" property="subjectName"/>
+        <result column="subject_type" property="subjectType"/>
+        <result column="subject_difficult" property="subjectDifficult"/>
+        <result column="subject_score" property="subjectScore"/>
+        <result column="subject_parse" property="subjectParse"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO subject (subject_name, subject_type, subject_difficult, subject_score, subject_parse, created_by)
+        VALUES (#{subjectName}, #{subjectType}, #{subjectDifficult}, #{subjectScore}, #{subjectParse}, #{createdBy})
+    </insert>
+
+    <update id="update">
+        UPDATE subject
+        SET subject_name = #{subjectName},
+            subject_difficult = #{subjectDifficult},
+            subject_score = #{subjectScore},
+            subject_parse = #{subjectParse},
+            update_by = #{updateBy}
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE subject SET is_deleted = 1 WHERE id = #{id}
+    </update>
+
+    <select id="selectById" resultMap="SubjectResultMap">
+        SELECT * FROM subject WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <select id="selectPage" resultMap="SubjectResultMap">
+        SELECT s.* FROM subject s
+        <if test="categoryId != null or labelId != null">
+            INNER JOIN subject_mapping m ON s.id = m.subject_id AND m.is_deleted = 0
+        </if>
+        WHERE s.is_deleted = 0
+        <if test="categoryId != null">
+            AND m.category_id = #{categoryId}
+        </if>
+        <if test="labelId != null">
+            AND m.label_id = #{labelId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND s.subject_name LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        ORDER BY s.id DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT COUNT(DISTINCT s.id) FROM subject s
+        <if test="categoryId != null or labelId != null">
+            INNER JOIN subject_mapping m ON s.id = m.subject_id AND m.is_deleted = 0
+        </if>
+        WHERE s.is_deleted = 0
+        <if test="categoryId != null">
+            AND m.category_id = #{categoryId}
+        </if>
+        <if test="labelId != null">
+            AND m.label_id = #{labelId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND s.subject_name LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+    </select>
+
+    <select id="selectRandomIdsByLabels" resultType="long">
+        SELECT DISTINCT s.id FROM subject s
+        INNER JOIN subject_mapping m ON s.id = m.subject_id AND m.is_deleted = 0
+        WHERE s.is_deleted = 0
+        AND m.label_id IN
+        <foreach collection="labelIds" item="labelId" open="(" separator="," close=")">
+            #{labelId}
+        </foreach>
+        ORDER BY RAND()
+        LIMIT #{limit}
+    </select>
+
+</mapper>

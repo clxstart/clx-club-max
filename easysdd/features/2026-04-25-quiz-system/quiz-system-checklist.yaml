@@ -1,0 +1,222 @@
+feature: 2026-04-25-quiz-system
+created: 2026-04-25
+
+steps:
+  - id: step-1
+    title: 搭建 clx-quiz 模块骨架
+    action: "新建模块：pom.xml、启动类、配置文件、Security配置、数据库脚本、更新根pom"
+    exit_signal: "mvn compile 成功，服务能在 9600 端口启动"
+    status: done
+    files:
+      - clx-quiz/pom.xml
+      - clx-quiz/src/main/java/com/clx/quiz/ClxQuizApplication.java
+      - clx-quiz/src/main/resources/application.yml
+      - clx-quiz/src/main/resources/application-dev.yml
+      - clx-quiz/src/main/java/com/clx/quiz/config/SecurityConfig.java
+      - clx-quiz/src/main/java/com/clx/quiz/config/CorsConfig.java
+      - doc/sql/quiz_schema.sql
+      - pom.xml (根，添加 module)
+
+  - id: step-2
+    title: 实现分类和标签管理
+    action: "新建实体、Mapper、Service、Controller，初始化数据"
+    exit_signal: "GET /quiz/category/list 和 /quiz/label/list 返回列表"
+    status: done
+    files:
+      - clx-quiz/src/main/java/com/clx/quiz/entity/SubjectCategory.java
+      - clx-quiz/src/main/java/com/clx/quiz/entity/SubjectLabel.java
+      - clx-quiz/src/main/java/com/clx/quiz/mapper/SubjectCategoryMapper.java
+      - clx-quiz/src/main/java/com/clx/quiz/mapper/SubjectLabelMapper.java
+      - clx-quiz/src/main/resources/mapper/SubjectCategoryMapper.xml
+      - clx-quiz/src/main/resources/mapper/SubjectLabelMapper.xml
+      - clx-quiz/src/main/java/com/clx/quiz/service/SubjectCategoryService.java
+      - clx-quiz/src/main/java/com/clx/quiz/service/impl/SubjectCategoryServiceImpl.java
+      - clx-quiz/src/main/java/com/clx/quiz/service/SubjectLabelService.java
+      - clx-quiz/src/main/java/com/clx/quiz/service/impl/SubjectLabelServiceImpl.java
+      - clx-quiz/src/main/java/com/clx/quiz/controller/SubjectCategoryController.java
+      - clx-quiz/src/main/java/com/clx/quiz/controller/SubjectLabelController.java
+      - doc/sql/quiz_init_data.sql
+
+  - id: step-3
+    title: 实现题目管理（含题型策略）
+    action: "新建题目相关实体、Mapper、题型策略、Service、Controller"
+    exit_signal: "POST /quiz/subject/add 能新增四种题型，POST /quiz/subject/page 能分页查询，POST /quiz/subject/detail 能获取详情"
+    status: done
+    files:
+      - clx-quiz/src/main/java/com/clx/quiz/entity/Subject.java
+      - clx-quiz/src/main/java/com/clx/quiz/entity/SubjectRadio.java
+      - clx-quiz/src/main/java/com/clx/quiz/entity/SubjectMultiple.java
+      - clx-quiz/src/main/java/com/clx/quiz/entity/SubjectJudge.java
+      - clx-quiz/src/main/java/com/clx/quiz/entity/SubjectBrief.java
+      - clx-quiz/src/main/java/com/clx/quiz/entity/SubjectMapping.java
+      - clx-quiz/src/main/java/com/clx/quiz/mapper/SubjectMapper.java
+      - clx-quiz/src/main/java/com/clx/quiz/mapper/SubjectRadioMapper.java
+      - clx-quiz/src/main/java/com/clx/quiz/mapper/SubjectMultipleMapper.java
+      - clx-quiz/src/main/java/com/clx/quiz/mapper/SubjectJudgeMapper.java
+      - clx-quiz/src/main/java/com/clx/quiz/mapper/SubjectBriefMapper.java
+      - clx-quiz/src/main/java/com/clx/quiz/mapper/SubjectMappingMapper.java
+      - clx-quiz/src/main/resources/mapper/*.xml
+      - clx-quiz/src/main/java/com/clx/quiz/service/handler/SubjectTypeHandler.java
+      - clx-quiz/src/main/java/com/clx/quiz/service/handler/RadioTypeHandler.java
+      - clx-quiz/src/main/java/com/clx/quiz/service/handler/MultipleTypeHandler.java
+      - clx-quiz/src/main/java/com/clx/quiz/service/handler/JudgeTypeHandler.java
+      - clx-quiz/src/main/java/com/clx/quiz/service/handler/BriefTypeHandler.java
+      - clx-quiz/src/main/java/com/clx/quiz/service/handler/SubjectTypeHandlerFactory.java
+      - clx-quiz/src/main/java/com/clx/quiz/service/SubjectService.java
+      - clx-quiz/src/main/java/com/clx/quiz/service/impl/SubjectServiceImpl.java
+      - clx-quiz/src/main/java/com/clx/quiz/controller/SubjectController.java
+      - clx-quiz/src/main/java/com/clx/quiz/dto/*.java
+      - clx-quiz/src/main/java/com/clx/quiz/vo/*.java
+
+  - id: step-4
+    title: 实现练习流程
+    action: "新建练习相关实体、Mapper、Service、Controller"
+    exit_signal: "开始练习/获取题目/提交答案/结束练习 API 全部打通"
+    status: done
+    files:
+      - clx-quiz/src/main/java/com/clx/quiz/entity/Practice.java
+      - clx-quiz/src/main/java/com/clx/quiz/entity/PracticeDetail.java
+      - clx-quiz/src/main/java/com/clx/quiz/mapper/PracticeMapper.java
+      - clx-quiz/src/main/java/com/clx/quiz/mapper/PracticeDetailMapper.java
+      - clx-quiz/src/main/resources/mapper/PracticeMapper.xml
+      - clx-quiz/src/main/resources/mapper/PracticeDetailMapper.xml
+      - clx-quiz/src/main/java/com/clx/quiz/service/PracticeService.java
+      - clx-quiz/src/main/java/com/clx/quiz/service/impl/PracticeServiceImpl.java
+      - clx-quiz/src/main/java/com/clx/quiz/controller/PracticeController.java
+
+  - id: step-5
+    title: 实现错题本
+    action: "新建错题本实体、Mapper、Service、Controller，练习结束自动写入错题本"
+    exit_signal: "答错题目后能在错题本中看到，能移除"
+    status: done
+    files:
+      - clx-quiz/src/main/java/com/clx/quiz/entity/WrongBook.java
+      - clx-quiz/src/main/java/com/clx/quiz/mapper/WrongBookMapper.java
+      - clx-quiz/src/main/resources/mapper/WrongBookMapper.xml
+      - clx-quiz/src/main/java/com/clx/quiz/service/WrongBookService.java
+      - clx-quiz/src/main/java/com/clx/quiz/service/impl/WrongBookServiceImpl.java
+      - clx-quiz/src/main/java/com/clx/quiz/controller/WrongBookController.java
+
+  - id: step-6
+    title: 前端 - 题库首页和答题页面
+    action: "新建 quiz 功能目录、实现题库首页、答题页面、练习结果页、状态管理、路由配置"
+    exit_signal: "能访问 /quiz 看到题库首页，能开始练习并逐题作答"
+    status: done
+    files:
+      - clx-web/src/features/quiz/pages/QuizHomePage.tsx
+      - clx-web/src/features/quiz/pages/PracticePage.tsx
+      - clx-web/src/features/quiz/pages/PracticeResultPage.tsx
+      - clx-web/src/features/quiz/components/*.tsx
+      - clx-web/src/features/quiz/store/quizStore.ts
+      - clx-web/src/routes/index.tsx
+
+  - id: step-7
+    title: 前端 - 错题本页面
+    action: "实现错题本页面、路由配置"
+    exit_signal: "能访问 /quiz/wrong-book 看到错题列表，能移除"
+    status: done
+    files:
+      - clx-web/src/features/quiz/pages/WrongBookPage.tsx
+      - clx-web/src/routes/index.tsx
+
+  - id: step-8
+    title: 补充测试
+    action: "新建 Service 测试类、各题型 Handler 测试"
+    exit_signal: "mvn test 全部通过"
+    status: done
+    files:
+      - clx-quiz/src/test/java/com/clx/quiz/service/SubjectServiceTest.java
+      - clx-quiz/src/test/java/com/clx/quiz/service/PracticeServiceTest.java
+      - clx-quiz/src/test/java/com/clx/quiz/service/WrongBookServiceTest.java
+      - clx-quiz/src/test/java/com/clx/quiz/service/handler/RadioTypeHandlerTest.java
+      - clx-quiz/src/test/java/com/clx/quiz/service/handler/MultipleTypeHandlerTest.java
+      - clx-quiz/src/test/java/com/clx/quiz/service/handler/JudgeTypeHandlerTest.java
+      - clx-quiz/src/test/java/com/clx/quiz/service/handler/BriefTypeHandlerTest.java
+
+checks:
+  # 范围守护
+  - id: scope-01
+    type: scope-guard
+    description: 不做编程题（在线判题）
+    verify: grep 无 subject_type=5 或 SubjectCode 相关代码
+    status: passed
+
+  - id: scope-02
+    type: scope-guard
+    description: 不做考试系统（场次、限时、排名）
+    verify: grep 无 exam_info / exam_detail 相关代码
+    status: passed
+
+  - id: scope-03
+    type: scope-guard
+    description: 不做防作弊（摄像头、屏幕录制）
+    verify: grep 无 anti-cheat / camera / screen-record 相关代码
+    status: passed
+
+  - id: scope-04
+    type: scope-guard
+    description: 不做AI智能推荐
+    verify: grep 无 ai-recommend / knowledge-graph 相关代码
+    status: passed
+
+  - id: scope-05
+    type: scope-guard
+    description: 不做社区深度整合（题目讨论区、解题分享、积分徽章）
+    verify: 无 quiz-discussion / quiz-share 相关 API
+    status: passed
+
+  # 接口一致性
+  - id: api-01
+    type: contract
+    description: POST /quiz/subject/add 返回 success
+    verify: 响应 code=200
+    status: passed
+
+  - id: api-02
+    type: contract
+    description: POST /quiz/subject/page 返回分页结构
+    verify: 响应含 data.total 和 data.list
+    status: passed
+
+  - id: api-03
+    type: contract
+    description: POST /quiz/practice/start 返回 practiceId 和 subjectIds
+    verify: 响应含 data.practiceId 和 data.subjectIds
+    status: passed
+
+  - id: api-04
+    type: contract
+    description: POST /quiz/practice/submit 返回判题结果
+    verify: 响应含 data.isCorrect 和 data.subjectParse
+    status: passed
+
+  - id: api-05
+    type: contract
+    description: POST /quiz/practice/finish 返回练习统计
+    verify: 响应含 data.correctRate 和 data.wrongSubjectIds
+    status: passed
+
+  # 测试验证
+  - id: test-01
+    type: test
+    description: 新增四种题型测试通过
+    verify: SubjectServiceTest.testCreateAllTypes 通过
+    status: passed
+
+  - id: test-02
+    type: test
+    description: 多选题判题测试（全对、少选、错选）
+    verify: MultipleTypeHandlerTest 通过
+    status: passed
+
+  - id: test-03
+    type: test
+    description: 练习流程端到端测试
+    verify: PracticeServiceTest.testFullPracticeFlow 通过
+    status: passed
+
+  - id: test-04
+    type: test
+    description: 错题本自动写入测试
+    verify: WrongBookServiceTest.testAutoAddWrongBook 通过
+    status: passed

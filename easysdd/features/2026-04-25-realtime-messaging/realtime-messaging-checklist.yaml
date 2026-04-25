@@ -1,0 +1,274 @@
+---
+doc_type: feature-checklist
+feature: 2026-04-25-realtime-messaging
+status: completed
+summary: 实时消息与通知系统实施清单 - 验收完成
+---
+
+steps:
+  - id: step-1
+    title: 搭建 clx-message 模块骨架
+    status: done
+    files:
+      - clx-message/pom.xml
+      - clx-message/src/main/java/com/clx/message/ClxMessageApplication.java
+      - clx-message/src/main/resources/application.yml
+      - clx-message/src/main/resources/application-dev.yml
+      - clx-message/src/main/java/com/clx/message/config/SecurityConfig.java
+      - clx-message/src/main/java/com/clx/message/config/CorsConfig.java
+      - doc/sql/message_schema.sql
+      - pom.xml (根，添加 module)
+    exit_signal: mvn compile 成功，服务能启动
+
+  - id: step-2
+    title: WebSocket 基础设施
+    status: done
+    files:
+      - clx-message/src/main/java/com/clx/message/config/WebSocketConfig.java
+      - clx-message/src/main/java/com/clx/message/ws/WsHandshakeInterceptor.java
+      - clx-message/src/main/java/com/clx/message/ws/MessageWebSocketHandler.java
+      - clx-message/src/main/java/com/clx/message/ws/WsSessionManager.java
+    exit_signal: wscat 连接 ws://localhost:9500/ws/message?token=xxx 成功，心跳正常
+
+  - id: step-3
+    title: 在线状态与 Redis Pub/Sub
+    status: done
+    files:
+      - clx-message/src/main/java/com/clx/message/service/OnlineStatusService.java
+      - clx-message/src/main/java/com/clx/message/service/impl/OnlineStatusServiceImpl.java
+      - clx-message/src/main/java/com/clx/message/controller/OnlineStatusController.java
+    exit_signal: 查 Redis user:online:{userId} 有值，GET /message/online-status 返回正确
+
+  - id: step-4
+    title: 私信核心流程
+    status: done
+    files:
+      - clx-message/src/main/java/com/clx/message/entity/ChatMessage.java
+      - clx-message/src/main/java/com/clx/message/entity/ChatSession.java
+      - clx-message/src/main/java/com/clx/message/mapper/ChatMessageMapper.java
+      - clx-message/src/main/java/com/clx/message/mapper/ChatSessionMapper.java
+      - clx-message/src/main/java/com/clx/message/dto/SendMessageRequest.java
+      - clx-message/src/main/java/com/clx/message/dto/WsEnvelope.java
+      - clx-message/src/main/java/com/clx/message/service/ChatService.java
+      - clx-message/src/main/java/com/clx/message/service/impl/ChatServiceImpl.java
+      - clx-message/src/main/java/com/clx/message/service/MessageRouter.java
+      - clx-message/src/main/java/com/clx/message/controller/MessageController.java
+      - clx-message/src/main/resources/mapper/ChatMessageMapper.xml
+      - clx-message/src/main/resources/mapper/ChatSessionMapper.xml
+    exit_signal: 两个浏览器窗口互发私信，秒级送达
+
+  - id: step-5
+    title: 上线补发
+    status: done
+    files:
+      - clx-message/src/main/java/com/clx/message/ws/WsSessionManager.java (改造)
+    exit_signal: 用户 A 给离线用户 B 发消息，B 上线后收到补发
+
+  - id: step-6
+    title: 通知系统
+    status: done
+    files:
+      - clx-message/src/main/java/com/clx/message/entity/Notification.java
+      - clx-message/src/main/java/com/clx/message/mapper/NotificationMapper.java
+      - clx-message/src/main/java/com/clx/message/dto/NotificationTriggerRequest.java
+      - clx-message/src/main/java/com/clx/message/service/NotificationService.java
+      - clx-message/src/main/java/com/clx/message/service/impl/NotificationServiceImpl.java
+      - clx-message/src/main/java/com/clx/message/controller/NotificationController.java
+      - clx-message/src/main/java/com/clx/message/mq/NotificationProducer.java
+      - clx-message/src/main/java/com/clx/message/mq/NotificationConsumer.java
+      - clx-message/src/main/java/com/clx/message/config/RabbitMQConfig.java
+      - clx-message/src/main/resources/mapper/NotificationMapper.xml
+    exit_signal: 调用 /notification/trigger，通知出现在列表中，聚合生效
+
+  - id: step-7
+    title: 离线消息清理与边界处理
+    status: done
+    files:
+      - clx-message/src/main/java/com/clx/message/task/OfflineMessageCleaner.java
+    exit_signal: 手动插入超量消息，清理后条数 <= 500
+
+  - id: step-8
+    title: 补充测试
+    status: done
+    files:
+      - clx-message/src/test/java/com/clx/message/service/ChatServiceTest.java
+      - clx-message/src/test/java/com/clx/message/service/NotificationServiceTest.java
+      - clx-message/src/test/java/com/clx/message/service/OnlineStatusServiceTest.java
+      - clx-message/src/test/java/com/clx/message/ws/WsSessionManagerTest.java
+    exit_signal: mvn test 全部通过
+
+checks:
+  # 范围守护
+  - id: scope-01
+    type: scope-guard
+    description: 不做群聊（单聊优先）
+    verify: grep 无 GroupChat/GroupMessage 相关代码
+    status: passed
+
+  - id: scope-02
+    type: scope-guard
+    description: 不做消息搜索
+    verify: clx-message 无 ES 依赖，无 SearchService
+    status: passed
+
+  - id: scope-03
+    type: scope-guard
+    description: 不做消息撤回/编辑
+    verify: 无 recall/edit 相关接口
+    status: passed
+
+  - id: scope-04
+    type: scope-guard
+    description: 单设备假设（踢掉旧连接）
+    verify: WsSessionManager 有踢旧连接逻辑
+    status: passed
+
+  - id: scope-05
+    type: scope-guard
+    description: 不做富媒体消息
+    verify: ChatMessage 只有 content 字段，无 mediaUrl
+    status: passed
+
+  - id: scope-06
+    type: scope-guard
+    description: 不做消息已读回执
+    verify: 无 readStatus/ack 相关逻辑
+    status: passed
+
+  # 接口一致性
+  - id: api-01
+    type: contract
+    description: POST /message/send 返回 messageId 和 timestamp
+    verify: 接口响应包含 messageId 和 timestamp
+    status: passed
+
+  - id: api-02
+    type: contract
+    description: GET /message/sessions 返回会话列表含未读数
+    verify: 响应 list[].unreadCount 存在
+    status: passed
+
+  - id: api-03
+    type: contract
+    description: GET /notification/unread-count 返回分类未读数
+    verify: 响应包含 chat/comment/like/follow/system
+    status: passed
+
+  - id: api-04
+    type: contract
+    description: WebSocket 消息格式符合 WsEnvelope
+    verify: 推送消息包含 type 字段
+    status: passed
+
+  - id: api-05
+    type: contract
+    description: 握手失败返回 4401
+    verify: 无效 token 连接被关闭，code=4401
+    status: passed
+
+  # 测试验证 - F1 私信实时投递
+  - id: test-c1
+    type: test
+    description: C1 发送私信后 DB 有记录
+    step_ref: step-4
+    status: passed
+
+  - id: test-c2
+    type: test
+    description: C2 发送私信后会话更新
+    step_ref: step-4
+    status: passed
+
+  - id: test-c3
+    type: test
+    description: C3 接收者在线时 WebSocket 推送
+    step_ref: step-4
+    status: passed
+
+  - id: test-c4
+    type: test
+    description: C4 接收者离线时写入离线队列
+    step_ref: step-4
+    status: passed
+
+  - id: test-c5
+    type: test
+    description: C5 发送给自己报错
+    step_ref: step-4
+    status: passed
+
+  - id: test-c6
+    type: test
+    description: C6 空内容报错
+    step_ref: step-4
+    status: passed
+
+  # 测试验证 - F2 上线补发
+  - id: test-c7
+    type: test
+    description: C7 上线时推送离线消息
+    step_ref: step-5
+    status: passed
+
+  - id: test-c8
+    type: test
+    description: C8 推送后清空离线队列
+    step_ref: step-5
+    status: passed
+
+  # 测试验证 - F3 通知系统
+  - id: test-c9
+    type: test
+    description: C9 触发通知写入 DB
+    step_ref: step-6
+    status: passed
+
+  - id: test-c10
+    type: test
+    description: C10 1小时内同类通知聚合
+    step_ref: step-6
+    status: passed
+
+  - id: test-c11
+    type: test
+    description: C11 标记已读后未读数-1
+    step_ref: step-6
+    status: passed
+
+  - id: test-c12
+    type: test
+    description: C12 通知 MQ 消费者写 DB
+    step_ref: step-6
+    status: passed
+
+  # 测试验证 - F4 在线状态
+  - id: test-c13
+    type: test
+    description: C13 连接时 Redis 记录在线
+    step_ref: step-3
+    status: passed
+
+  - id: test-c14
+    type: test
+    description: C14 断开时 Redis 更新最后活跃时间
+    step_ref: step-3
+    status: passed
+
+  - id: test-c15
+    type: test
+    description: C15 TTL过期后查询返回离线
+    step_ref: step-3
+    status: passed
+
+  # 测试验证 - F5 离线消息清理
+  - id: test-c16
+    type: test
+    description: C16 30天前的私信被清理
+    step_ref: step-7
+    status: passed
+
+  - id: test-c17
+    type: test
+    description: C17 超过500条/会话保留最近500条
+    step_ref: step-7
+    status: passed

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clx.post.mapper.PostTagMapper">
+
+    <insert id="batchInsert">
+        INSERT INTO post_tag (post_id, tag_id)
+        VALUES
+        <foreach collection="tagIds" item="tagId" separator=",">
+            (#{postId}, #{tagId})
+        </foreach>
+    </insert>
+
+    <delete id="deleteByPostId">
+        DELETE FROM post_tag WHERE post_id = #{postId}
+    </delete>
+
+    <select id="selectTagIdsByPostId" resultType="long">
+        SELECT tag_id FROM post_tag WHERE post_id = #{postId}
+    </select>
+
+</mapper>

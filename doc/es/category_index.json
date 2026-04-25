@@ -1,0 +1,27 @@
+{
+  "mappings": {
+    "properties": {
+      "id": { "type": "long" },
+      "name": {
+        "type": "text",
+        "analyzer": "standard",
+        "fields": {
+          "keyword": { "type": "keyword" }
+        }
+      },
+      "code": { "type": "keyword" },
+      "description": {
+        "type": "text",
+        "analyzer": "standard"
+      },
+      "icon": { "type": "keyword" },
+      "sort": { "type": "integer" },
+      "status": { "type": "keyword" },
+      "createTime": { "type": "date" }
+    }
+  },
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  }
+}

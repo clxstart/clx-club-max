@@ -5,32 +5,21 @@ import com.clx.auth.entity.SocialBind;
 import java.util.List;
 
 /**
- * 社交账号绑定服务接口
- *
- * @author CLX
- * @since 2026-04-22
+ * 社交账号绑定服务
+ * <p>
+ * 绑定逻辑由 OAuthService.bindAccount() 处理，本服务提供查询、检查、解绑功能
  */
 public interface SocialBindService {
 
-    /**
-     * 获取当前用户绑定的所有社交账号
-     *
-     * @return 绑定列表
-     */
+    /** 获取当前用户绑定的所有社交账号 */
     List<SocialBind> getMyBinds();
 
-    /**
-     * 解绑社交账号
-     *
-     * @param bindId 绑定ID
-     */
-    void unbind(Long bindId);
+    /** 检查当前用户是否已绑定某平台 */
+    boolean isBound(String platform);
 
-    /**
-     * 绑定GitHub账号
-     *
-     * @param code  GitHub授权码
-     * @param state 状态码
-     */
-    void bindGithub(String code, String state);
+    /** 获取当前用户某平台的绑定详情 */
+    SocialBind getBindByPlatform(String platform);
+
+    /** 解绑社交账号 */
+    void unbind(Long bindId);
 }

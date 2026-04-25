@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clx.quiz.mapper.SubjectRadioMapper">
+
+    <resultMap id="RadioResultMap" type="com.clx.quiz.entity.SubjectRadio">
+        <id column="id" property="id"/>
+        <result column="subject_id" property="subjectId"/>
+        <result column="option_type" property="optionType"/>
+        <result column="option_content" property="optionContent"/>
+        <result column="is_correct" property="isCorrect"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <insert id="batchInsert">
+        INSERT INTO subject_radio (subject_id, option_type, option_content, is_correct, created_by)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.subjectId}, #{item.optionType}, #{item.optionContent}, #{item.isCorrect}, #{item.createdBy})
+        </foreach>
+    </insert>
+
+    <select id="selectBySubjectId" resultMap="RadioResultMap">
+        SELECT * FROM subject_radio
+        WHERE subject_id = #{subjectId} AND is_deleted = 0
+        ORDER BY option_type
+    </select>
+
+    <update id="deleteBySubjectId">
+        UPDATE subject_radio SET is_deleted = 1 WHERE subject_id = #{subjectId}
+    </update>
+
+</mapper>

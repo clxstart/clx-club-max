@@ -1,0 +1,86 @@
+feature: 2026-04-22-community-homepage
+created_at: 2026-04-22
+
+steps:
+  - action: "数据库：创建帖子相关表"
+    exit_signal: "SQL 执行成功，表结构正确"
+    status: done
+
+  - action: "新建 clx-post 服务框架"
+    exit_signal: "服务能启动，健康检查通过"
+    status: done
+
+  - action: "实现帖子 CRUD（不含搜索）"
+    exit_signal: "能发布、查看、删除帖子"
+    status: done
+
+  - action: "实现评论功能"
+    exit_signal: "能评论帖子"
+    status: done
+
+  - action: "实现点赞功能"
+    exit_signal: "能点赞/取消点赞"
+    status: done
+
+  - action: "实现分类/标签"
+    exit_signal: "能筛选帖子"
+    status: done
+
+  - action: "集成 ES，实现搜索"
+    exit_signal: "能关键词搜索"
+    status: done
+
+  - action: "实现推荐（热度兜底）"
+    exit_signal: "首页有推荐区域"
+    status: done
+
+  - action: "前端首页页面"
+    exit_signal: "浏览器能看到完整首页"
+    status: done
+
+  - action: "单元测试"
+    exit_signal: "核心逻辑有测试覆盖"
+    status: done
+
+acceptance_criteria:
+  - "用户能完整走通浏览→发布→互动→搜索/筛选闭环"
+  - "新建独立的 clx-post 微服务"
+  - "有单元测试覆盖核心逻辑"
+  - "前后端接口有清晰契约"
+
+checks:
+  # 第 1 节：接口契约核对
+  - check: "帖子列表 API 契约一致"
+    status: passed
+  - check: "发布帖子 API 契约一致"
+    status: passed
+  - check: "帖子详情 API 契约一致"
+    status: passed
+  - check: "点赞 API 契约一致"
+    status: passed
+  - check: "评论 API 契约一致"
+    status: passed
+  - check: "搜索 API 契约一致"
+    status: passed
+  - check: "分类/标签 API 契约一致"
+    status: passed
+  # 第 2 节：行为与决策核对
+  - check: "明确不做项未实现"
+    status: passed
+  - check: "关键决策落地"
+    status: passed
+  # 第 3 节：测试约束核对
+  - check: "发布帖子参数校验有测试覆盖"
+    status: passed
+  - check: "帖子列表分页有测试覆盖"
+    status: passed
+  - check: "点赞逻辑有测试覆盖"
+    status: passed
+  - check: "评论功能有测试覆盖"
+    status: passed
+  # 第 4 节：术语一致性
+  - check: "术语命名一致"
+    status: passed
+  # 第 5 节：架构归并
+  - check: "架构文档已更新"
+    status: passed

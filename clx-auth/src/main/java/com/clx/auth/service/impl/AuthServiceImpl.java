@@ -7,8 +7,8 @@ import com.clx.auth.config.RememberMeProperties;
 import com.clx.auth.entity.User;
 import com.clx.auth.mapper.UserMapper;
 import com.clx.auth.service.AuthService;
-import com.clx.auth.service.CaptchaService;
-import com.clx.auth.service.VerificationCodeService;
+import com.clx.auth.support.CaptchaGenerator;
+import com.clx.auth.support.CodeStorage;
 import com.clx.auth.vo.LoginVO;
 import com.clx.auth.vo.RegisterVO;
 import com.clx.auth.vo.UserInfoVO;
@@ -29,7 +29,7 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 认证服务实现。
+ * 认证服务实现
  */
 @Slf4j
 @Service
@@ -44,8 +44,8 @@ public class AuthServiceImpl implements AuthService {
     private final StringRedisTemplate redisTemplate;
     private final SaTokenConfig saTokenConfig;
     private final RememberMeProperties rememberMeProperties;
-    private final CaptchaService captchaService;
-    private final VerificationCodeService verificationCodeService;
+    private final CaptchaGenerator captchaGenerator;
+    private final CodeStorage codeStorage;
 
     @Override
     public LoginVO login(String username, String password, String captchaId, String captchaCode,
@@ -55,7 +55,7 @@ public class AuthServiceImpl implements AuthService {
 
         checkLoginLock(attemptKey);
 
-        if (!captchaService.verifyCaptchaCode(captchaId, captchaCode)) {
+        if (!captchaGenerator.verify(captchaId, captchaCode)) {
             throw AuthException.captchaError();
         }
 
@@ -92,13 +92,8 @@ public class AuthServiceImpl implements AuthService {
         userMapper.updateLoginSuccess(user.getUserId(), clientIp);
 
         log.info("用户登录成功: username={}, userId={}, ip={}", user.getUsername(), user.getUserId(), clientIp);
-        return new LoginVO(
-                StpUtil.getTokenValue(),
-                SecurityConstants.TOKEN_HEADER,
-                loginTimeout,
-                activeTimeout,
-                rememberMe
-        );
+        return new LoginVO(StpUtil.getTokenValue(), SecurityConstants.TOKEN_HEADER,
+                loginTimeout, activeTimeout, rememberMe);
     }
 
     @Override
@@ -107,7 +102,7 @@ public class AuthServiceImpl implements AuthService {
                                String nickname, String email, String emailCode, String clientIp) {
         String normalizedUsername = normalizeUsername(username);
 
-        if (!verificationCodeService.verifyEmailCode(email, emailCode)) {
+        if (!codeStorage.verifyEmailCode(email, emailCode)) {
             throw AuthException.emailCodeError();
         }
 
@@ -125,9 +120,7 @@ public class AuthServiceImpl implements AuthService {
 
         String encodedPassword = passwordEncoder.encode(password);
         Long userId = generateUserId();
-        String finalNickname = (nickname == null || nickname.isBlank())
-                ? normalizedUsername
-                : nickname.trim();
+        String finalNickname = (nickname == null || nickname.isBlank()) ? normalizedUsername : nickname.trim();
 
         User user = new User();
         user.setUserId(userId);
@@ -155,14 +148,8 @@ public class AuthServiceImpl implements AuthService {
         userMapper.updateLoginSuccess(userId, clientIp);
         log.info("用户注册成功: username={}, userId={}, email={}", normalizedUsername, userId, email);
 
-        return new RegisterVO(
-                userId,
-                normalizedUsername,
-                StpUtil.getTokenValue(),
-                SecurityConstants.TOKEN_HEADER,
-                loginTimeout,
-                activeTimeout
-        );
+        return new RegisterVO(userId, normalizedUsername, StpUtil.getTokenValue(),
+                SecurityConstants.TOKEN_HEADER, loginTimeout, activeTimeout);
     }
 
     @Override
@@ -175,11 +162,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public UserInfoVO getCurrentUser() {
         StpUtil.checkLogin();
-        return new UserInfoVO(
-                StpUtil.getLoginIdAsLong(),
-                (String) StpUtil.getSession().get("username"),
-                StpUtil.getTokenInfo()
-        );
+        return new UserInfoVO(StpUtil.getLoginIdAsLong(),
+                (String) StpUtil.getSession().get("username"), StpUtil.getTokenInfo());
     }
 
     @Override
@@ -196,13 +180,8 @@ public class AuthServiceImpl implements AuthService {
         long activeTimeout = isRememberMe ? rememberMeProperties.getActiveTimeout() : saTokenConfig.getActiveTimeout();
 
         log.info("Token 刷新成功: userId={}", userId);
-        return new LoginVO(
-                StpUtil.getTokenValue(),
-                SecurityConstants.TOKEN_HEADER,
-                timeout,
-                activeTimeout,
-                isRememberMe
-        );
+        return new LoginVO(StpUtil.getTokenValue(), SecurityConstants.TOKEN_HEADER,
+                timeout, activeTimeout, isRememberMe);
     }
 
     @Override
@@ -280,9 +259,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private long resolveActiveTimeout(boolean rememberMe, long loginTimeout) {
-        long activeTimeout = rememberMe
-                ? rememberMeProperties.getActiveTimeout()
-                : saTokenConfig.getActiveTimeout();
+        long activeTimeout = rememberMe ? rememberMeProperties.getActiveTimeout() : saTokenConfig.getActiveTimeout();
         if (loginTimeout > 0 && activeTimeout > loginTimeout) {
             return loginTimeout;
         }
@@ -290,8 +267,6 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private Long generateUserId() {
-        long timestamp = System.currentTimeMillis();
-        int random = (int) (Math.random() * 1000);
-        return timestamp * 1000 + random;
+        return System.currentTimeMillis() * 1000 + (int) (Math.random() * 1000);
     }
 }

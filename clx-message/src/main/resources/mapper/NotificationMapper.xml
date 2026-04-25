@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clx.message.mapper.NotificationMapper">
+
+    <resultMap id="NotificationMap" type="com.clx.message.entity.Notification">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="type" column="type"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="sourceId" column="source_id"/>
+        <result property="sourceType" column="source_type"/>
+        <result property="isRead" column="is_read"/>
+        <result property="aggregateCount" column="aggregate_count"/>
+        <result property="aggregateKey" column="aggregate_key"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.clx.message.entity.Notification" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO notification (user_id, type, title, content, source_id, source_type, aggregate_key, aggregate_count)
+        VALUES (#{userId}, #{type}, #{title}, #{content}, #{sourceId}, #{sourceType}, #{aggregateKey}, #{aggregateCount})
+    </insert>
+
+    <select id="selectById" resultMap="NotificationMap">
+        SELECT * FROM notification WHERE id = #{id}
+    </select>
+
+    <select id="selectByAggregateKey" resultMap="NotificationMap">
+        SELECT * FROM notification WHERE aggregate_key = #{aggregateKey} AND is_read = 0
+    </select>
+
+    <update id="updateAggregateCount">
+        UPDATE notification SET aggregate_count = #{count}, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <select id="selectByUserId" resultMap="NotificationMap">
+        SELECT * FROM notification
+        WHERE user_id = #{userId}
+        <if test="type != null and type != ''">
+            AND type = #{type}
+        </if>
+        ORDER BY create_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countByUserId" resultType="int">
+        SELECT COUNT(*) FROM notification
+        WHERE user_id = #{userId}
+        <if test="type != null and type != ''">
+            AND type = #{type}
+        </if>
+    </select>
+
+    <update id="markRead">
+        UPDATE notification SET is_read = 1, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="markAllRead">
+        UPDATE notification SET is_read = 1, update_time = NOW()
+        WHERE user_id = #{userId} AND is_read = 0
+        <if test="type != null and type != ''">
+            AND type = #{type}
+        </if>
+    </update>
+
+    <select id="countUnreadByType" resultType="java.util.Map">
+        SELECT type AS `type`, COUNT(*) AS count
+        FROM notification
+        WHERE user_id = #{userId} AND is_read = 0
+        GROUP BY type
+    </select>
+
+</mapper>

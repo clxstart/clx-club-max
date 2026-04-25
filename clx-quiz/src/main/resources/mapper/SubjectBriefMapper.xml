@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clx.quiz.mapper.SubjectBriefMapper">
+
+    <resultMap id="BriefResultMap" type="com.clx.quiz.entity.SubjectBrief">
+        <id column="id" property="id"/>
+        <result column="subject_id" property="subjectId"/>
+        <result column="subject_answer" property="subjectAnswer"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO subject_brief (subject_id, subject_answer, created_by)
+        VALUES (#{subjectId}, #{subjectAnswer}, #{createdBy})
+    </insert>
+
+    <select id="selectBySubjectId" resultMap="BriefResultMap">
+        SELECT * FROM subject_brief
+        WHERE subject_id = #{subjectId} AND is_deleted = 0
+    </select>
+
+    <update id="deleteBySubjectId">
+        UPDATE subject_brief SET is_deleted = 1 WHERE subject_id = #{subjectId}
+    </update>
+
+</mapper>

@@ -1,0 +1,181 @@
+# Frontend Rewrite Checklist
+# Generated from: frontend-rewrite-design.md
+# Feature: 2026-04-24-frontend-rewrite
+# Status: approved
+
+meta:
+  feature: 2026-04-24-frontend-rewrite
+  created_at: 2026-04-24
+  design_file: frontend-rewrite-design.md
+
+# 推进步骤（来自设计文件第3节）
+steps:
+  - id: step-01
+    desc: "基础设施搭建：合并 tailwind preset，引入 globals.css，创建 NeuButton/NeuInput/NeuCard"
+    status: done
+    exit_signal: "浏览器能看到 Neumorphism 风格的按钮和输入框示例页"
+
+  - id: step-02
+    desc: "登录页实现：LoginPage + authStore + /login 路由"
+    status: done
+    exit_signal: "能登录成功，Token 存入 localStorage，跳转首页"
+
+  - id: step-03
+    desc: "路由守卫 + MainLayout：AuthGuard + 导航栏 + 内容区"
+    status: done
+    exit_signal: "未登录访问首页跳转登录；登录后能看到导航栏"
+
+  - id: step-04
+    desc: "首页（帖子列表）：PostCard + HomePage + 分页"
+    status: done
+    exit_signal: "首页能展示帖子列表，分页可用"
+
+  - id: step-05
+    desc: "帖子详情页：PostDetailPage + /posts/:id 路由"
+    status: done
+    exit_signal: "点击帖子卡片能进入详情页，内容正确展示"
+
+  - id: step-06
+    desc: "登出功能：导航栏登出按钮 + 清除 Token + 跳转"
+    status: done
+    exit_signal: "登出后跳转登录页，再访问首页被拦截"
+
+  - id: step-07
+    desc: "优化与细节：骨架屏 + toast + 响应式"
+    status: done
+    exit_signal: "所有交互有反馈，移动端可用"
+
+# 验收检查项（来自设计文件验收点和明确不做）
+checks:
+  # 范围守护（来自"明确不做"）
+  scope:
+    - id: scope-01
+      desc: "无注册页面"
+      verify: "无 /register 路由和 RegisterPage 组件"
+      status: passed
+
+    - id: scope-02
+      desc: "无忘记密码页面"
+      verify: "无 /forgot-password 路由"
+      status: passed
+
+    - id: scope-03
+      desc: "无 OAuth/手机登录页面"
+      verify: "无 OAuth 回调和 PhoneLogin 相关代码"
+      status: passed
+
+    - id: scope-04
+      desc: "无用户中心/个人主页"
+      verify: "无 /user 或 /profile 路由"
+      status: passed
+
+    - id: scope-05
+      desc: "无发帖功能"
+      verify: "无 /posts/create 路由"
+      status: passed
+
+    - id: scope-06
+      desc: "无评论交互（只展示）"
+      verify: "详情页无评论输入框"
+      status: passed
+
+    - id: scope-07
+      desc: "无点赞交互（只展示数量）"
+      verify: "点赞按钮无 onClick 事件"
+      status: passed
+
+    - id: scope-08
+      desc: "无复杂搜索"
+      verify: "无搜索页面，无 /search 路由"
+      status: passed
+
+    - id: scope-09
+      desc: "无 shadcn/ui 组件引用"
+      verify: "grep 无 @/components/ui/ 引用（shadcn 风格）"
+      status: passed
+
+  # 接口一致性（来自 API 契约）
+  api:
+    - id: api-01
+      desc: "登录接口返回 Token 并存 localStorage"
+      verify: "登录后 localStorage 有 token 值"
+      status: passed
+
+    - id: api-02
+      desc: "请求头携带 Authorization"
+      verify: "浏览器 Network 面板看到 Authorization: Bearer xxx"
+      status: passed
+
+    - id: api-03
+      desc: "帖子列表分页参数正确传递"
+      verify: "请求 /api/post/list?page=1&size=10 返回数据"
+      status: passed
+
+    - id: api-04
+      desc: "帖子详情通过 ID 获取"
+      verify: "访问 /posts/1 调用 /api/post/1"
+      status: passed
+
+    - id: api-05
+      desc: "登出清除 Token"
+      verify: "登出后 localStorage 无 token 值"
+      status: passed
+
+  # 视觉风格一致性
+  style:
+    - id: style-01
+      desc: "背景色为 #e0e5ec"
+      verify: "页面背景非纯白，为 Neumorphism 浅灰色"
+      status: passed
+
+    - id: style-02
+      desc: "按钮使用双重阴影（凸起/凹陷切换）"
+      verify: "按钮 hover/active 有 neu-sm/neu-inset 阴影"
+      status: passed
+
+    - id: style-03
+      desc: "输入框使用凹陷阴影"
+      verify: "输入框 shadow 为 inset 类型"
+      status: passed
+
+    - id: style-04
+      desc: "卡片使用凸起阴影"
+      verify: "卡片 shadow 为 neu-lg"
+      status: passed
+
+    - id: style-05
+      desc: "无禁止的 class（shadow-sm/shadow-lg/bg-white/border-2 等）"
+      verify: "grep 无 stype 提示词中 FORBIDDEN 列出的 class"
+      status: passed
+
+  # 测试覆盖
+  test:
+    - id: test-01
+      desc: "登录功能手动验证"
+      verify: "admin/admin123 登录成功跳转首页"
+      status: passed
+
+    - id: test-02
+      desc: "登录失败提示验证"
+      verify: "错误密码显示提示信息"
+      status: passed
+
+    - id: test-03
+      desc: "路由守卫生效"
+      verify: "未登录访问首页 → 跳转登录页"
+      status: passed
+
+    - id: test-04
+      desc: "帖子列表展示"
+      verify: "首页能看到帖子标题、摘要、作者"
+      status: passed
+
+    - id: test-05
+      desc: "帖子详情展示"
+      verify: "详情页内容完整"
+      status: passed
+
+    - id: test-06
+      desc: "登出流程"
+      verify: "登出 → 跳转登录 → 再访问被拦截"
+      status: passed

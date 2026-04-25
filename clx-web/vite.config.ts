@@ -1,69 +1,26 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
-// https://vite.dev/config/
+// 后端服务端口配置（Gateway 未实现，直接代理到各服务）
+const services = {
+  auth: 'http://localhost:9100',
+  post: 'http://localhost:9300',
+  search: 'http://localhost:9400',
+  message: 'http://localhost:9500'
+};
+
 export default defineConfig({
   plugins: [react()],
-
-  // 路径别名
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, 'src'),
-      '@features': path.resolve(__dirname, 'src/features'),
-      '@shared': path.resolve(__dirname, 'src/shared'),
-      '@api': path.resolve(__dirname, 'src/api'),
-      '@store': path.resolve(__dirname, 'src/store'),
-      '@layouts': path.resolve(__dirname, 'src/layouts'),
-      '@routes': path.resolve(__dirname, 'src/routes'),
-      '@config': path.resolve(__dirname, 'src/config'),
-    },
-  },
-
-  // 开发服务器配置
   server: {
     port: 5173,
-    host: true,
-    open: true,
-    // API 代理（连接后端）
     proxy: {
-      '/auth': {
-        target: 'http://localhost:9100',
-        changeOrigin: true,
-      },
-      '/user': {
-        target: 'http://localhost:9200',
-        changeOrigin: true,
-      },
-      '/api': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
-    },
-  },
-
-  // 构建配置
-  build: {
-    outDir: 'dist',
-    sourcemap: true,
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
-            return 'vendor-react';
-          }
-          if (id.includes('zustand') || id.includes('react-query')) {
-            return 'vendor-state';
-          }
-          if (id.includes('antd') || id.includes('ant-design')) {
-            return 'vendor-ui';
-          }
-          if (id.includes('axios')) {
-            return 'vendor-http';
-          }
-        },
-      },
-    },
-  },
-})
+      '/auth': services.auth,
+      '/post': services.post,
+      '/category': services.post,
+      '/tag': services.post,
+      '/comment': services.post,
+      '/search': services.search,
+      '/message': services.message
+    }
+  }
+});

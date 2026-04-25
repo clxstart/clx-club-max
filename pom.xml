@@ -18,7 +18,11 @@
         <module>clx-api</module>
         <module>clx-auth</module>
         <module>clx-user</module>
+        <module>clx-post</module>
+        <module>clx-search</module>
         <module>clx-gateway</module>
+        <module>clx-message</module>
+        <module>clx-quiz</module>
     </modules>
 
     <!-- 版本管理 -->
@@ -72,6 +76,9 @@
 
         <!-- 序列化 -->
         <fastjson2.version>2.0.43</fastjson2.version>
+
+        <!-- API文档 -->
+        <springdoc.version>2.3.0</springdoc.version>
 
         <!-- 其他 -->
         <commons-lang3.version>3.14.0</commons-lang3.version>
@@ -198,6 +205,13 @@
                 <groupId>com.alibaba.fastjson2</groupId>
                 <artifactId>fastjson2</artifactId>
                 <version>${fastjson2.version}</version>
+            </dependency>
+
+            <!-- SpringDoc OpenAPI -->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc.version}</version>
             </dependency>
 
             <!-- Guava -->
@@ -351,6 +365,8 @@
                         <source>${java.version}</source>
                         <target>${java.version}</target>
                         <encoding>${project.build.sourceEncoding}</encoding>
+                        <!-- 保留参数名，Spring MVC 方法参数解析需要 -->
+                        <parameters>true</parameters>
                         <annotationProcessorPaths>
                             <path>
                                 <groupId>org.projectlombok</groupId>

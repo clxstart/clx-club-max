@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clx.post.mapper.CommentMapper">
+
+    <resultMap id="CommentResultMap" type="com.clx.post.entity.Comment">
+        <id column="id" property="id"/>
+        <result column="post_id" property="postId"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="reply_to_id" property="replyToId"/>
+        <result column="author_id" property="authorId"/>
+        <result column="author_name" property="authorName"/>
+        <result column="content" property="content"/>
+        <result column="like_count" property="likeCount"/>
+        <result column="status" property="status"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="BaseColumns">
+        id, post_id, parent_id, reply_to_id, author_id, author_name, content,
+        like_count, status, is_deleted, create_time, update_time
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO comment (post_id, parent_id, reply_to_id, author_id, author_name, content)
+        VALUES (#{postId}, #{parentId}, #{replyToId}, #{authorId}, #{authorName}, #{content})
+    </insert>
+
+    <select id="selectById" resultMap="CommentResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM comment
+        WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <update id="deleteById">
+        UPDATE comment SET is_deleted = 1, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <select id="selectByPostId" resultMap="CommentResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM comment
+        WHERE post_id = #{postId} AND is_deleted = 0 AND status = '0'
+        ORDER BY create_time ASC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="selectCountByPostId" resultType="int">
+        SELECT COUNT(*)
+        FROM comment
+        WHERE post_id = #{postId} AND is_deleted = 0 AND status = '0'
+    </select>
+
+    <update id="incrementLikeCount">
+        UPDATE comment SET like_count = like_count + 1 WHERE id = #{id}
+    </update>
+
+    <update id="decrementLikeCount">
+        UPDATE comment SET like_count = like_count - 1 WHERE id = #{id} AND like_count > 0
+    </update>
+
+</mapper>

@@ -198,3 +198,124 @@ CREATE TABLE IF NOT EXISTS `sys_oper_log` (
     KEY `idx_user_id` (`user_id`),
     KEY `idx_oper_time` (`oper_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='操作日志表';
+
+-- ========================================
+-- 帖子服务数据库
+-- ========================================
+CREATE DATABASE IF NOT EXISTS `clx_post` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+USE `clx_post`;
+
+-- ========================================
+-- 分类表
+-- ========================================
+CREATE TABLE IF NOT EXISTS `category` (
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '分类ID',
+    `name` varchar(50) NOT NULL COMMENT '分类名称',
+    `code` varchar(50) NOT NULL COMMENT '分类编码',
+    `description` varchar(255) DEFAULT NULL COMMENT '分类描述',
+    `icon` varchar(255) DEFAULT NULL COMMENT '分类图标',
+    `sort` int DEFAULT '0' COMMENT '排序',
+    `status` char(1) DEFAULT '0' COMMENT '状态:0正常,1禁用',
+    `is_deleted` tinyint DEFAULT '0' COMMENT '是否删除',
+    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_code` (`code`),
+    KEY `idx_sort` (`sort`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='分类表';
+
+-- ========================================
+-- 标签表
+-- ========================================
+CREATE TABLE IF NOT EXISTS `tag` (
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '标签ID',
+    `name` varchar(50) NOT NULL COMMENT '标签名称',
+    `description` varchar(255) DEFAULT NULL COMMENT '标签描述',
+    `color` varchar(20) DEFAULT NULL COMMENT '标签颜色',
+    `is_deleted` tinyint DEFAULT '0' COMMENT '是否删除',
+    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    KEY `idx_name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='标签表';
+
+-- ========================================
+-- 帖子表
+-- ========================================
+CREATE TABLE IF NOT EXISTS `post` (
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '帖子ID',
+    `title` varchar(200) NOT NULL COMMENT '标题',
+    `content` longtext NOT NULL COMMENT '内容',
+    `summary` varchar(500) DEFAULT NULL COMMENT '摘要',
+    `author_id` bigint NOT NULL COMMENT '作者ID',
+    `author_name` varchar(50) DEFAULT NULL COMMENT '作者名称（冗余）',
+    `category_id` bigint DEFAULT NULL COMMENT '分类ID',
+    `category_name` varchar(50) DEFAULT NULL COMMENT '分类名称（冗余）',
+    `view_count` int DEFAULT '0' COMMENT '浏览数',
+    `like_count` int DEFAULT '0' COMMENT '点赞数',
+    `comment_count` int DEFAULT '0' COMMENT '评论数',
+    `is_top` tinyint DEFAULT '0' COMMENT '是否置顶',
+    `is_essence` tinyint DEFAULT '0' COMMENT '是否精华',
+    `status` char(1) DEFAULT '0' COMMENT '状态:0正常,1禁用,2草稿',
+    `is_deleted` tinyint DEFAULT '0' COMMENT '是否删除',
+    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    KEY `idx_author_id` (`author_id`),
+    KEY `idx_category_id` (`category_id`),
+    KEY `idx_status` (`status`),
+    KEY `idx_create_time` (`create_time`),
+    KEY `idx_like_count` (`like_count`),
+    KEY `idx_is_top` (`is_top`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='帖子表';
+
+-- ========================================
+-- 帖子标签关联表
+-- ========================================
+CREATE TABLE IF NOT EXISTS `post_tag` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `post_id` bigint NOT NULL COMMENT '帖子ID',
+    `tag_id` bigint NOT NULL COMMENT '标签ID',
+    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_post_tag` (`post_id`, `tag_id`),
+    KEY `idx_tag_id` (`tag_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='帖子标签关联表';
+
+-- ========================================
+-- 评论表
+-- ========================================
+CREATE TABLE IF NOT EXISTS `comment` (
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '评论ID',
+    `post_id` bigint NOT NULL COMMENT '帖子ID',
+    `parent_id` bigint DEFAULT '0' COMMENT '父评论ID（0表示一级评论）',
+    `reply_to_id` bigint DEFAULT NULL COMMENT '回复的评论ID',
+    `author_id` bigint NOT NULL COMMENT '评论者ID',
+    `author_name` varchar(50) DEFAULT NULL COMMENT '评论者名称（冗余）',
+    `content` varchar(2000) NOT NULL COMMENT '评论内容',
+    `like_count` int DEFAULT '0' COMMENT '点赞数',
+    `status` char(1) DEFAULT '0' COMMENT '状态:0正常,1禁用',
+    `is_deleted` tinyint DEFAULT '0' COMMENT '是否删除',
+    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    KEY `idx_post_id` (`post_id`),
+    KEY `idx_parent_id` (`parent_id`),
+    KEY `idx_author_id` (`author_id`),
+    KEY `idx_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='评论表';
+
+-- ========================================
+-- 点赞记录表
+-- ========================================
+CREATE TABLE IF NOT EXISTS `like_record` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `user_id` bigint NOT NULL COMMENT '用户ID',
+    `target_type` char(1) NOT NULL COMMENT '目标类型:1帖子,2评论',
+    `target_id` bigint NOT NULL COMMENT '目标ID',
+    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_user_target` (`user_id`, `target_type`, `target_id`),
+    KEY `idx_target` (`target_type`, `target_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='点赞记录表';

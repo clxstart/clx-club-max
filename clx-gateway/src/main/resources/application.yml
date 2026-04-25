@@ -23,13 +23,21 @@ spring:
           lower-case-service-id: true
       routes:
         - id: clx-auth
-          uri: lb://clx-auth
+          uri: http://localhost:9100
           predicates:
             - Path=/auth/**
         - id: clx-user
-          uri: lb://clx-user
+          uri: http://localhost:9202
           predicates:
             - Path=/user/**
+        - id: clx-post
+          uri: http://localhost:9300
+          predicates:
+            - Path=/post/**,/category/**,/tag/**,/comment/**
+        - id: clx-search
+          uri: http://localhost:9400
+          predicates:
+            - Path=/search/**
 
 logging:
   level:

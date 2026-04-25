@@ -1,0 +1,201 @@
+---
+doc_type: feature-checklist
+feature: 2026-04-24-async-like
+status: completed
+summary: 点赞异步化实施清单 - 验收完成
+---
+
+steps:
+  - id: step-1
+    title: 添加 RabbitMQ 依赖
+    status: done
+    files:
+      - clx-post/pom.xml
+    exit_signal: mvn compile 成功
+
+  - id: step-2
+    title: MQ 配置与消息实体
+    status: done
+    files:
+      - clx-post/src/main/java/com/clx/post/config/LikeMQConfig.java
+      - clx-post/src/main/java/com/clx/post/dto/LikeMessage.java
+    exit_signal: 启动服务，MQ 管理界面看到队列创建
+
+  - id: step-3
+    title: 生产者实现
+    status: done
+    files:
+      - clx-post/src/main/java/com/clx/post/mq/LikeProducer.java
+    exit_signal: 单元测试发送消息成功
+
+  - id: step-4
+    title: 改造 LikeServiceImpl.likePost
+    status: done
+    files:
+      - clx-post/src/main/java/com/clx/post/service/impl/LikeServiceImpl.java
+    exit_signal: 点赞后 Redis 有计数、MQ 有消息
+
+  - id: step-5
+    title: 消费者实现
+    status: done
+    files:
+      - clx-post/src/main/java/com/clx/post/mq/LikeConsumer.java
+    exit_signal: 点赞后 DB like_record 和 post.like_count 更新
+
+  - id: step-6
+    title: unlike 处理
+    status: done
+    files:
+      - clx-post/src/main/java/com/clx/post/service/impl/LikeServiceImpl.java
+      - clx-post/src/main/java/com/clx/post/controller/LikeController.java
+    exit_signal: 取消点赞后 Redis key 删除、DB 计数减少
+
+  - id: step-7
+    title: 定时校准
+    status: done
+    files:
+      - clx-post/src/main/java/com/clx/post/service/LikeSyncService.java
+    exit_signal: 手动修改 Redis 计数，校准后 DB 被修正
+
+  - id: step-8
+    title: 补充测试
+    status: done
+    files:
+      - clx-post/src/test/java/com/clx/post/service/LikeServiceTest.java
+    exit_signal: mvn test 全部通过
+
+checks:
+  # 范围守护
+  - id: scope-01
+    type: scope-guard
+    description: unlike 保持同步，不走 MQ
+    verify: grep LikeProducer 不在 unlike 流程中被调用
+    status: passed
+
+  - id: scope-02
+    type: scope-guard
+    description: 评论点赞保持同步，本次不改
+    verify: likeComment/unlikeComment 方法无 MQ 相关代码
+    status: passed
+
+  - id: scope-03
+    type: scope-guard
+    description: 不引入 Sentinel
+    verify: grep 无 sentinel 依赖
+    status: passed
+
+  - id: scope-04
+    type: scope-guard
+    description: 不做分布式事务
+    verify: grep 无 seata 依赖
+    status: passed
+
+  - id: scope-05
+    type: scope-guard
+    description: 不做前端乐观更新
+    verify: 前端代码无变更
+    status: passed
+
+  # 接口一致性
+  - id: api-01
+    type: contract
+    description: POST /post/{id}/like 返回 Redis 计数
+    verify: 接口响应 data.likeCount == Redis post:like_count:{id}
+    status: passed
+
+  - id: api-02
+    type: contract
+    description: DELETE /post/{id}/like 返回 DB 计数
+    verify: 接口响应 data.likeCount == DB post.like_count
+    status: passed
+
+  - id: api-03
+    type: contract
+    description: MQ 消息格式包含 postId/userId/action/timestamp/uuid
+    verify: LikeMessage 字段完整
+    status: passed
+
+  # 测试验证
+  - id: test-c1
+    type: test
+    description: C1 点赞后 Redis 计数 +1
+    step_ref: step-4
+    status: passed
+
+  - id: test-c2
+    type: test
+    description: C2 点赞后 MQ 有消息
+    step_ref: step-4
+    status: passed
+
+  - id: test-c3
+    type: test
+    description: C3 消费者写入 like_record
+    step_ref: step-5
+    status: passed
+
+  - id: test-c4
+    type: test
+    description: C4 消费者更新 post.like_count
+    step_ref: step-5
+    status: passed
+
+  - id: test-c5
+    type: test
+    description: C5 重复点赞被拦截
+    step_ref: step-4
+    status: passed
+
+  - id: test-c6
+    type: test
+    description: C6 unlike 后 DB 计数 -1
+    step_ref: step-6
+    status: passed
+
+  - id: test-c7
+    type: test
+    description: C7 unlike 后 Redis key 删除
+    step_ref: step-6
+    status: passed
+
+  - id: test-c8
+    type: test
+    description: C8 未点赞 unlike 报错
+    step_ref: step-6
+    status: passed
+
+  - id: test-c9
+    type: test
+    description: C9 重复消息不重复写（幂等）
+    step_ref: step-5
+    status: passed
+
+  - id: test-c11
+    type: test
+    description: C11 消费失败重试 3 次
+    step_ref: step-2
+    status: passed
+
+  - id: test-c12
+    type: test
+    description: C12 3 次后进 DLQ
+    step_ref: step-2
+    status: passed
+
+  - id: test-c13
+    type: test
+    description: C13 Redis > DB 时更新 DB
+    step_ref: step-7
+    status: passed
+
+  - id: test-c14
+    type: test
+    description: C14 Redis < DB 时更新 Redis
+    step_ref: step-7
+    status: passed
+
+  - id: test-c15
+    type: test
+    description: C15 Redis key 不存在时从 DB 初始化
+    step_ref: step-7
+    status: passed
