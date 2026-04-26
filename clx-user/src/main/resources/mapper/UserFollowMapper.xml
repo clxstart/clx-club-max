@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clx.user.mapper.UserFollowMapper">
+
+    <resultMap id="FollowResultMap" type="com.clx.user.entity.UserFollow">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="target_id" property="targetId"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <select id="selectByUserAndTarget" resultMap="FollowResultMap">
+        SELECT id, user_id, target_id, create_time
+        FROM user_follow
+        WHERE user_id = #{userId} AND target_id = #{targetId}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO user_follow (user_id, target_id, create_time)
+        VALUES (#{userId}, #{targetId}, NOW())
+    </insert>
+
+    <delete id="deleteByUserAndTarget">
+        DELETE FROM user_follow
+        WHERE user_id = #{userId} AND target_id = #{targetId}
+    </delete>
+
+    <select id="selectFollowing" resultMap="FollowResultMap">
+        SELECT id, user_id, target_id, create_time
+        FROM user_follow
+        WHERE user_id = #{userId}
+        ORDER BY create_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="selectFans" resultMap="FollowResultMap">
+        SELECT id, user_id, target_id, create_time
+        FROM user_follow
+        WHERE target_id = #{targetId}
+        ORDER BY create_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countFollowing" resultType="int">
+        SELECT COUNT(*) FROM user_follow WHERE user_id = #{userId}
+    </select>
+
+    <select id="countFans" resultType="int">
+        SELECT COUNT(*) FROM user_follow WHERE target_id = #{targetId}
+    </select>
+
+</mapper>

@@ -106,4 +106,16 @@ public class PostController {
         List<PostListItemVO> posts = postService.getHot(limit);
         return R.ok(posts);
     }
+
+    /**
+     * 按作者查询帖子。
+     */
+    @Operation(summary = "按作者查询帖子")
+    @GetMapping("/user/{userId}")
+    public R<PostListVO> getByAuthor(@PathVariable Long userId,
+                                      @RequestParam(defaultValue = "1") Integer page,
+                                      @RequestParam(defaultValue = "20") Integer size) {
+        PostListVO result = postService.getByAuthor(userId, page, size);
+        return R.ok(result);
+    }
 }

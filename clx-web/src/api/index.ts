@@ -36,7 +36,11 @@ import type {
   PracticeSubmitRequest,
   SubmitResultVO,
   PracticeResultVO,
-  WrongBookVO
+  WrongBookVO,
+  UserProfileVO,
+  UserSimpleVO,
+  ProfileUpdateRequest,
+  FavoriteItemVO
 } from './types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
@@ -174,4 +178,25 @@ export const quizApi = {
   // 错题本
   wrongBookList: (pageNo = 1, pageSize = 10) => post<{ total: number; list: WrongBookVO[] }>('/quiz/wrong-book/list', { pageNo, pageSize }),
   wrongBookRemove: (subjectId: number) => post<boolean>('/quiz/wrong-book/remove', { subjectId })
+};
+
+export const userApi = {
+  // 用户资料
+  profile: (userId: number) => get<UserProfileVO>(`/user/${userId}`),
+  me: () => get<UserProfileVO>('/user/me'),
+  updateProfile: (body: ProfileUpdateRequest) => put<void>('/user/profile', body),
+
+  // 关注
+  follow: (userId: number) => post<{ followCount: number }>(`/user/follow/${userId}`),
+  unfollow: (userId: number) => del<{ followCount: number }>(`/user/follow/${userId}`),
+  following: (userId: number, page = 1, size = 20) => get<{ total: number; list: UserSimpleVO[] }>(`/user/${userId}/following`, { page, size }),
+  fans: (userId: number, page = 1, size = 20) => get<{ total: number; list: UserSimpleVO[] }>(`/user/${userId}/fans`, { page, size }),
+
+  // 收藏
+  favorite: (postId: number) => post<void>(`/user/favorite/${postId}`),
+  unfavorite: (postId: number) => del<void>(`/user/favorite/${postId}`),
+  favorites: (page = 1, size = 20) => get<{ total: number; list: FavoriteItemVO[] }>('/user/favorites', { page, size }),
+
+  // 用户帖子（调用 post 服务）
+  userPosts: (userId: number, page = 1, size = 20) => get<PostListVO>(`/post/user/${userId}`, { page, size })
 };

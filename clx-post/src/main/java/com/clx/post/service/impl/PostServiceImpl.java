@@ -260,6 +260,22 @@ public class PostServiceImpl implements PostService {
         return posts.stream().map(this::toListItemVO).collect(Collectors.toList());
     }
 
+    @Override
+    public PostListVO getByAuthor(Long authorId, Integer page, Integer size) {
+        int offset = (page - 1) * size;
+        List<Post> posts = postMapper.selectByAuthor(authorId, offset, size);
+        int total = postMapper.countByAuthor(authorId);
+
+        List<PostListItemVO> postVOs = posts.stream().map(this::toListItemVO).collect(Collectors.toList());
+
+        PostListVO result = new PostListVO();
+        result.setPosts(postVOs);
+        result.setTotal(total);
+        result.setPage(page);
+        result.setSize(size);
+        return result;
+    }
+
     /**
      * Post实体转PostListItemVO。
      */

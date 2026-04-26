@@ -1,0 +1,80 @@
+feature: 2026-04-26-user-profile
+created: 2026-04-26
+
+steps:
+  - action: "搭建 clx-user 服务骨架：依赖、配置、启动类"
+    exit_signal: "服务可启动，健康检查通过"
+    status: done
+
+  - action: "实现 User 实体 + Mapper + 资料查询/更新 API"
+    exit_signal: "GET/PUT /user/{userId} 可用"
+    status: done
+
+  - action: "实现 UserFollow 实体 + Mapper + 关注/取关 API"
+    exit_signal: "POST/DELETE /user/follow/{id} 可用"
+    status: done
+
+  - action: "实现 PostFavorite 实体 + Mapper + 收藏 API"
+    exit_signal: "POST/DELETE /user/favorite/{id} 可用"
+    status: done
+
+  - action: "clx-post 新增按作者查询接口"
+    exit_signal: "GET /post/user/{userId} 可用"
+    status: done
+
+  - action: "clx-post 点赞成功后同步获赞数到 clx-user"
+    exit_signal: "点赞后用户获赞数 +1"
+    status: done
+
+  - action: "前端：个人主页页面 + 路由"
+    exit_signal: "访问 /user/123 显示主页"
+    status: done
+
+  - action: "前端：关注/粉丝列表、收藏夹、编辑资料弹窗"
+    exit_signal: "所有交互可用"
+    status: done
+
+checks:
+  - item: "用户资料可查看任意用户，仅可编辑自己"
+    source: 测试约束
+    status: passed
+
+  - item: "不能关注自己，重复关注幂等"
+    source: 测试约束
+    status: passed
+
+  - item: "取关后关注数 -1"
+    source: 测试约束
+    status: passed
+
+  - item: "关注列表分页正确"
+    source: 测试约束
+    status: passed
+
+  - item: "收藏状态可在帖子详情显示"
+    source: 测试约束
+    status: passed
+
+  - item: "收藏夹按时间倒序"
+    source: 测试约束
+    status: passed
+
+  - item: "点赞帖子后作者获赞数 +1"
+    source: 测试约束
+    status: passed
+
+  - item: "删除帖子不影响获赞数"
+    source: 测试约束
+    status: passed
+
+  - item: "不做私信、黑名单、等级勋章、推荐算法"
+    source: 范围守护
+    status: passed
+
+  - item: "clx-user 端口 9200"
+    source: 架构约束
+    status: passed
+
+  - item: "前端个人主页 URL 为 /user/{userId}"
+    source: 接口契约
+    status: passed

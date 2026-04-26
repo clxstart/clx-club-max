@@ -74,4 +74,14 @@ public interface PostService {
      * @return 热门帖子列表
      */
     List<PostListItemVO> getHot(Integer limit);
+
+    /**
+     * 按作者查询帖子。
+     *
+     * @param authorId 作者ID
+     * @param page     页码
+     * @param size     每页数量
+     * @return 帖子列表
+     */
+    PostListVO getByAuthor(Long authorId, Integer page, Integer size);
 }

@@ -94,4 +94,16 @@ public interface PostMapper {
      * 查询热门帖子。
      */
     List<Post> selectHot(@Param("limit") Integer limit);
+
+    /**
+     * 按作者查询帖子。
+     */
+    List<Post> selectByAuthor(@Param("authorId") Long authorId,
+                              @Param("offset") Integer offset,
+                              @Param("size") Integer size);
+
+    /**
+     * 按作者统计帖子数。
+     */
+    int countByAuthor(@Param("authorId") Long authorId);
 }

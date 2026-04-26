@@ -135,4 +135,18 @@
         LIMIT #{limit}
     </select>
 
+    <select id="selectByAuthor" resultMap="PostResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM post
+        WHERE is_deleted = 0 AND status = '0' AND author_id = #{authorId}
+        ORDER BY create_time DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countByAuthor" resultType="int">
+        SELECT COUNT(*)
+        FROM post
+        WHERE is_deleted = 0 AND status = '0' AND author_id = #{authorId}
+    </select>
+
 </mapper>

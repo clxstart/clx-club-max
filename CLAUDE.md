@@ -33,7 +33,7 @@ mvn spring-boot:run -pl clx-auth -Dspring-boot.run.profiles=dev
 | 服务 | 端口 | 说明 |
 |------|------|------|
 | clx-auth | 9100 | 认证中心，用户登录 |
-| clx-user | 9200 | 用户服务（暂未实现） |
+| clx-user | 9200 | 用户服务，个人资料、关注/粉丝、收藏 |
 | clx-post | 9300 | 帖子服务 |
 | clx-search | 9400 | 搜索服务，聚合搜索、ES全文搜索、热词分析 |
 | clx-message | 9500 | 消息服务，私信、通知、在线状态 |
@@ -54,7 +54,11 @@ clx/
 │   ├── mapper/UserMapper.java     # MyBatis-Plus Mapper
 │   ├── service/AuthService.java   # 登录验证
 │   └── controller/AuthController.java
-├── clx-user/                      # 用户服务（暂未实现）
+├── clx-user/                      # 用户服务（当前可用）
+│   ├── entity/                    # User、UserFollow、PostFavorite
+│   ├── mapper/                    # MyBatis Mapper
+│   ├── service/                   # 用户资料、关注、收藏服务
+│   └── controller/                # API 控制器
 ├── clx-post/                      # 帖子服务（当前可用）
 │   ├── entity/                    # Post、Comment、Category、Tag、LikeRecord
 │   ├── mapper/                    # MyBatis Mapper
@@ -84,11 +88,10 @@ clx/
 ├── clx-gateway/                   # API 网关（暂未实现）
 ├── clx-web/                       # 前端（React + Vite + Tailwind + Neumorphism）
 │   ├── src/components/ui/         # Neumorphism 基础组件（NeuButton/NeuInput/NeuCard/Toast）
-│   ├── src/features/auth/         # 认证功能（登录页、authStore）
-│   ├── src/features/post/         # 帖子功能（首页、详情页、发帖、评论、点赞）
-│   ├── src/features/search/       # 搜索功能（聚合搜索、热词）
-│   ├── src/layouts/               # 布局组件（MainLayout）
-│   └── src/routes/                # 路由配置（AuthGuard 守卫）
+│   ├── src/components/layout/     # 布局组件（TopNavBar、LeftNav）
+│   ├── src/pages/                  # 页面组件（Home、PostDetail、UserProfile、Compose、Search、Quiz、Account、Auth）
+│   ├── src/api/                    # API 请求和类型定义
+│   └── src/styles/                 # 全局样式
 └── doc/sql/                       # 数据库脚本
 ```
 
@@ -205,7 +208,7 @@ ES 索引定义：`doc/es/` 目录下
 1. **阶段 1**：最简登录（sa-Token 核心模式） ✅
 2. **阶段 2**：添加 JWT 支持
 3. **阶段 3**：添加权限控制（@SaCheckPermission）
-4. **阶段 4**：实现 clx-user 服务
+4. **阶段 4**：实现 clx-user 服务 ✅
 5. **阶段 5**：启用 Gateway 路由
 6. **阶段 6**：启用 OAuth2 SSO（企业微信、钉钉）
 7. **阶段 7**：社区功能开发（帖子、评论、点赞、分类标签） ✅

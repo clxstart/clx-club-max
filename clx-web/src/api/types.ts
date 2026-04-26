@@ -293,3 +293,51 @@ export type WrongBookVO = {
   wrongCount: number;
   lastWrongTime?: string;
 };
+
+// ========== Active User Types ==========
+
+export type ActiveUserVO = {
+  rank: number;
+  userId: number;
+  username: string;
+  score: number;
+};
+
+// ========== User Profile Types ==========
+
+export type UserProfileVO = {
+  userId: number;
+  username: string;
+  nickname?: string;
+  avatar?: string;
+  signature?: string;
+  gender?: string;
+  followCount?: number;
+  fansCount?: number;
+  likeTotalCount?: number;
+  isFollowed?: boolean;
+};
+
+export type UserSimpleVO = {
+  userId: number;
+  nickname?: string;
+  avatar?: string;
+  signature?: string;
+};
+
+export type ProfileUpdateRequest = {
+  nickname?: string;
+  avatar?: string;
+  signature?: string;
+  gender?: string;
+};
+
+export type FavoriteItemVO = {
+  postId: number;
+  title: string;
+  summary?: string;
+  authorName?: string;
+  likeCount?: number;
+  createdAt?: string;
+  favoritedAt?: string;
+};

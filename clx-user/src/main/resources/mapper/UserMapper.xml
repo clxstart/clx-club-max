@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clx.user.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="com.clx.user.entity.User">
+        <id column="user_id" property="userId"/>
+        <result column="username" property="username"/>
+        <result column="nickname" property="nickname"/>
+        <result column="email" property="email"/>
+        <result column="phone" property="phone"/>
+        <result column="avatar" property="avatar"/>
+        <result column="signature" property="signature"/>
+        <result column="gender" property="gender"/>
+        <result column="birthday" property="birthday"/>
+        <result column="status" property="status"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="like_total_count" property="likeTotalCount"/>
+        <result column="follow_count" property="followCount"/>
+        <result column="fans_count" property="fansCount"/>
+        <result column="last_login_time" property="lastLoginTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT user_id, username, nickname, email, phone, avatar, signature,
+               gender, birthday, status, is_deleted, like_total_count,
+               follow_count, fans_count, last_login_time, create_time, update_time
+        FROM sys_user
+        WHERE user_id = #{userId} AND is_deleted = 0
+    </select>
+
+    <update id="updateProfile">
+        UPDATE sys_user
+        <set>
+            <if test="user.nickname != null">nickname = #{user.nickname},</if>
+            <if test="user.avatar != null">avatar = #{user.avatar},</if>
+            <if test="user.signature != null">signature = #{user.signature},</if>
+            <if test="user.gender != null">gender = #{user.gender},</if>
+            update_time = NOW()
+        </set>
+        WHERE user_id = #{user.userId}
+    </update>
+
+    <update id="incrLikeTotalCount">
+        UPDATE sys_user SET like_total_count = like_total_count + #{delta}
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="incrFollowCount">
+        UPDATE sys_user SET follow_count = follow_count + #{delta}
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="incrFansCount">
+        UPDATE sys_user SET fans_count = fans_count + #{delta}
+        WHERE user_id = #{userId}
+    </update>
+
+</mapper>
