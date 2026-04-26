@@ -1,7 +1,7 @@
 ---
 doc_type: feature-design
 feature: 2026-04-26-zhihu-layout
-status: draft
+status: approved
 summary: 参考知乎的三栏布局重构前端，内容流与详情页分离，适配桌面和移动端
 tags: [frontend, layout, responsive, ux]
 ---

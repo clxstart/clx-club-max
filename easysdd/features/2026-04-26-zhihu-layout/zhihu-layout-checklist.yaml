@@ -32,29 +32,29 @@ steps:
 
   - action: "收尾测试：全功能验证"
     exit_signal: "功能全部通过"
-    status: in_progress
+    status: completed
 
 checks:
   - item: "三栏布局：桌面端三栏可见，宽度比例合理"
     source: 测试约束
-    status: pending
+    status: passed
 
   - item: "详情页分离：点击帖子跳转新 URL，全屏展示"
     source: 测试约束
-    status: pending
+    status: passed
 
   - item: "移动端适配：<640px 单栏，导航收起"
     source: 测试约束
-    status: pending
+    status: passed
 
   - item: "不改动配色和视觉风格"
     source: 范围守护
-    status: pending
+    status: passed
 
   - item: "不改动后端 API"
     source: 范围守护
-    status: pending
+    status: passed
 
   - item: "不新增功能，只改布局"
     source: 范围守护
-    status: pending
+    status: passed
