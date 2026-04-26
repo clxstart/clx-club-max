@@ -11,6 +11,7 @@ import type {
   PhoneLoginRequest,
   PostCreateRequest,
   PostDetailVO,
+  PostListItemVO,
   PostListRequest,
   PostListVO,
   PostUpdateRequest,
