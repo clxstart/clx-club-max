@@ -3,7 +3,11 @@ package com.clx.search.service;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.IndexRequest;
 import com.clx.search.config.RabbitMQConfig;
+import com.clx.search.constant.ESIndexConstants;
 import com.clx.search.es.PostDocument;
+import com.clx.search.es.UserDocument;
+import com.clx.search.es.CategoryDocument;
+import com.clx.search.es.TagDocument;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -12,9 +16,9 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 
 /**
- * 数据同步服务（MQ 消费者）。
+ * 数据同步服务 - MQ 消费者。
  *
- * 消费 Canal 发送的数据变更消息，更新 ES 索引。
+ * 消费其他服务发送的数据变更消息，更新 ES 索引。
  */
 @Slf4j
 @Service
@@ -23,20 +27,13 @@ public class SyncService {
 
     private final ElasticsearchClient esClient;
 
-    private static final String POST_INDEX = "clx_post";
-    private static final String USER_INDEX = "clx_user";
-    private static final String CATEGORY_INDEX = "clx_category";
-    private static final String TAG_INDEX = "clx_tag";
-
-    /**
-     * 消费帖子同步消息。
-     */
+    /** 消费帖子同步消息 */
     @RabbitListener(queues = RabbitMQConfig.POST_SYNC_QUEUE)
     public void syncPost(PostDocument post) {
         log.info("收到帖子同步消息: {}", post.getId());
         try {
             IndexRequest<PostDocument> request = IndexRequest.of(i -> i
-                    .index(POST_INDEX)
+                    .index(ESIndexConstants.POST_INDEX)
                     .id(String.valueOf(post.getId()))
                     .document(post));
             esClient.index(request);
@@ -46,30 +43,51 @@ public class SyncService {
         }
     }
 
-    /**
-     * 消费用户同步消息。
-     */
+    /** 消费用户同步消息 */
     @RabbitListener(queues = RabbitMQConfig.USER_SYNC_QUEUE)
-    public void syncUser(Object user) {
-        log.info("收到用户同步消息");
-        // TODO: 实现用户同步逻辑
+    public void syncUser(UserDocument user) {
+        log.info("收到用户同步消息: {}", user.getUserId());
+        try {
+            IndexRequest<UserDocument> request = IndexRequest.of(i -> i
+                    .index(ESIndexConstants.USER_INDEX)
+                    .id(String.valueOf(user.getUserId()))
+                    .document(user));
+            esClient.index(request);
+            log.info("用户同步成功: {}", user.getUserId());
+        } catch (IOException e) {
+            log.error("用户同步失败: {}", e.getMessage());
+        }
     }
 
-    /**
-     * 消费分类同步消息。
-     */
+    /** 消费分类同步消息 */
     @RabbitListener(queues = RabbitMQConfig.CATEGORY_SYNC_QUEUE)
-    public void syncCategory(Object category) {
-        log.info("收到分类同步消息");
-        // TODO: 实现分类同步逻辑
+    public void syncCategory(CategoryDocument category) {
+        log.info("收到分类同步消息: {}", category.getId());
+        try {
+            IndexRequest<CategoryDocument> request = IndexRequest.of(i -> i
+                    .index(ESIndexConstants.CATEGORY_INDEX)
+                    .id(String.valueOf(category.getId()))
+                    .document(category));
+            esClient.index(request);
+            log.info("分类同步成功: {}", category.getId());
+        } catch (IOException e) {
+            log.error("分类同步失败: {}", e.getMessage());
+        }
     }
 
-    /**
-     * 消费标签同步消息。
-     */
+    /** 消费标签同步消息 */
     @RabbitListener(queues = RabbitMQConfig.TAG_SYNC_QUEUE)
-    public void syncTag(Object tag) {
-        log.info("收到标签同步消息");
-        // TODO: 实现标签同步逻辑
+    public void syncTag(TagDocument tag) {
+        log.info("收到标签同步消息: {}", tag.getId());
+        try {
+            IndexRequest<TagDocument> request = IndexRequest.of(i -> i
+                    .index(ESIndexConstants.TAG_INDEX)
+                    .id(String.valueOf(tag.getId()))
+                    .document(tag));
+            esClient.index(request);
+            log.info("标签同步成功: {}", tag.getId());
+        } catch (IOException e) {
+            log.error("标签同步失败: {}", e.getMessage());
+        }
     }
 }

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 聚合搜索结果。
+ * 聚合搜索结果 - 返回给前端。
  */
 @Data
 public class SearchVO {
@@ -20,22 +20,17 @@ public class SearchVO {
     /** 各数据源搜索结果 */
     private Map<String, SearchResult> results;
 
-    /** 搜索建议 */
-    private List<String> suggest;
-
-    /** 是否部分成功 */
+    /** 是否部分成功（有数据源失败时为 true） */
     private Boolean partialSuccess = false;
 
-    /**
-     * 单个数据源搜索结果。
-     */
+    /** 单个数据源搜索结果 */
     @Data
     public static class SearchResult {
         /** 总数量 */
         private Long total;
         /** 结果列表 */
         private List<?> items;
-        /** 错误信息（如有） */
+        /** 错误信息（有则表示该数据源失败） */
         private String error;
     }
 }

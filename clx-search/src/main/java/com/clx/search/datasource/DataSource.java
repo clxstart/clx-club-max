@@ -3,37 +3,19 @@ package com.clx.search.datasource;
 import java.util.List;
 
 /**
- * 数据源接口（定义统一的搜索方法）。
+ * 数据源接口 - 定义统一的搜索方法。
  *
- * 所有数据源必须实现此接口，提供统一的搜索能力。
- *
- * @param <T> 搜索结果的数据类型
+ * 不管你是 ES 搜索还是爬虫，都要实现这个接口，让 SearchFacade 能统一调用。
  */
 public interface DataSource<T> {
 
-    /**
-     * 执行搜索。
-     *
-     * @param keyword 搜索关键词
-     * @param page    页码（从 1 开始）
-     * @param size    每页数量
-     * @return 搜索结果列表
-     */
+    /** 执行搜索，返回结果列表 */
     List<T> doSearch(String keyword, int page, int size);
 
-    /**
-     * 获取数据源名称。
-     *
-     * @return 数据源名称（如 post、user、picture）
-     */
+    /** 数据源名字（如 post、user、picture），供 Registry 注册查找 */
     String getName();
 
-    /**
-     * 获取总数量（用于分页）。
-     *
-     * @param keyword 搜索关键词
-     * @return 总数量
-     */
+    /** 统计总数（可选实现） */
     default long count(String keyword) {
         return 0;
     }

@@ -4,6 +4,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.clx.search.datasource.DataSource;
 import com.clx.search.datasource.DataSourceRegistry;
 import com.clx.search.dto.SearchRequest;
+import com.clx.search.enums.SearchTypeEnum;
 import com.clx.search.service.HotKeywordService;
 import com.clx.search.service.SearchLogService;
 import com.clx.search.vo.SearchVO;
@@ -14,15 +15,12 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
- * 搜索门面（业务聚合层）。
+ * 搜索门面 - 业务聚合层。
  *
- * 职责：
- * 1. 解析搜索请求
- * 2. 并发查询多个数据源
- * 3. 合并结果
- * 4. 记录搜索日志和热词
+ * 职责：解析请求、并发搜索、合并结果、记录日志和热词。
  */
 @Slf4j
 @Component
@@ -33,12 +31,10 @@ public class SearchFacade {
     private final HotKeywordService hotKeywordService;
     private final SearchLogService searchLogService;
 
-    // 爬虫超时时间（毫秒）
+    /** 爬虫超时时间（毫秒） */
     private static final long CRAWLER_TIMEOUT = 3000;
 
-    /**
-     * 执行聚合搜索。
-     */
+    /** 执行聚合搜索 */
     public SearchVO searchAll(SearchRequest request, String ip) {
         String keyword = request.getKeyword();
         int page = request.getPage() != null ? request.getPage() : 1;
@@ -52,17 +48,25 @@ public class SearchFacade {
         SearchVO searchVO = new SearchVO();
         searchVO.setKeyword(keyword);
 
-        // 确定要搜索的类型
+        // 确定要搜索的类型（过滤无效类型）
         List<String> types = request.getTypes();
         if (types == null || types.isEmpty()) {
-            types = Arrays.asList("post", "user", "category", "picture", "web");
+            types = Arrays.asList("post", "user", "category", "tag", "picture", "web");
         }
-        final List<String> finalTypes = types;
+        // 使用枚举校验并过滤无效类型
+        final List<String> validTypes = types.stream()
+                .filter(SearchTypeEnum::isValid)
+                .collect(Collectors.toList());
+
+        if (validTypes.isEmpty()) {
+            log.warn("没有有效的搜索类型: {}", types);
+            return searchVO;
+        }
 
         // 并发搜索
         Map<String, CompletableFuture<SearchVO.SearchResult>> futures = new HashMap<>();
 
-        for (String type : types) {
+        for (String type : validTypes) {
             DataSource<?> dataSource = registry.getDataSource(type);
             if (dataSource == null) {
                 log.warn("数据源不存在: {}", type);
@@ -135,16 +139,21 @@ public class SearchFacade {
         final int finalTotalResultCount = totalResultCount;
         final long finalTotalTime = totalTime;
         CompletableFuture.runAsync(() -> {
-            searchLogService.recordLog(keyword, finalUserId, String.join(",", finalTypes), finalTotalResultCount, (int) finalTotalTime, ip);
+            searchLogService.recordLog(keyword, finalUserId, String.join(",", validTypes), finalTotalResultCount, (int) finalTotalTime, ip);
         });
 
         return searchVO;
     }
 
-    /**
-     * 单类型搜索。
-     */
+    /** 单类型搜索 */
     public SearchVO.SearchResult searchSingle(String type, String keyword, int page, int size) {
+        // 校验类型
+        if (!SearchTypeEnum.isValid(type)) {
+            SearchVO.SearchResult result = new SearchVO.SearchResult();
+            result.setError("无效的搜索类型: " + type);
+            return result;
+        }
+
         DataSource<?> dataSource = registry.getDataSource(type);
         if (dataSource == null) {
             SearchVO.SearchResult result = new SearchVO.SearchResult();

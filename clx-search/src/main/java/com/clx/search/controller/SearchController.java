@@ -1,6 +1,5 @@
 package com.clx.search.controller;
 
-import cn.dev33.satoken.stp.StpUtil;
 import com.clx.common.core.domain.R;
 import com.clx.search.dto.SearchRequest;
 import com.clx.search.manager.SearchFacade;
@@ -12,11 +11,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 搜索控制器。
+ * 搜索控制器 - 搜索 API 入口。
  */
 @Tag(name = "聚合搜索", description = "聚合搜索相关接口")
 @RestController
@@ -24,12 +22,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SearchController {
 
-    private final SearchFacade searchFacade; // 业务聚合层
-    private final HotKeywordService hotKeywordService; // 热词服务
+    private final SearchFacade searchFacade;
+    private final HotKeywordService hotKeywordService;
 
-    /**
-     * 聚合搜索。
-     */
+    /** 聚合搜索（同时搜索多种数据源） */
     @Operation(summary = "聚合搜索")
     @PostMapping("/aggregate")
     public R<SearchVO> searchAggregate(@RequestBody SearchRequest request, HttpServletRequest httpRequest) {
@@ -41,9 +37,7 @@ public class SearchController {
         return R.ok(result);
     }
 
-    /**
-     * 单类型搜索。
-     */
+    /** 单类型搜索（只搜索一种数据源） */
     @Operation(summary = "单类型搜索")
     @GetMapping("/single")
     public R<SearchVO.SearchResult> searchSingle(
@@ -58,21 +52,7 @@ public class SearchController {
         return R.ok(result);
     }
 
-    /**
-     * 搜索建议（暂时返回空，后续可接入 ES Suggest）。
-     */
-    @Operation(summary = "搜索建议")
-    @GetMapping("/suggest")
-    public R<List<String>> suggest(
-            @RequestParam String keyword,
-            @RequestParam(defaultValue = "5") Integer size) {
-        // TODO: 实现 ES Suggest
-        return R.ok(new ArrayList<>());
-    }
-
-    /**
-     * 热词统计。
-     */
+    /** 热词统计（获取今日热门搜索词） */
     @Operation(summary = "热词统计")
     @GetMapping("/hot")
     public R<List<HotKeywordService.HotKeywordVO>> hotKeywords(
@@ -82,9 +62,7 @@ public class SearchController {
         return R.ok(hotKeywords);
     }
 
-    /**
-     * 获取客户端 IP。
-     */
+    /** 获取客户端 IP（用于记录搜索日志） */
     private String getClientIp(HttpServletRequest request) {
         String ip = request.getHeader("X-Forwarded-For");
         if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
@@ -93,7 +71,6 @@ public class SearchController {
         if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getRemoteAddr();
         }
-        // 多个代理时取第一个
         if (ip != null && ip.contains(",")) {
             ip = ip.split(",")[0].trim();
         }

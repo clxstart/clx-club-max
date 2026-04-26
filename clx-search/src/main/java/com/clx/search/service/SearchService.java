@@ -5,7 +5,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
-import co.elastic.clients.elasticsearch.core.search.HighlightField;
+import com.clx.search.constant.ESIndexConstants;
 import com.clx.search.es.PostDocument;
 import com.clx.search.es.UserDocument;
 import com.clx.search.es.CategoryDocument;
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * ES 搜索服务。
+ * ES 搜索服务 - 封装 ES 全文搜索操作。
  */
 @Slf4j
 @Service
@@ -28,14 +28,7 @@ public class SearchService {
 
     private final ElasticsearchClient esClient;
 
-    private static final String POST_INDEX = "clx_post";
-    private static final String USER_INDEX = "clx_user";
-    private static final String CATEGORY_INDEX = "clx_category";
-    private static final String TAG_INDEX = "clx_tag";
-
-    /**
-     * 搜索帖子。
-     */
+    /** 搜索帖子 - 多字段匹配 + 高亮 */
     public List<PostDocument> searchPosts(String keyword, int page, int size, boolean enableHighlight) {
         try {
             Query query = MultiMatchQuery.of(m -> m
@@ -44,7 +37,7 @@ public class SearchService {
             )._toQuery();
 
             SearchResponse<PostDocument> response = esClient.search(s -> {
-                s.index(POST_INDEX)
+                s.index(ESIndexConstants.POST_INDEX)
                         .query(query)
                         .from((page - 1) * size)
                         .size(size);
@@ -89,7 +82,7 @@ public class SearchService {
             )._toQuery();
 
             SearchResponse<UserDocument> response = esClient.search(s -> s
-                    .index(USER_INDEX)
+                    .index(ESIndexConstants.USER_INDEX)
                     .query(query)
                     .from((page - 1) * size)
                     .size(size),
@@ -119,7 +112,7 @@ public class SearchService {
             )._toQuery();
 
             SearchResponse<CategoryDocument> response = esClient.search(s -> s
-                    .index(CATEGORY_INDEX)
+                    .index(ESIndexConstants.CATEGORY_INDEX)
                     .query(query)
                     .from((page - 1) * size)
                     .size(size),
@@ -149,7 +142,7 @@ public class SearchService {
             )._toQuery();
 
             SearchResponse<TagDocument> response = esClient.search(s -> s
-                    .index(TAG_INDEX)
+                    .index(ESIndexConstants.TAG_INDEX)
                     .query(query)
                     .from((page - 1) * size)
                     .size(size),
