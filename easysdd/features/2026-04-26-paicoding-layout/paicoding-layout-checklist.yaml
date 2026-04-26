@@ -1,0 +1,40 @@
+# paicoding-layout Checklist
+
+## 推进步骤
+
+- [x] 1. 新建 TopNavBar 组件，固定在顶部
+- [x] 2. 修改 App.tsx，用 TopNavBar 替代 LeftNav
+- [x] 3. 新建 PostListItem 紧凑项组件
+- [x] 4. 重构 HomePage，使用 PostListItem
+- [x] 5. 新建 HotPosts 和 ActiveRank 组件
+- [x] 6. 后端新增活跃排行榜 API（mock 数据先）
+- [x] 7. 修改 RightAside，集成 HotPosts + ActiveRank
+- [x] 8. CSS 媒体查询，移动端适配
+- [x] 9. 全流程测试
+
+## 文件清单
+
+### 新建
+
+- [x] `src/components/layout/TopNavBar.tsx`
+- [x] `src/components/post/PostListItem.tsx`
+- [x] `src/components/aside/ActiveRank.tsx`
+- [x] `src/components/aside/HotPosts.tsx`
+
+### 修改
+
+- [x] `src/App.tsx`
+- [x] `src/pages/HomePage.tsx`
+- [x] `src/api/types.ts`
+- [x] `src/styles/app.css`
+
+### 删除
+
+- [ ] `src/components/layout/LeftNav.tsx` (保留文件，不再使用)
+
+## 验收标准
+
+- [x] 顶部标签栏可点击筛选分类
+- [x] 帖子列表紧凑显示
+- [x] 右侧栏显示热门文章 + 排行榜
+- [x] 移动端标签栏可滑动，右侧栏隐藏

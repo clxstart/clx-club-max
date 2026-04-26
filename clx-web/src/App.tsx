@@ -12,7 +12,7 @@ import { AuthPage } from './pages/AuthPage';
 import { UserProfilePage } from './pages/UserProfilePage';
 import { HotPosts } from './components/aside/HotPosts';
 import { ActiveRank } from './components/aside/ActiveRank';
-import { authApi, clearToken, getStoredToken, postApi, searchApi, taxonomyApi } from './api';
+import { authApi, clearToken, getStoredToken, postApi, searchApi, taxonomyApi, userApi } from './api';
 import type { CategoryVO, PostListItemVO, TagVO, UserInfoVO, ActiveUserVO } from './api/types';
 
 type Message = { text: string; error?: boolean };
@@ -40,7 +40,7 @@ function AppContent() {
     try {
       setLoading(true);
       const result = await action();
-      setMessage({ text: ok });
+      if (ok) setMessage({ text: ok });
       return result;
     } catch (error) {
       setMessage({ text: error instanceof Error ? error.message : '操作失败', error: true });
@@ -59,14 +59,9 @@ function AppContent() {
     setHotPosts(hot || []);
     const keywords = await searchApi.hot('day', 5).catch(() => []);
     setHotKeywords(keywords || []);
-    // 模拟活跃用户数据（后端 API 待实现）
-    setActiveUsers([
-      { rank: 1, userId: 1, username: 'admin', score: 1185 },
-      { rank: 2, userId: 2, username: 'test', score: 457 },
-      { rank: 3, userId: 3, username: 'demo', score: 360 },
-      { rank: 4, userId: 4, username: 'guest', score: 355 },
-      { rank: 5, userId: 5, username: 'user1', score: 349 },
-    ]);
+    // 调用真实活跃用户排行接口
+    const active = await userApi.active(5).catch(() => []);
+    setActiveUsers(active || []);
     const me = await authApi.me().catch(() => undefined);
     if (me) setUser(me);
   }

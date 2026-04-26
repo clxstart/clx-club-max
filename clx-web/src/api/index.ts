@@ -40,7 +40,8 @@ import type {
   UserProfileVO,
   UserSimpleVO,
   ProfileUpdateRequest,
-  FavoriteItemVO
+  FavoriteItemVO,
+  ActiveUserVO
 } from './types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
@@ -198,5 +199,8 @@ export const userApi = {
   favorites: (page = 1, size = 20) => get<{ total: number; list: FavoriteItemVO[] }>('/user/favorites', { page, size }),
 
   // 用户帖子（调用 post 服务）
-  userPosts: (userId: number, page = 1, size = 20) => get<PostListVO>(`/post/user/${userId}`, { page, size })
+  userPosts: (userId: number, page = 1, size = 20) => get<PostListVO>(`/post/user/${userId}`, { page, size }),
+
+  // 活跃用户排行
+  active: (limit = 5) => get<ActiveUserVO[]>('/user/active', { limit })
 };

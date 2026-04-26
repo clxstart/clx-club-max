@@ -25,7 +25,7 @@ export function PostDetailPage({ run }: PostDetailPageProps) {
 
   async function loadDetail(postId: number) {
     setLoading(true);
-    const data = await run(() => postApi.detail(postId), '帖子详情已加载。');
+    const data = await run(() => postApi.detail(postId), '');
     if (data) {
       setPost(data);
       const list = await postApi.comments(postId).catch(() => []);

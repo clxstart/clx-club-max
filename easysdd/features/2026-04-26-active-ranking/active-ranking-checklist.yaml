@@ -1,0 +1,39 @@
+feature: active-ranking
+created: 2026-04-26
+
+steps:
+  - step: 1
+    action: 新建 ActiveUserVO.java
+    file: clx-user/src/main/java/com/clx/user/vo/ActiveUserVO.java
+    exit_signal: VO 类定义完成，包含 rank/userId/username/score 字段
+    status: done
+
+  - step: 2
+    action: 新建 ActiveMapper.java 和 ActiveMapper.xml
+    file: clx-user/src/main/java/com/clx/user/mapper/ActiveMapper.java
+    exit_signal: Mapper 接口和 SQL 实现完成
+    status: done
+
+  - step: 3
+    action: 修改 UserService.java 添加 getActiveUsers 方法签名
+    file: clx-user/src/main/java/com/clx/user/service/UserService.java
+    exit_signal: 接口方法定义完成
+    status: done
+
+  - step: 4
+    action: 修改 UserServiceImpl.java 实现活跃度查询逻辑
+    file: clx-user/src/main/java/com/clx/user/service/impl/UserServiceImpl.java
+    exit_signal: 业务逻辑实现完成
+    status: done
+
+  - step: 5
+    action: 修改 UserController.java 添加 REST 接口
+    file: clx-user/src/main/java/com/clx/user/controller/UserController.java
+    exit_signal: GET /user/active 接口暴露完成
+    status: done
+
+  - step: 6
+    action: 修改前端 App.tsx 替换假数据为真实 API 调用
+    file: clx-web/src/App.tsx
+    exit_signal: 前端调用真实接口，排行榜正常显示
+    status: done

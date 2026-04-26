@@ -141,9 +141,8 @@ public class OAuthController {
 
             // 重定向到前端，带上 token
             String redirectUrl = String.format(
-                "http://localhost:5174/oauth-callback?token=%s&rememberMe=%s",
-                loginVO.token(),
-                loginVO.rememberMe()
+                "http://localhost:5173?oauth_token=%s",
+                loginVO.token()
             );
             response.sendRedirect(redirectUrl);
 
@@ -155,6 +154,6 @@ public class OAuthController {
 
     /** 构造错误跳转 URL */
     private String getErrorUrl(String message) throws IOException {
-        return "http://localhost:5174/login?error=" + java.net.URLEncoder.encode(message, "UTF-8");
+        return "http://localhost:5173?error=" + java.net.URLEncoder.encode(message, "UTF-8");
     }
 }

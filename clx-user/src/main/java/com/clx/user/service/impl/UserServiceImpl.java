@@ -2,12 +2,16 @@ package com.clx.user.service.impl;
 
 import com.clx.user.dto.ProfileUpdateDTO;
 import com.clx.user.entity.User;
+import com.clx.user.mapper.ActiveMapper;
 import com.clx.user.mapper.UserMapper;
 import com.clx.user.service.UserService;
+import com.clx.user.vo.ActiveUserVO;
 import com.clx.user.vo.UserProfileVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * 用户服务实现。
@@ -17,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
+    private final ActiveMapper activeMapper;
 
     @Override
     public UserProfileVO getProfile(Long userId, Long currentUserId) {
@@ -60,6 +65,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void incrLikeTotalCount(Long userId, int delta) {
         userMapper.incrLikeTotalCount(userId, delta);
+    }
+
+    @Override
+    public List<ActiveUserVO> getActiveUsers(int limit) {
+        return activeMapper.selectActiveUsers(limit);
     }
 
     private UserProfileVO toProfileVO(User user, boolean isFollowed) {

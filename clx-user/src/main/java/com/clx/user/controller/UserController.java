@@ -4,11 +4,14 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.clx.common.core.domain.R;
 import com.clx.user.dto.ProfileUpdateDTO;
 import com.clx.user.service.UserService;
+import com.clx.user.vo.ActiveUserVO;
 import com.clx.user.vo.UserProfileVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 用户控制器。
@@ -61,5 +64,15 @@ public class UserController {
         Long userId = StpUtil.getLoginIdAsLong();
         userService.updateProfile(userId, dto);
         return R.ok();
+    }
+
+    /**
+     * 获取活跃用户排行。
+     */
+    @Operation(summary = "获取活跃用户排行")
+    @GetMapping("/active")
+    public R<List<ActiveUserVO>> getActiveUsers(@RequestParam(defaultValue = "5") Integer limit) {
+        List<ActiveUserVO> users = userService.getActiveUsers(limit);
+        return R.ok(users);
     }
 }

@@ -1,7 +1,10 @@
 package com.clx.user.service;
 
 import com.clx.user.dto.ProfileUpdateDTO;
+import com.clx.user.vo.ActiveUserVO;
 import com.clx.user.vo.UserProfileVO;
+
+import java.util.List;
 
 /**
  * 用户服务接口。
@@ -27,4 +30,9 @@ public interface UserService {
      * 增加获赞数。
      */
     void incrLikeTotalCount(Long userId, int delta);
+
+    /**
+     * 获取活跃用户排行。
+     */
+    List<ActiveUserVO> getActiveUsers(int limit);
 }

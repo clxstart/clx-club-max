@@ -24,8 +24,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SearchController {
 
-    private final SearchFacade searchFacade;
-    private final HotKeywordService hotKeywordService;
+    private final SearchFacade searchFacade; // 业务聚合层
+    private final HotKeywordService hotKeywordService; // 热词服务
 
     /**
      * 聚合搜索。

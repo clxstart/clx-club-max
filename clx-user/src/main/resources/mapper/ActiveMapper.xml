@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clx.user.mapper.ActiveMapper">
+
+    <!-- 活跃用户排行：分数 = 获赞数 * 3 + 粉丝数 * 2 + 关注数 * 1 -->
+    <select id="selectActiveUsers" resultType="com.clx.user.vo.ActiveUserVO">
+        SELECT
+            ROW_NUMBER() OVER (ORDER BY score DESC) AS rank,
+            user_id AS userId,
+            username,
+            (COALESCE(like_total_count, 0) * 3 + COALESCE(fans_count, 0) * 2 + COALESCE(follow_count, 0)) AS score
+        FROM sys_user
+        WHERE is_deleted = 0 AND status = '0'
+        ORDER BY score DESC
+        LIMIT #{limit}
+    </select>
+
+</mapper>
