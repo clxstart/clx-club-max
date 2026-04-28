@@ -1,0 +1,82 @@
+{
+  "slug": "pet-adopt-community",
+  "name": "萌宠社区风",
+  "nameEn": "Pet Adopt Community",
+  "styleType": "visual",
+  "category": "warm",
+  "tags": ["warm", "friendly", "mobile-first"],
+  "keywords": ["宠物社区", "暖色系", "圆角卡片", "温馨", "微信小程序"],
+  "colors": {
+    "primary": "#F8F8F8",
+    "secondary": "#FFFFFF",
+    "accent": {
+      "brand": "#F8A323",
+      "orange": "#F58418",
+      "pink": "#FF7E93",
+      "blue": "#368BE3",
+      "green": "#70AF48",
+      "coral": "#F08080"
+    },
+    "text": {
+      "primary": "#333333",
+      "secondary": "#778288",
+      "muted": "#999999"
+    },
+    "background": {
+      "page": "#F8F8F8",
+      "card": "#FFFFFF",
+      "mask": "rgba(0, 0, 0, 0.4)"
+    }
+  },
+  "philosophy": "萌宠社区风格专为宠物领养、宠物社交类小程序设计，强调温馨、友好、亲和力。通过暖色调、圆润的圆角、柔和的阴影营造温暖亲切的视觉感受。\n\n核心理念：\n- 温馨友好：暖橙色系传达关怀与温度\n- 圆润柔和：大圆角设计增加亲和力\n- 层次分明：卡片式布局清晰展示信息\n- 交互直观：符合小程序用户习惯的组件设计",
+  "doList": [
+    "使用暖橙色 #F8A323 作为品牌主色",
+    "卡片使用白色背景 + 柔和阴影 box-shadow: 0 2rpx 12rpx rgba(206, 225, 235, 0.5)",
+    "大圆角设计 border-radius: 20rpx ~ 30rpx",
+    "标签使用胶囊样式 border-radius: 30rpx + 彩色背景",
+    "Section 标题使用左侧彩色竖线装饰 border-left: 6rpx solid #F58418",
+    "底部固定操作栏使用白色背景 + 顶部细线",
+    "图片使用圆角处理，保持视觉统一",
+    "使用 rpx 单位适配小程序屏幕"
+  ],
+  "dontList": [
+    "禁止使用纯黑 #000 或深灰色作为主色",
+    "禁止使用锐利的直角边框",
+    "禁止使用大面积冷色调（蓝、紫）作为主色",
+    "禁止使用过于强烈的阴影效果",
+    "禁止使用模糊不清的浅色文字",
+    "禁止底部操作栏遮挡主要内容区域"
+  ],
+  "aiRules": "你是一个萌宠社区风格的前端开发专家。生成的所有代码必须严格遵守以下约束：\n\n## 配色规范\n\n- 品牌主色：#F8A323（暖橙色）\n- 强调色：#F58418（深橙）、#FF7E93（粉红）\n- 标签色：#368BE3（蓝）、#70AF48（绿）、#F08080（珊瑚）\n- 背景：#F8F8F8（页面）、#FFFFFF（卡片）\n- 文字：#333（主）、#778288（次）、#999（辅）\n\n## 组件规范\n\n### 卡片组件\n```\nbackground: #ffffff;\nborder-radius: 20rpx;\nbox-shadow: 0 2rpx 12rpx rgba(206, 225, 235, 0.5);\npadding: 24rpx;\n```\n\n### 标签组件\n```\nborder-radius: 30rpx;\npadding: 8rpx 16rpx;\nfont-size: 24rpx;\ncolor: #ffffff;\n```\n\n### Section 标题\n```\nborder-left: 6rpx solid #F58418;\npadding-left: 20rpx;\ncolor: #F58418;\nfont-weight: 600;\n```\n\n### 底部操作栏\n```\nposition: fixed;\nbottom: 0;\nleft: 0;\nright: 0;\nbackground: #ffffff;\nborder-top: 1rpx solid #e5e5e5;\npadding: 20rpx;\n```\n\n## 布局规范\n\n- 页面内边距：padding: 15rpx ~ 20rpx\n- 卡片间距：margin-top: 30rpx\n- 列表项高度：height: 300rpx\n- 图片宽度：width: 250rpx（列表项左侧）\n\n## 必须包含\n\n- 轮播图组件（swiper）\n- 标签入口网格（4列）\n- 列表卡片（左图右文）\n- 底部 TabBar\n- 下拉刷新 + 上拉加载",
+  "components": {
+    "card": "<view class=\"pet-card\">\n  <image :src=\"item.pictures[0]\" class=\"card-img\" mode=\"aspectFill\"></image>\n  <view class=\"card-content\">\n    <view class=\"card-badge\">等待领养</view>\n    <text class=\"card-title\">{{item.nickname}}，{{item.age}}</text>\n    <text class=\"card-desc\">{{item.content}}</text>\n    <view class=\"card-tags\">\n      <text class=\"tag tag-blue\">{{item.tags[0]}}</text>\n      <text class=\"tag tag-green\">{{item.tags[1]}}</text>\n    </view>\n  </view>\n</view>",
+    "tag": "<view class=\"tag-grid\">\n  <view class=\"tag-item\" v-for=\"(item, index) in labelList\" :key=\"index\">\n    <image :src=\"item.pic\" mode=\"aspectFill\"></image>\n    <text>{{item.title}}</text>\n  </view>\n</view>",
+    "swiper": "<swiper class=\"banner-swiper\" indicator-dots autoplay interval=\"2000\" duration=\"800\">\n  <swiper-item v-for=\"(item, index) in carouselList\" :key=\"index\">\n    <image :src=\"item\" mode=\"aspectFill\"></image>\n  </swiper-item>\n</swiper>",
+    "sectionTitle": "<view class=\"section-title\">\n  <text>Section 标题</text>\n</view>",
+    "bottomBar": "<view class=\"bottom-bar\">\n  <view class=\"action-item\">\n    <image src=\"/static/home.png\"></image>\n    <text>返回首页</text>\n  </view>\n  <view class=\"action-item\">\n    <image src=\"/static/collect.png\"></image>\n    <text>收藏</text>\n  </view>\n  <button class=\"primary-btn\">申请领养</button>\n</view>"
+  },
+  "styles": {
+    "card": ".pet-card {\n  width: 100%;\n  height: 300rpx;\n  background: #ffffff;\n  border-radius: 20rpx;\n  box-shadow: 0 2rpx 12rpx rgba(206, 225, 235, 0.5);\n  margin-top: 30rpx;\n  display: flex;\n  padding: 24rpx;\n}\n\n.card-img {\n  width: 250rpx;\n  height: 240rpx;\n  border-radius: 10rpx;\n}\n\n.card-content {\n  flex: 1;\n  padding-left: 24rpx;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n}\n\n.card-badge {\n  width: 120rpx;\n  height: 50rpx;\n  background: #fca400;\n  border-radius: 0 20rpx 0 20rpx;\n  color: #ffffff;\n  font-size: 24rpx;\n  text-align: center;\n  line-height: 50rpx;\n}\n\n.card-title {\n  font-size: 28rpx;\n  color: #333333;\n  margin-top: 16rpx;\n}\n\n.card-desc {\n  font-size: 24rpx;\n  color: #778288;\n  margin-top: 12rpx;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  display: -webkit-box;\n  -webkit-line-clamp: 2;\n}\n\n.card-tags {\n  margin-top: 12rpx;\n  display: flex;\n  gap: 16rpx;\n}\n\n.tag {\n  font-size: 24rpx;\n  padding: 8rpx 16rpx;\n  border-radius: 30rpx;\n  color: #ffffff;\n}\n\n.tag-blue { background: #368BE3; }\n.tag-green { background: #70AF48; }\n.tag-coral { background: #F08080; }",
+    "page": ".page {\n  padding: 15rpx;\n  background: #F8F8F8;\n  min-height: 100vh;\n}\n\n.section-title {\n  border-left: 6rpx solid #F58418;\n  padding-left: 20rpx;\n  color: #F58418;\n  font-size: 28rpx;\n  font-weight: 600;\n  margin: 30rpx 0;\n}",
+    "bottomBar": ".bottom-bar {\n  position: fixed;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  background: #ffffff;\n  border-top: 1rpx solid #e5e5e5;\n  padding: 20rpx;\n  display: flex;\n  align-items: center;\n  z-index: 100;\n}\n\n.action-item {\n  text-align: center;\n  margin: 0 30rpx;\n  font-size: 24rpx;\n  color: #778288;\n}\n\n.action-item image {\n  width: 50rpx;\n  height: 50rpx;\n}\n\n.primary-btn {\n  flex: 1;\n  height: 84rpx;\n  line-height: 84rpx;\n  background: #F8A323;\n  color: #ffffff;\n  border-radius: 40rpx;\n  font-size: 28rpx;\n  border: none;\n}"
+  },
+  "examplePrompts": [
+    {
+      "title": "宠物领养首页",
+      "description": "包含轮播图、标签入口、领养列表",
+      "prompt": "使用萌宠社区风格生成一个宠物领养小程序首页，要求：\n1. 顶部轮播图：高度400rpx，自动播放，圆角20rpx\n2. 标签入口：4列网格，每个包含图标+文字（签到、科普、领养流程、答题星球）\n3. 城市选择：定位图标+城市名称，点击弹窗选择\n4. 宠物列表：左图右文卡片，包含图片、状态标签、名称年龄、描述、健康标签\n5. 底部TabBar：领养、寻宠、宠物社区、我的\n配色：主色#F8A323，背景#F8F8F8，卡片白色+柔和阴影"
+    },
+    {
+      "title": "宠物详情页",
+      "description": "包含轮播图、详情信息、送养人信息、底部操作",
+      "prompt": "使用萌宠社区风格生成一个宠物详情页，要求：\n1. 轮播图：高度700rpx，支持预览大图\n2. 详情信息：标题、位置、浏览量、更新时间\n3. 基本信息卡片：姓名、性别、年龄，带彩色健康标签\n4. Section 区块：特别提醒、领养说明、TA的故事、领养条件，使用左侧橙色竖线标题\n5. 送养人卡片：头像、昵称、实名认证、关注按钮、在线咨询+联系方式\n6. 底部操作栏：返回首页、收藏、申请领养按钮\n配色：主色#F8A323，强调色#F58418"
+    },
+    {
+      "title": "发布领养表单",
+      "description": "宠物信息发布表单",
+      "prompt": "使用萌宠社区风格生成一个发布领养表单页，要求：\n1. 图片上传：最多9张，网格布局\n2. 基本信息表单：标题、昵称、性别选择、年龄输入\n3. 健康状况：多选标签（已绝育、已免疫、已驱虫）\n4. 省市区选择：使用picker组件\n5. 详细描述：textarea，带字数统计\n6. 领养条件：多选标签组\n7. 联系方式：手机号、微信号\n8. 底部提交按钮：固定定位，暖橙色背景\n配色：按钮#F8A323，标签使用蓝#368BE3、绿#70AF48"
+    }
+  ],
+  "generatedAt": "2026-04-28T05:45:00.000Z",
+  "source": "pet-wx-uniapp-analysis"
+}

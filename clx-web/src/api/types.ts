@@ -341,10 +341,3 @@ export type FavoriteItemVO = {
   createdAt?: string;
   favoritedAt?: string;
 };
-
-export type ActiveUserVO = {
-  rank: number;
-  userId: number;
-  username: string;
-  score: number;
-};

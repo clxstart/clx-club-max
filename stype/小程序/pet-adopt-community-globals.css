@@ -1,0 +1,198 @@
+/* 萌宠社区风 (Pet Adopt Community) - 全局样式 */
+/* 适用于 React/Vue Web 端 */
+
+:root {
+  /* 品牌色 */
+  --pet-brand: #F8A323;
+  --pet-orange: #F58418;
+  --pet-pink: #FF7E93;
+
+  /* 标签色 */
+  --pet-tag-blue: #368BE3;
+  --pet-tag-green: #70AF48;
+  --pet-tag-coral: #F08080;
+  --pet-tag-yellow: #fca400;
+
+  /* 文字色 */
+  --pet-text: #333333;
+  --pet-text-secondary: #778288;
+  --pet-text-muted: #999999;
+
+  /* 背景色 */
+  --pet-bg-page: #F8F8F8;
+  --pet-bg-card: #FFFFFF;
+
+  /* 边框色 */
+  --pet-border: #e5e5e5;
+  --pet-divider: #efefef;
+
+  /* 阴影 */
+  --pet-shadow-card: 0 2px 12px rgba(206, 225, 235, 0.5);
+  --pet-shadow-card-hover: 0 4px 20px rgba(206, 225, 235, 0.8);
+
+  /* 圆角 */
+  --pet-radius-sm: 5px;
+  --pet-radius-md: 10px;
+  --pet-radius-lg: 15px;
+  --pet-radius-full: 20px;
+}
+
+/* 基础页面 */
+.pet-page {
+  background: var(--pet-bg-page);
+  min-height: 100vh;
+  padding: 8px;
+}
+
+/* 卡片组件 */
+.pet-card {
+  background: var(--pet-bg-card);
+  border-radius: var(--pet-radius-md);
+  box-shadow: var(--pet-shadow-card);
+  padding: 12px;
+  margin-top: 15px;
+  transition: box-shadow 0.2s ease;
+}
+
+.pet-card:hover {
+  box-shadow: var(--pet-shadow-card-hover);
+}
+
+/* 列表卡片 */
+.pet-list-card {
+  display: flex;
+  background: var(--pet-bg-card);
+  border-radius: var(--pet-radius-md);
+  box-shadow: var(--pet-shadow-card);
+  padding: 12px;
+  margin-top: 15px;
+}
+
+.pet-list-card .card-img {
+  width: 125px;
+  height: 120px;
+  border-radius: var(--pet-radius-sm);
+  object-fit: cover;
+}
+
+.pet-list-card .card-content {
+  flex: 1;
+  padding-left: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* 状态标签 */
+.pet-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: var(--pet-radius-full);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.pet-badge-brand {
+  background: var(--pet-brand);
+  color: white;
+}
+
+.pet-badge-orange {
+  background: var(--pet-orange);
+  color: white;
+}
+
+/* 健康标签 */
+.pet-tag {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 15px;
+  font-size: 12px;
+  color: white;
+  margin-right: 8px;
+}
+
+.pet-tag-blue { background: var(--pet-tag-blue); }
+.pet-tag-green { background: var(--pet-tag-green); }
+.pet-tag-coral { background: var(--pet-tag-coral); }
+
+/* Section 标题 */
+.pet-section-title {
+  border-left: 3px solid var(--pet-orange);
+  padding-left: 10px;
+  color: var(--pet-orange);
+  font-size: 14px;
+  font-weight: 600;
+  margin: 15px 0;
+}
+
+/* 底部操作栏 */
+.pet-bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 1px solid var(--pet-border);
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  z-index: 100;
+}
+
+.pet-bottom-bar .action-item {
+  text-align: center;
+  margin: 0 15px;
+  font-size: 12px;
+  color: var(--pet-text-secondary);
+}
+
+.pet-bottom-bar .primary-btn {
+  flex: 1;
+  height: 42px;
+  background: var(--pet-brand);
+  color: white;
+  border-radius: 21px;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+}
+
+/* 输入框 */
+.pet-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--pet-border);
+  border-radius: var(--pet-radius-sm);
+  font-size: 14px;
+  background: white;
+}
+
+.pet-input:focus {
+  outline: none;
+  border-color: var(--pet-brand);
+}
+
+/* 按钮 */
+.pet-btn {
+  padding: 10px 20px;
+  border-radius: var(--pet-radius-full);
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pet-btn-primary {
+  background: var(--pet-brand);
+  color: white;
+}
+
+.pet-btn-primary:hover {
+  background: var(--pet-orange);
+}
+
+.pet-btn-secondary {
+  background: var(--pet-pink);
+  color: white;
+}

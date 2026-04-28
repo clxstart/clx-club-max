@@ -1,0 +1,116 @@
+{
+  "name": "pet-adopt-community",
+  "colors": {
+    "brand": {
+      "primary": {
+        "value": "#F8A323",
+        "type": "color"
+      },
+      "orange": {
+        "value": "#F58418",
+        "type": "color"
+      },
+      "pink": {
+        "value": "#FF7E93",
+        "type": "color"
+      }
+    },
+    "tag": {
+      "blue": {
+        "value": "#368BE3",
+        "type": "color"
+      },
+      "green": {
+        "value": "#70AF48",
+        "type": "color"
+      },
+      "coral": {
+        "value": "#F08080",
+        "type": "color"
+      },
+      "yellow": {
+        "value": "#fca400",
+        "type": "color"
+      }
+    },
+    "text": {
+      "primary": {
+        "value": "#333333",
+        "type": "color"
+      },
+      "secondary": {
+        "value": "#778288",
+        "type": "color"
+      },
+      "muted": {
+        "value": "#999999",
+        "type": "color"
+      }
+    },
+    "background": {
+      "page": {
+        "value": "#F8F8F8",
+        "type": "color"
+      },
+      "card": {
+        "value": "#FFFFFF",
+        "type": "color"
+      }
+    },
+    "border": {
+      "light": {
+        "value": "#e5e5e5",
+        "type": "color"
+      },
+      "divider": {
+        "value": "#efefef",
+        "type": "color"
+      }
+    }
+  },
+  "typography": {
+    "fontFamily": {
+      "primary": {
+        "value": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+        "type": "fontFamily"
+      }
+    },
+    "fontSize": {
+      "xs": { "value": "20rpx", "type": "fontSize" },
+      "sm": { "value": "24rpx", "type": "fontSize" },
+      "base": { "value": "28rpx", "type": "fontSize" },
+      "lg": { "value": "32rpx", "type": "fontSize" },
+      "xl": { "value": "36rpx", "type": "fontSize" },
+      "2xl": { "value": "40rpx", "type": "fontSize" }
+    },
+    "fontWeight": {
+      "normal": { "value": "400", "type": "fontWeight" },
+      "medium": { "value": "500", "type": "fontWeight" },
+      "semibold": { "value": "600", "type": "fontWeight" }
+    }
+  },
+  "spacing": {
+    "xs": { "value": "8rpx", "type": "spacing" },
+    "sm": { "value": "12rpx", "type": "spacing" },
+    "md": { "value": "16rpx", "type": "spacing" },
+    "lg": { "value": "24rpx", "type": "spacing" },
+    "xl": { "value": "30rpx", "type": "spacing" },
+    "2xl": { "value": "40rpx", "type": "spacing" }
+  },
+  "borderRadius": {
+    "sm": { "value": "10rpx", "type": "borderRadius" },
+    "md": { "value": "20rpx", "type": "borderRadius" },
+    "lg": { "value": "30rpx", "type": "borderRadius" },
+    "full": { "value": "40rpx", "type": "borderRadius" }
+  },
+  "boxShadow": {
+    "card": {
+      "value": "0 2rpx 12rpx rgba(206, 225, 235, 0.5)",
+      "type": "boxShadow"
+    },
+    "card-hover": {
+      "value": "0 4rpx 20rpx rgba(206, 225, 235, 0.8)",
+      "type": "boxShadow"
+    }
+  }
+}

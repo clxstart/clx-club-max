@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clx.auth.mapper.AuthMapper">
+
+    <select id="selectAllRoles" resultType="com.clx.api.auth.dto.RoleVO">
+        SELECT role_id, role_name, role_code, description
+        FROM sys_role
+        WHERE is_deleted = 0 AND status = '0'
+        ORDER BY sort
+    </select>
+
+    <select id="selectRoleCodesByUserId" resultType="java.lang.String">
+        SELECT r.role_code
+        FROM sys_role r
+        INNER JOIN sys_user_role ur ON r.role_id = ur.role_id
+        WHERE ur.user_id = #{userId} AND r.is_deleted = 0 AND r.status = '0'
+    </select>
+
+</mapper>

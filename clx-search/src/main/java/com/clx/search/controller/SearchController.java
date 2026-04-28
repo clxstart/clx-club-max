@@ -4,6 +4,7 @@ import com.clx.common.core.domain.R;
 import com.clx.search.dto.SearchRequest;
 import com.clx.search.manager.SearchFacade;
 import com.clx.search.service.HotKeywordService;
+import com.clx.search.vo.HotKeywordVO;
 import com.clx.search.vo.SearchVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -55,10 +56,10 @@ public class SearchController {
     /** 热词统计（获取今日热门搜索词） */
     @Operation(summary = "热词统计")
     @GetMapping("/hot")
-    public R<List<HotKeywordService.HotKeywordVO>> hotKeywords(
+    public R<List<HotKeywordVO>> hotKeywords(
             @RequestParam(defaultValue = "day") String period,
             @RequestParam(defaultValue = "10") Integer limit) {
-        List<HotKeywordService.HotKeywordVO> hotKeywords = hotKeywordService.getTodayHotKeywords(limit);
+        List<HotKeywordVO> hotKeywords = hotKeywordService.getTodayHotKeywords(limit);
         return R.ok(hotKeywords);
     }
 

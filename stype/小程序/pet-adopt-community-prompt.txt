@@ -1,0 +1,343 @@
+STYLEKIT_STYLE_REFERENCE
+style_name: 萌宠社区风
+style_slug: pet-adopt-community
+style_source: /styles/pet-adopt-community
+
+# Hard Prompt
+
+请严格遵守以下风格规则并保持一致性，禁止风格漂移。
+
+## 执行要求
+- 优先保证风格一致性，其次再做创意延展。
+- 遇到冲突时以禁止项为最高优先级。
+- 输出前自检：配色、圆角、阴影、交互是否仍属于该风格。
+
+## Style Rules
+# Pet Adopt Community (萌宠社区风) Design System
+
+> 温馨友好的宠物社区风格，以暖橙色为主色调，圆润的圆角卡片，柔和的阴影，营造亲切温暖的视觉感受。
+
+## 核心理念
+
+萌宠社区风格专为宠物领养、宠物社交类应用设计，强调温馨、友好、亲和力。
+
+核心理念：
+- 温馨友好：暖橙色系传达关怀与温度
+- 圆润柔和：大圆角设计增加亲和力
+- 层次分明：卡片式布局清晰展示信息
+- 交互直观：符合移动端用户习惯的组件设计
+
+设计原则：
+- 视觉一致性：所有组件必须遵循统一的视觉语言
+- 层次分明：通过颜色深浅、字号大小、留白空间建立清晰的信息层级
+- 交互反馈：每个可交互元素都必须有明确的 hover、active 状态反馈
+- 移动优先：设计必须在移动端保持良好体验
+
+---
+
+## Token 字典（精确 Class 映射）
+
+### 配色
+```
+品牌主色: bg-[#F8A323] text-[#F8A323]
+品牌橙色: bg-[#F58418] text-[#F58418]
+品牌粉色: bg-[#FF7E93] text-[#FF7E93]
+标签蓝: bg-[#368BE3]
+标签绿: bg-[#70AF48]
+标签珊瑚: bg-[#F08080]
+```
+
+### 文字色
+```
+主文字: text-[#333333]
+次文字: text-[#778288]
+辅助文字: text-[#999999]
+```
+
+### 背景
+```
+页面背景: bg-[#F8F8F8]
+卡片背景: bg-[#FFFFFF]
+```
+
+### 圆角
+```
+小: rounded-[10rpx]
+中: rounded-[20rpx]
+大: rounded-[30rpx]
+胶囊: rounded-full
+```
+
+### 阴影
+```
+卡片: shadow-[0_2rpx_12rpx_rgba(206,225,235,0.5)]
+悬停: shadow-[0_4rpx_20rpx_rgba(206,225,235,0.8)]
+```
+
+---
+
+## [FORBIDDEN] 绝对禁止
+
+以下 class 在本风格中**绝对禁止使用**：
+
+### 禁止的 Class
+- `bg-black`
+- `bg-gray-900`
+- `text-black`
+- `rounded-none`
+- `shadow-xl`
+- `shadow-2xl`
+- `border-4`
+- `border-8`
+
+### 禁止的模式
+- 匹配 `^bg-black`
+- 匹配 `^text-black`
+- 匹配 `^rounded-none`
+- 匹配 `^border-[48]`
+
+### 禁止原因
+- `bg-black`: 萌宠社区风格使用暖色调，禁止纯黑背景
+- `text-black`: 使用 #333333 作为主文字色，比纯黑更柔和
+- `rounded-none`: 必须使用圆角增加亲和力
+- `shadow-xl`: 阴影应该柔和，不应过于强烈
+
+---
+
+## [REQUIRED] 必须包含
+
+### 卡片必须包含
+```
+bg-[#FFFFFF]
+rounded-[20rpx]
+shadow-[0_2rpx_12rpx_rgba(206,225,235,0.5)]
+```
+
+### 标签必须包含
+```
+rounded-full
+px-[16rpx] py-[8rpx]
+text-white
+font-medium
+```
+
+### Section 标题必须包含
+```
+border-l-[6rpx] border-l-[#F58418]
+pl-[20rpx]
+text-[#F58418]
+font-semibold
+```
+
+### 底部操作栏必须包含
+```
+fixed bottom-0 left-0 right-0
+bg-white
+border-t border-[#e5e5e5]
+```
+
+---
+
+## [COMPARE] 错误 vs 正确对比
+
+### 卡片
+
+[WRONG] **错误示例**（锐利边角、强烈阴影）：
+```html
+<div class="rounded-sm shadow-2xl bg-white p-4">
+  <h3 class="text-black font-bold">标题</h3>
+</div>
+```
+
+[CORRECT] **正确示例**（圆角、柔和阴影）：
+```html
+<div class="bg-white rounded-[20rpx] shadow-[0_2rpx_12rpx_rgba(206,225,235,0.5)] p-[24rpx]">
+  <h3 class="text-[#333333] font-semibold text-[28rpx]">标题</h3>
+</div>
+```
+
+### 标签
+
+[WRONG] **错误示例**（直角边框）：
+```html
+<span class="bg-blue-500 text-white px-2 py-1 rounded-sm">已绝育</span>
+```
+
+[CORRECT] **正确示例**（胶囊圆角）：
+```html
+<span class="bg-[#368BE3] text-white px-[16rpx] py-[8rpx] rounded-full text-[24rpx]">已绝育</span>
+```
+
+### 按钮
+
+[WRONG] **错误示例**（冷色调）：
+```html
+<button class="bg-blue-600 text-white rounded-lg px-4 py-2">申请领养</button>
+```
+
+[CORRECT] **正确示例**（暖色调）：
+```html
+<button class="bg-[#F8A323] text-white rounded-full px-[32rpx] py-[20rpx] text-[28rpx]">申请领养</button>
+```
+
+---
+
+## [TEMPLATES] 页面骨架模板
+
+### 列表页骨架
+```html
+<view class="pet-page">
+  <!-- 轮播图 -->
+  <swiper class="h-[400rpx] rounded-[20rpx]" indicator-dots autoplay>
+    <swiper-item v-for="item in banners">
+      <image :src="item" class="w-full h-full" mode="aspectFill"></image>
+    </swiper-item>
+  </swiper>
+
+  <!-- 标签入口 -->
+  <view class="grid grid-cols-4 gap-[20rpx] mt-[30rpx]">
+    <view class="text-center" v-for="item in labels">
+      <image :src="item.pic" class="w-[120rpx] h-[120rpx] rounded-[20rpx]"></image>
+      <text class="text-[28rpx] text-[#333333]">{{item.title}}</text>
+    </view>
+  </view>
+
+  <!-- 列表 -->
+  <view class="pet-list-card" v-for="item in list">
+    <image :src="item.img" class="card-img"></image>
+    <view class="card-content">
+      <view class="pet-badge pet-badge-brand">等待领养</view>
+      <text class="text-[28rpx] text-[#333333] mt-[16rpx]">{{item.name}}，{{item.age}}</text>
+      <text class="text-[24rpx] text-[#778288] mt-[12rpx] line-clamp-2">{{item.desc}}</text>
+      <view class="flex gap-[16rpx] mt-[12rpx]">
+        <span class="pet-tag pet-tag-blue">{{item.tags[0]}}</span>
+        <span class="pet-tag pet-tag-green">{{item.tags[1]}}</span>
+      </view>
+    </view>
+  </view>
+</view>
+```
+
+### 详情页骨架
+```html
+<view class="pet-page">
+  <!-- 轮播图 -->
+  <swiper class="h-[700rpx]" indicator-dots>
+    <swiper-item v-for="pic in detail.pictures">
+      <image :src="pic" class="w-full h-full" mode="aspectFill"></image>
+    </swiper-item>
+  </swiper>
+
+  <!-- 详情信息 -->
+  <view class="p-[20rpx]">
+    <text class="text-[36rpx] font-semibold text-[#333333]">{{detail.title}}</text>
+    <view class="flex gap-[20rpx] mt-[20rpx] text-[22rpx] text-[#778288]">
+      <text>📍{{detail.city}}</text>
+      <text>浏览：{{detail.view}}</text>
+      <text>更新：{{detail.updateTime}}</text>
+    </view>
+
+    <!-- 基本信息卡片 -->
+    <view class="pet-card border-2 border-[#ffaa7f]">
+      <view class="flex gap-[16rpx]">
+        <text>姓名：{{detail.name}}</text>
+        <text>性别：{{detail.sex}}</text>
+        <text>年龄：{{detail.age}}</text>
+      </view>
+      <view class="flex gap-[8rpx] mt-[10rpx]">
+        <span class="pet-tag pet-tag-blue">{{detail.tags[0]}}</span>
+        <span class="pet-tag pet-tag-green">{{detail.tags[1]}}</span>
+      </view>
+    </view>
+
+    <!-- Section 区块 -->
+    <view class="pet-section-title">领养说明</view>
+    <text class="text-[24rpx] text-[#333333] leading-relaxed">{{detail.description}}</text>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="pet-bottom-bar">
+    <view class="action-item">
+      <image src="/static/home.png" class="w-[50rpx] h-[50rpx]"></image>
+      <text>首页</text>
+    </view>
+    <view class="action-item">
+      <image src="/static/collect.png" class="w-[50rpx] h-[50rpx]"></image>
+      <text>收藏</text>
+    </view>
+    <button class="primary-btn">申请领养</button>
+  </view>
+</view>
+```
+
+---
+
+## [CHECKLIST] 生成后自检清单
+
+**在输出代码前，必须逐项验证以下每一条：**
+
+### 1. 配色检查
+- [ ] 主色调使用 #F8A323（暖橙色）
+- [ ] 文字色使用 #333333 而非纯黑
+- [ ] 标签使用预定义的蓝/绿/珊瑚色
+- [ ] 背景使用 #F8F8F8（页面）和 #FFFFFF（卡片）
+
+### 2. 圆角检查
+- [ ] 卡片使用 rounded-[20rpx]
+- [ ] 标签使用 rounded-full
+- [ ] 按钮使用 rounded-full
+- [ ] 图片使用适中的圆角
+
+### 3. 阴影检查
+- [ ] 阴影柔和，不使用 shadow-xl 或更强烈阴影
+- [ ] 使用 rgba(206, 225, 235, 0.5) 作为阴影色
+
+### 4. 交互检查
+- [ ] 按钮有 hover 状态变化
+- [ ] 卡片有 hover 阴影加深效果
+- [ ] 所有交互元素包含 transition-all
+
+### 5. 文字检查
+- [ ] 标题使用 font-semibold
+- [ ] 次要信息使用 text-[#778288]
+- [ ] 行高适当，至少 leading-relaxed
+
+---
+
+## [EXAMPLES] 示例 Prompt
+
+### 1. 宠物领养首页
+
+```
+使用萌宠社区风格生成一个宠物领养小程序首页，要求：
+1. 顶部轮播图：高度400rpx，自动播放，圆角20rpx
+2. 标签入口：4列网格（签到、科普、领养流程、答题星球）
+3. 城市选择：定位图标+城市名称
+4. 宠物列表：左图右文卡片，包含状态标签、名称年龄、描述、健康标签
+5. 底部TabBar：领养、寻宠、宠物社区、我的
+配色：主色#F8A323，背景#F8F8F8，卡片白色+柔和阴影
+```
+
+### 2. 宠物详情页
+
+```
+使用萌宠社区风格生成一个宠物详情页，要求：
+1. 轮播图：高度700rpx，支持预览大图
+2. 详情信息：标题、位置、浏览量、更新时间
+3. 基本信息卡片：姓名、性别、年龄，带彩色健康标签
+4. Section 区块：特别提醒、领养说明、TA的故事、领养条件
+5. 送养人卡片：头像、昵称、实名认证、关注按钮
+6. 底部操作栏：返回首页、收藏、申请领养按钮
+```
+
+### 3. 发布领养表单
+
+```
+使用萌宠社区风格生成一个发布领养表单页，要求：
+1. 图片上传：最多9张，网格布局
+2. 基本信息表单：标题、昵称、性别选择、年龄输入
+3. 健康状况：多选标签（已绝育、已免疫、已驱虫）
+4. 详细描述：textarea，带字数统计
+5. 领养条件：多选标签组
+6. 底部提交按钮：固定定位，暖橙色背景
+```

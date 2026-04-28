@@ -1,6 +1,8 @@
 package com.clx.search.service;
 
 import com.clx.search.mapper.HotKeywordMapper;
+import com.clx.search.service.impl.HotKeywordServiceImpl;
+import com.clx.search.vo.HotKeywordVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -45,7 +47,7 @@ class HotKeywordServiceTest {
     @BeforeEach
     void setUp() {
         when(redisTemplate.opsForZSet()).thenReturn(zSetOperations);
-        hotKeywordService = new HotKeywordService(redisTemplate, hotKeywordMapper);
+        hotKeywordService = new HotKeywordServiceImpl(redisTemplate, hotKeywordMapper);
     }
 
     @Test
@@ -119,7 +121,7 @@ class HotKeywordServiceTest {
         // 昨日数据（默认返回 100.0）
         when(zSetOperations.score(endsWith("2026-04-23"), anyString())).thenReturn(100.0);
 
-        List<HotKeywordService.HotKeywordVO> result = hotKeywordService.getTodayHotKeywords(10);
+        List<HotKeywordVO> result = hotKeywordService.getTodayHotKeywords(10);
 
         assertNotNull(result, "热词列表不应为空");
         assertEquals(2, result.size(), "应返回2个热词");
@@ -150,7 +152,7 @@ class HotKeywordServiceTest {
         when(zSetOperations.reverseRange(anyString(), anyLong(), anyLong()))
                 .thenReturn(null);
 
-        List<HotKeywordService.HotKeywordVO> result = hotKeywordService.getTodayHotKeywords(10);
+        List<HotKeywordVO> result = hotKeywordService.getTodayHotKeywords(10);
 
         assertNotNull(result, "结果不应为 null");
         assertTrue(result.isEmpty(), "无数据时应返回空列表");

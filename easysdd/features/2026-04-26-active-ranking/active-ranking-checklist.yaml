@@ -37,3 +37,17 @@ steps:
     file: clx-web/src/App.tsx
     exit_signal: 前端调用真实接口，排行榜正常显示
     status: done
+
+checks:
+  - check: 接口契约核对 - GET /user/active 返回格式正确
+    status: passed
+  - check: 行为核对 - 明确不做项未实现
+    status: passed
+  - check: 测试约束 - 正常返回 Top N 用户
+    status: passed
+  - check: 测试约束 - 空数据处理返回空数组
+    status: passed
+  - check: 术语一致性 - ActiveUserVO 命名一致
+    status: passed
+  - check: 架构归并 - 确认是否需要更新架构文档
+    status: passed

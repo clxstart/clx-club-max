@@ -2,10 +2,11 @@
 name: active-ranking
 feature: active-ranking
 doc_type: feature-design
-status: approved
+status: completed
 summary: 实现月度活跃用户排行接口，替换前端假数据
 tags: [user, ranking, api]
 created: 2026-04-26
+completed: 2026-04-26
 ---
 
 # 活跃用户排行接口设计
@@ -16,7 +17,7 @@ created: 2026-04-26
 |------|------|----------|
 | ActiveUserVO | 活跃用户排行返回结构 | `clx-user/.../vo/ActiveUserVO.java` |
 | ActiveMapper | 活跃度聚合查询 Mapper | `clx-user/.../mapper/ActiveMapper.java` |
-| 活跃度分数 | 基于发帖/评论/点赞行为的加权得分 | - |
+| 活跃度分数 | 获赞×3 + 粉丝×2 + 关注×1 | `ActiveMapper.xml` |
 
 ## 1. 需求摘要
 
@@ -70,6 +71,15 @@ public class ActiveUserVO {
 | `clx-web/src/App.tsx` | 替换假数据为 API 调用 |
 
 ### 活跃度评分规则
+**当前实现（简化版）**：基于用户表静态字段计算
+| 字段 | 权重 |
+|------|------|
+| 获赞数 | × 3 |
+| 粉丝数 | × 2 |
+| 关注数 | × 1 |
+
+**后续优化**：可改为基于发帖/评论/点赞行为计算，需要跨库查询或 Feign 调用。
+
 | 行为 | 分数 |
 |------|------|
 | 发帖 | +10 |
@@ -77,7 +87,7 @@ public class ActiveUserVO {
 | 点赞他人 | +2 |
 | 被点赞 | +3 |
 
-**时间范围**：近 30 天
+**时间范围**：当前无时间限制（全量），后续可加近 30 天过滤。
 
 ### 推进顺序
 1. 新建 `ActiveUserVO.java`
@@ -96,4 +106,4 @@ public class ActiveUserVO {
 |--------|----------|----------|----------|
 | 正常返回 | 返回 Top N 用户 | 接口调用验证 | `GET /user/active?limit=5` 返回 5 条数据 |
 | 空数据处理 | 无活跃用户时返回空数组 | 边界测试 | 清空数据后调用返回 `[]` |
-| 分数计算 | 分数符合规则 | 数据验证 | 手造数据验证分数正确 |
+| 分数计算 | 分数 = 获赞×3 + 粉丝×2 + 关注×1 | 数据验证 | 手造数据验证分数正确 |

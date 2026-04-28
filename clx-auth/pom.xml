@@ -30,6 +30,12 @@
             <artifactId>clx-common-redis</artifactId>
         </dependency>
 
+        <!-- API 模块 -->
+        <dependency>
+            <groupId>com.clx</groupId>
+            <artifactId>clx-api-auth</artifactId>
+        </dependency>
+
         <!-- Web Starter（排除默认 Logback） -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -1,0 +1,91 @@
+feature: admin-user-management
+created: 2026-04-28
+
+steps:
+  - step: 1
+    action: 新建 clx-admin 后端模块基础结构
+    file: clx-admin/pom.xml, ClxAdminApplication.java, application.yml
+    exit_signal: 服务启动成功，访问 /actuator/health 返回 UP
+    status: done
+
+  - step: 2
+    action: 新建 clx-api Feign 接口定义
+    file: clx-api/src/main/java/com/clx/api/UserFeignClient.java, AuthFeignClient.java
+    exit_signal: 编译通过
+    status: done
+
+  - step: 3
+    action: clx-user/clx-auth 新增内部接口供 Feign 调用
+    file: clx-user/.../controller/UserInternalController.java, clx-auth/.../controller/AuthInternalController.java
+    exit_signal: 接口测试通过
+    status: pending
+
+  - step: 4
+    action: 新建 clx-admin Mapper 层（OperLogMapper）
+    file: clx-admin/.../mapper/OperLogMapper.java, OperLogMapper.xml
+    exit_signal: 单元测试通过
+    status: pending
+
+  - step: 5
+    action: 新建 clx-admin Service 层
+    file: clx-admin/.../service/*.java, service/impl/*.java
+    exit_signal: 单元测试通过
+    status: pending
+
+  - step: 6
+    action: 新建 clx-admin Controller 层
+    file: clx-admin/.../controller/UserController.java, RoleController.java
+    exit_signal: 接口测试通过，非管理员访问返回 403
+    status: pending
+
+  - step: 7
+    action: 新建 clx-admin-web 前端项目
+    file: clx-admin-web/package.json, vite.config.ts, main.ts
+    exit_signal: 项目启动成功，访问 http://localhost:5174 正常
+    status: pending
+
+  - step: 8
+    action: 新建前端登录页
+    file: clx-admin-web/src/views/login/LoginPage.vue, api/index.ts
+    exit_signal: 登录流程完整，Token 存储正确
+    status: pending
+
+  - step: 9
+    action: 新建前端布局组件
+    file: clx-admin-web/src/layouts/AdminLayout.vue, router/index.ts
+    exit_signal: 布局渲染正常，侧边栏菜单可点击
+    status: pending
+
+  - step: 10
+    action: 新建前端用户管理页
+    file: clx-admin-web/src/views/user/UserListPage.vue, UserEditDialog.vue
+    exit_signal: 列表展示、搜索、编辑功能完整
+    status: pending
+
+  - step: 11
+    action: 端到端验证
+    file: -
+    exit_signal: 主站登录后访问后台自动登录，用户管理 CRUD 完整，操作日志记录正确
+    status: pending
+
+checks:
+  - check: 接口契约核对 - 用户列表 GET /admin/user/page 返回格式正确
+    status: pending
+  - check: 接口契约核对 - 封禁/解封接口 PUT /admin/user/{id}/ban|unban
+    status: pending
+  - check: 接口契约核对 - 角色列表 GET /admin/role/list 返回正确
+    status: pending
+  - check: 行为核对 - 明确不做项未实现（批量操作、密码重置、日志查询界面）
+    status: pending
+  - check: 测试约束 - 非管理员访问返回 403
+    status: pending
+  - check: 测试约束 - 禁止封禁自己返回 400
+    status: pending
+  - check: 测试约束 - 禁止修改自己角色返回 400
+    status: pending
+  - check: 测试约束 - 操作日志正确记录
+    status: pending
+  - check: 测试约束 - Token 共享，主站登录后可直接访问后台
+    status: pending
+  - check: 架构归并 - clx-admin 端口 9700，clx-admin-web 端口 5174
+    status: pending

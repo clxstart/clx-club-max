@@ -2,6 +2,7 @@ package com.clx.search.service;
 
 import com.clx.search.entity.SearchLog;
 import com.clx.search.mapper.SearchLogMapper;
+import com.clx.search.service.impl.SearchLogServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ class SearchLogServiceTest {
 
     @BeforeEach
     void setUp() {
-        searchLogService = new SearchLogService(searchLogMapper);
+        searchLogService = new SearchLogServiceImpl(searchLogMapper);
     }
 
     @Test
