@@ -33,12 +33,14 @@ mvn spring-boot:run -pl clx-auth -Dspring-boot.run.profiles=dev
 | 服务 | 端口 | 说明 |
 |------|------|------|
 | clx-auth | 9100 | 认证中心，用户登录 |
-| clx-user | 9200 | 用户服务，个人资料、关注/粉丝、收藏 |
+| clx-user | 9201 | 用户服务，个人资料、关注/粉丝、收藏 |
 | clx-post | 9300 | 帖子服务 |
 | clx-search | 9400 | 搜索服务，聚合搜索、ES全文搜索、热词分析 |
 | clx-message | 9500 | 消息服务，私信、通知、在线状态 |
 | clx-quiz | 9600 | 刷题服务，题库管理、练习流程、错题本 |
+| clx-admin | 9700 | 后台管理服务，用户管理、角色分配 |
 | clx-gateway | 8080 | API 网关（暂未实现） |
+| clx-admin-web | 5174 | 后台管理前端（Vue 3 + Element Plus） |
 
 ## 模块结构
 
@@ -85,6 +87,11 @@ clx/
 │   ├── service/                   # 题目、练习、错题本服务
 │   ├── service/handler/           # 题型策略（Radio/Multiple/Judge/Brief）
 │   └── controller/                # API 控制器
+├── clx-admin/                     # 后台管理服务（当前可用）
+│   ├── controller/                # UserController、RoleController
+│   ├── service/                   # OperLogService（操作日志）
+│   ├── mapper/                    # OperLogMapper
+│   └── feign/                     # Feign 客户端（调用 clx-user/clx-auth）
 ├── clx-gateway/                   # API 网关（暂未实现）
 ├── clx-web/                       # 前端（React + Vite + Tailwind + Neumorphism）
 │   ├── src/components/ui/         # Neumorphism 基础组件（NeuButton/NeuInput/NeuCard/Toast）
@@ -92,6 +99,11 @@ clx/
 │   ├── src/pages/                  # 页面组件（Home、PostDetail、UserProfile、Compose、Search、Quiz、Account、Auth）
 │   ├── src/api/                    # API 请求和类型定义
 │   └── src/styles/                 # 全局样式
+├── clx-admin-web/                 # 后台管理前端（当前可用）
+│   ├── src/views/                  # 页面组件（Login、UserList、UserEdit）
+│   ├── src/layouts/               # 布局组件（AdminLayout）
+│   ├── src/api/                    # API 请求和类型定义
+│   └── src/stores/                 # Pinia 状态管理
 └── doc/sql/                       # 数据库脚本
 ```
 

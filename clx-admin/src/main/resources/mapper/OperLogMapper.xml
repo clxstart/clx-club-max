@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clx.admin.mapper.OperLogMapper">
+
+    <insert id="insert" parameterType="com.clx.admin.mapper.OperLogMapper$OperLogDTO">
+        INSERT INTO sys_oper_log (
+            user_id, username, module, action, method,
+            request_url, request_method, request_params, response_result,
+            status, error_msg, cost_time, oper_ip, oper_time
+        ) VALUES (
+            #{userId}, #{username}, #{module}, #{action}, #{method},
+            #{requestUrl}, #{requestMethod}, #{requestParams}, #{responseResult},
+            #{status}, #{errorMsg}, #{costTime}, #{operIp}, NOW()
+        )
+    </insert>
+
+</mapper>

@@ -9,7 +9,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * 后台管理服务启动类。
  */
 @SpringBootApplication
-@EnableFeignClients(basePackages = "com.clx.admin.feign")
+@EnableFeignClients(basePackages = {"com.clx.api.user.feign", "com.clx.api.auth.feign"})
 @MapperScan("com.clx.admin.mapper")
 public class ClxAdminApplication {
 

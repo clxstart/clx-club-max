@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * 认证服务 Feign 客户端。
  */
-@FeignClient(name = "clx-auth", contextId = "authFeignClient")
+@FeignClient(name = "clx-auth", contextId = "authFeignClient", url = "${feign.client.config.clx-auth.url:}")
 public interface AuthFeignClient {
 
     /**

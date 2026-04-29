@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * 用户服务 Feign 客户端。
  */
-@FeignClient(name = "clx-user", contextId = "userFeignClient")
+@FeignClient(name = "clx-user", contextId = "userFeignClient", url = "${feign.client.config.clx-user.url:}")
 public interface UserFeignClient {
 
     /**
