@@ -1,5 +1,6 @@
 package com.clx.quiz.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.clx.common.core.domain.R;
 import com.clx.quiz.service.WrongBookService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,7 +27,7 @@ public class WrongBookController {
     @Operation(summary = "查询错题本")
     @PostMapping("/list")
     public R<Map<String, Object>> list(@RequestBody Map<String, Integer> params) {
-        Long userId = 1L; // TODO: 从登录上下文获取
+        Long userId = StpUtil.getLoginIdAsLong();
         int pageNo = params.getOrDefault("pageNo", 1);
         int pageSize = params.getOrDefault("pageSize", 10);
         return R.ok(wrongBookService.list(userId, pageNo, pageSize));
@@ -38,7 +39,7 @@ public class WrongBookController {
     @Operation(summary = "移除错题")
     @PostMapping("/remove")
     public R<Boolean> remove(@RequestBody Map<String, Long> params) {
-        Long userId = 1L; // TODO: 从登录上下文获取
+        Long userId = StpUtil.getLoginIdAsLong();
         Long subjectId = params.get("subjectId");
         return R.ok(wrongBookService.remove(userId, subjectId));
     }

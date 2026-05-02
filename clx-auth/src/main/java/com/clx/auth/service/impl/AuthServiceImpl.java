@@ -25,6 +25,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -88,6 +89,10 @@ public class AuthServiceImpl implements AuthService {
         StpUtil.getSession().set("nickname", user.getNickname());
         StpUtil.getSession().set("rememberMe", rememberMe);
 
+        // 查询用户角色列表并存入 Session（JWT Payload 会包含）
+        List<String> roles = userMapper.selectRoleCodesByUserId(user.getUserId());
+        StpUtil.getSession().set("roles", roles);
+
         clearFailures(attemptKey);
         userMapper.updateLoginSuccess(user.getUserId(), clientIp);
 
@@ -144,6 +149,9 @@ public class AuthServiceImpl implements AuthService {
         StpUtil.getSession().set("username", normalizedUsername);
         StpUtil.getSession().set("nickname", finalNickname);
         StpUtil.getSession().set("email", email);
+
+        // 新用户默认角色为 "user"
+        StpUtil.getSession().set("roles", List.of("user"));
 
         userMapper.updateLoginSuccess(userId, clientIp);
         log.info("用户注册成功: username={}, userId={}, email={}", normalizedUsername, userId, email);

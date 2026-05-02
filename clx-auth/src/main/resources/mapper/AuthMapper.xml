@@ -16,4 +16,69 @@
         WHERE ur.user_id = #{userId} AND r.is_deleted = 0 AND r.status = '0'
     </select>
 
+    <!-- 查询所有权限列表 -->
+    <select id="selectAllPermissions" resultType="com.clx.api.auth.dto.PermissionVO">
+        SELECT permission_id, permission_name, permission_code, resource_type,
+               parent_id, path, api_path, method, sort
+        FROM sys_permission
+        WHERE is_deleted = 0 AND status = '0'
+        ORDER BY sort
+    </select>
+
+    <!-- 查询角色的权限ID列表 -->
+    <select id="selectPermissionIdsByRoleId" resultType="java.lang.Long">
+        SELECT permission_id
+        FROM sys_role_permission
+        WHERE role_id = #{roleId}
+    </select>
+
+    <!-- 新增角色 -->
+    <insert id="insertRole">
+        INSERT INTO sys_role (role_id, role_name, role_code, description, sort, status)
+        VALUES (#{roleId}, #{roleName}, #{roleCode}, #{description}, 0, '0')
+    </insert>
+
+    <!-- 更新角色 -->
+    <update id="updateRole">
+        UPDATE sys_role
+        SET role_name = #{roleName}, description = #{description}
+        WHERE role_id = #{roleId}
+    </update>
+
+    <!-- 删除角色（逻辑删除） -->
+    <update id="deleteRole">
+        UPDATE sys_role SET is_deleted = 1 WHERE role_id = #{roleId}
+    </update>
+
+    <!-- 新增权限 -->
+    <insert id="insertPermission">
+        INSERT INTO sys_permission (permission_id, permission_name, permission_code,
+                                    resource_type, parent_id, path, api_path, method, sort, status)
+        VALUES (#{permissionId}, #{permissionName}, #{permissionCode},
+                #{resourceType}, #{parentId}, #{path}, #{apiPath}, #{method}, #{sort}, '0')
+    </insert>
+
+    <!-- 更新权限 -->
+    <update id="updatePermission">
+        UPDATE sys_permission
+        SET permission_name = #{permissionName}, api_path = #{apiPath}, method = #{method}
+        WHERE permission_id = #{permissionId}
+    </update>
+
+    <!-- 删除权限（逻辑删除） -->
+    <update id="deletePermission">
+        UPDATE sys_permission SET is_deleted = 1 WHERE permission_id = #{permissionId}
+    </update>
+
+    <!-- 删除角色的所有权限关联 -->
+    <delete id="deleteRolePermissions">
+        DELETE FROM sys_role_permission WHERE role_id = #{roleId}
+    </delete>
+
+    <!-- 新增角色权限关联 -->
+    <insert id="insertRolePermission">
+        INSERT INTO sys_role_permission (role_id, permission_id)
+        VALUES (#{roleId}, #{permissionId})
+    </insert>
+
 </mapper>

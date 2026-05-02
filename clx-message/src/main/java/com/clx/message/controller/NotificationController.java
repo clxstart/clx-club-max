@@ -1,5 +1,6 @@
 package com.clx.message.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
 import com.clx.common.core.domain.R;
 import com.clx.message.dto.NotificationTriggerRequest;
@@ -36,6 +37,7 @@ public class NotificationController {
     /**
      * 获取通知列表。
      */
+    @SaCheckLogin
     @Operation(summary = "获取通知列表")
     @GetMapping("/notification/list")
     public R<Map<String, Object>> getList(
@@ -50,6 +52,7 @@ public class NotificationController {
     /**
      * 标记单条已读。
      */
+    @SaCheckLogin
     @Operation(summary = "标记单条已读")
     @PutMapping("/notification/read/{id}")
     public R<Void> markRead(@PathVariable Long id) {
@@ -61,6 +64,7 @@ public class NotificationController {
     /**
      * 按类型标记全部已读。
      */
+    @SaCheckLogin
     @Operation(summary = "按类型标记全部已读")
     @PutMapping("/notification/read-all")
     public R<Void> markAllRead(@RequestParam(required = false) String type) {
@@ -72,6 +76,7 @@ public class NotificationController {
     /**
      * 获取未读数。
      */
+    @SaCheckLogin
     @Operation(summary = "获取未读数")
     @GetMapping("/notification/unread-count")
     public R<Map<String, Integer>> getUnreadCount() {

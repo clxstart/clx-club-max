@@ -1,5 +1,6 @@
 package com.clx.post.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
 import com.clx.common.core.domain.R;
 import com.clx.post.dto.PostCreateRequest;
@@ -31,6 +32,7 @@ public class PostController {
     // ========== 写操作（需登录） ==========
 
     /** 创建帖子 */
+    @SaCheckLogin
     @Operation(summary = "创建帖子")
     @PostMapping("/create")
     public R<Long> create(@Valid @RequestBody PostCreateRequest request) {
@@ -40,6 +42,7 @@ public class PostController {
     }
 
     /** 更新帖子（仅作者可操作） */
+    @SaCheckLogin
     @Operation(summary = "更新帖子")
     @PutMapping("/{id}")
     public R<Void> update(@PathVariable Long id, @Valid @RequestBody PostUpdateRequest request) {
@@ -49,6 +52,7 @@ public class PostController {
     }
 
     /** 删除帖子（仅作者可操作） */
+    @SaCheckLogin
     @Operation(summary = "删除帖子")
     @DeleteMapping("/{id}")
     public R<Void> delete(@PathVariable Long id) {

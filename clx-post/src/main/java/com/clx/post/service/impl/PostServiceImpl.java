@@ -113,7 +113,8 @@ public class PostServiceImpl implements PostService {
         if (post == null) {
             throw new RuntimeException("帖子不存在");
         }
-        if (!post.getAuthorId().equals(userId)) {
+        // 作者或管理员可删除
+        if (!post.getAuthorId().equals(userId) && !StpUtil.hasRole("admin")) {
             throw new RuntimeException("无权删除此帖子");
         }
 

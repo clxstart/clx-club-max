@@ -1,5 +1,6 @@
 package com.clx.post.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
 import com.clx.common.core.domain.R;
 import com.clx.post.service.LikeService;
@@ -25,6 +26,7 @@ public class LikeController {
     // ========== 帖子点赞 ==========
 
     /** 点赞帖子（Redis +1，发 MQ 异步写 DB） */
+    @SaCheckLogin
     @Operation(summary = "点赞帖子")
     @PostMapping("/post/{id}/like")
     public R<Map<String, Integer>> likePost(@PathVariable Long id) {
@@ -34,6 +36,7 @@ public class LikeController {
     }
 
     /** 取消点赞帖子（同步写 DB，确保数据一致性） */
+    @SaCheckLogin
     @Operation(summary = "取消点赞帖子")
     @DeleteMapping("/post/{id}/like")
     public R<Map<String, Integer>> unlikePost(@PathVariable Long id) {
@@ -45,6 +48,7 @@ public class LikeController {
     // ========== 评论点赞 ==========
 
     /** 点赞评论 */
+    @SaCheckLogin
     @Operation(summary = "点赞评论")
     @PostMapping("/comment/{id}/like")
     public R<Map<String, Integer>> likeComment(@PathVariable Long id) {
@@ -54,6 +58,7 @@ public class LikeController {
     }
 
     /** 取消点赞评论 */
+    @SaCheckLogin
     @Operation(summary = "取消点赞评论")
     @DeleteMapping("/comment/{id}/like")
     public R<Map<String, Integer>> unlikeComment(@PathVariable Long id) {

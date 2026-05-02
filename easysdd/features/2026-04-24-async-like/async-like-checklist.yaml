@@ -54,7 +54,7 @@ steps:
     title: 定时校准
     status: done
     files:
-      - clx-post/src/main/java/com/clx/post/service/LikeSyncService.java
+      - clx-post/src/main/java/com/clx/post/job/LikeSyncJob.java
     exit_signal: 手动修改 Redis 计数，校准后 DB 被修正
 
   - id: step-8

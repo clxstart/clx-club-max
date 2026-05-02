@@ -41,3 +41,25 @@ steps:
   - action: "端到端验证"
     exit_signal: "完整流程可跑通"
     status: done
+
+checks:
+  - check: "接口契约核对：行为日志写入接口符合方案定义"
+    status: passed
+
+  - check: "接口契约核对：报表查询接口符合方案定义"
+    status: passed
+
+  - check: "行为核对：明确不做的事项确实没做"
+    status: passed
+
+  - check: "测试约束核对：行为日志写入可验证"
+    status: passed
+
+  - check: "测试约束核对：报表查询返回正确数据"
+    status: passed
+
+  - check: "术语一致性：代码命名与方案术语表一致"
+    status: passed
+
+  - check: "架构归并：CLAUDE.md 已更新"
+    status: passed

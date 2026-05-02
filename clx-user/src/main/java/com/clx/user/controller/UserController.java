@@ -1,5 +1,6 @@
 package com.clx.user.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
 import com.clx.common.core.domain.R;
 import com.clx.user.dto.ProfileUpdateDTO;
@@ -41,12 +42,10 @@ public class UserController {
     /**
      * 获取当前用户资料。
      */
+    @SaCheckLogin
     @Operation(summary = "获取当前用户资料")
     @GetMapping("/me")
     public R<UserProfileVO> getCurrentUser() {
-        if (!StpUtil.isLogin()) {
-            return R.fail(401, "未登录");
-        }
         Long userId = StpUtil.getLoginIdAsLong();
         UserProfileVO profile = userService.getCurrentUserProfile(userId);
         return R.ok(profile);
@@ -55,12 +54,10 @@ public class UserController {
     /**
      * 更新当前用户资料。
      */
+    @SaCheckLogin
     @Operation(summary = "更新当前用户资料")
     @PutMapping("/profile")
     public R<Void> updateProfile(@RequestBody ProfileUpdateDTO dto) {
-        if (!StpUtil.isLogin()) {
-            return R.fail(401, "未登录");
-        }
         Long userId = StpUtil.getLoginIdAsLong();
         userService.updateProfile(userId, dto);
         return R.ok();

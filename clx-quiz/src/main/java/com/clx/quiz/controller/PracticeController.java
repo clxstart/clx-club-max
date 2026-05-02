@@ -1,5 +1,6 @@
 package com.clx.quiz.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.clx.common.core.domain.R;
 import com.clx.quiz.dto.PracticeStartRequest;
 import com.clx.quiz.dto.PracticeSubmitRequest;
@@ -31,8 +32,7 @@ public class PracticeController {
     @Operation(summary = "开始练习")
     @PostMapping("/start")
     public R<Map<String, Object>> start(@RequestBody PracticeStartRequest request) {
-        // TODO: 从登录上下文获取用户ID
-        Long userId = 1L;
+        Long userId = StpUtil.getLoginIdAsLong();
         return R.ok(practiceService.start(request, userId));
     }
 
@@ -54,8 +54,7 @@ public class PracticeController {
     @Operation(summary = "提交答案")
     @PostMapping("/submit")
     public R<SubmitResultVO> submit(@RequestBody PracticeSubmitRequest request) {
-        // TODO: 从登录上下文获取用户ID
-        Long userId = 1L;
+        Long userId = StpUtil.getLoginIdAsLong();
         return R.ok(practiceService.submit(request, userId));
     }
 
@@ -68,7 +67,7 @@ public class PracticeController {
         Long practiceId = Long.valueOf(params.get("practiceId").toString());
         Long subjectId = Long.valueOf(params.get("subjectId").toString());
         Integer isCorrect = Integer.valueOf(params.get("isCorrect").toString());
-        Long userId = 1L; // TODO: 从登录上下文获取
+        Long userId = StpUtil.getLoginIdAsLong();
         return R.ok(practiceService.selfJudge(practiceId, subjectId, isCorrect, userId));
     }
 
@@ -79,7 +78,7 @@ public class PracticeController {
     @PostMapping("/finish")
     public R<PracticeResultVO> finish(@RequestBody Map<String, Long> params) {
         Long practiceId = params.get("practiceId");
-        Long userId = 1L; // TODO: 从登录上下文获取
+        Long userId = StpUtil.getLoginIdAsLong();
         return R.ok(practiceService.finish(practiceId, userId));
     }
 }

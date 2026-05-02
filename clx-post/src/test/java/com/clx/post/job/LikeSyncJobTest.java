@@ -1,4 +1,4 @@
-package com.clx.post.service;
+package com.clx.post.job;
 
 import com.clx.common.redis.service.RedisService;
 import com.clx.post.entity.Post;
@@ -11,17 +11,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * 点赞计数校准服务测试。
+ * 点赞计数校准定时任务测试。
  */
 @ExtendWith(MockitoExtension.class)
-class LikeSyncServiceTest {
+class LikeSyncJobTest {
 
     @Mock
     private RedisService redisService;
@@ -30,7 +29,7 @@ class LikeSyncServiceTest {
     private PostMapper postMapper;
 
     @InjectMocks
-    private LikeSyncService likeSyncService;
+    private LikeSyncJob likeSyncJob;
 
     private Post createPost(Long id, int likeCount) {
         Post post = new Post();
@@ -50,7 +49,7 @@ class LikeSyncServiceTest {
             when(postMapper.selectHot(1000)).thenReturn(List.of(post));
             when(redisService.get("post:like_count:1")).thenReturn(10);
 
-            likeSyncService.sync();
+            likeSyncJob.sync();
 
             verify(postMapper).updateLikeCount(1L, 10);
         }
@@ -62,7 +61,7 @@ class LikeSyncServiceTest {
             when(postMapper.selectHot(1000)).thenReturn(List.of(post));
             when(redisService.get("post:like_count:1")).thenReturn(5);
 
-            likeSyncService.sync();
+            likeSyncJob.sync();
 
             verify(redisService).set("post:like_count:1", 10);
         }
@@ -74,7 +73,7 @@ class LikeSyncServiceTest {
             when(postMapper.selectHot(1000)).thenReturn(List.of(post));
             when(redisService.get("post:like_count:1")).thenReturn(null);
 
-            likeSyncService.sync();
+            likeSyncJob.sync();
 
             verify(redisService).set("post:like_count:1", 8);
             verify(postMapper, never()).updateLikeCount(any(), anyInt());
@@ -87,7 +86,7 @@ class LikeSyncServiceTest {
             when(postMapper.selectHot(1000)).thenReturn(List.of(post));
             when(redisService.get("post:like_count:1")).thenReturn(10);
 
-            likeSyncService.sync();
+            likeSyncJob.sync();
 
             verify(postMapper, never()).updateLikeCount(any(), anyInt());
             verify(redisService, never()).set(anyString(), anyInt());

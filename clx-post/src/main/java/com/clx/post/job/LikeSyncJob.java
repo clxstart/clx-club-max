@@ -1,4 +1,4 @@
-package com.clx.post.service;
+package com.clx.post.job;
 
 import com.clx.common.redis.service.RedisService;
 import com.clx.post.entity.Post;
@@ -6,19 +6,19 @@ import com.clx.post.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 /**
- * 点赞计数校准服务。
+ * 点赞计数校准定时任务。
  *
  * 定时对比 Redis 与 DB 计数，修正偏差。
  */
 @Slf4j
-@Service
+@Component
 @RequiredArgsConstructor
-public class LikeSyncService {
+public class LikeSyncJob {
 
     private final RedisService redisService;
     private final PostMapper postMapper;

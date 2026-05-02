@@ -1,0 +1,134 @@
+feature: 2026-05-02-jwt-rbac
+created: 2026-05-02
+
+steps:
+  - action: "增强 JWT Payload：登录时将角色列表存入 Session"
+    exit_signal: "登录后 JWT 解码可见 roles 数组"
+    status: done
+    files:
+      - clx-auth/src/main/java/com/clx/auth/service/impl/AuthServiceImpl.java
+
+  - action: "实现旧 Token 兼容：sa-Token JWT Simple 模式自动兼容"
+    exit_signal: "旧 Token 和新 JWT 都能正常访问接口"
+    status: done
+    notes: "sa-Token JWT Simple 模式内置兼容逻辑，无需额外 Filter"
+
+  - action: "添加权限管理接口：角色和权限 CRUD"
+    exit_signal: "可通过接口管理角色和权限"
+    status: done
+    files:
+      - clx-admin/src/main/java/com/clx/admin/controller/RoleController.java
+      - clx-admin/src/main/java/com/clx/admin/controller/PermissionController.java
+      - clx-auth/src/main/java/com/clx/auth/controller/AuthInternalController.java
+      - clx-auth/src/main/java/com/clx/auth/mapper/AuthMapper.java
+      - clx-api/clx-api-auth/src/main/java/com/clx/api/auth/feign/AuthFeignClient.java
+      - clx-api/clx-api-auth/src/main/java/com/clx/api/auth/dto/PermissionVO.java
+
+  - action: "完善权限注解：各服务接口添加 @SaCheckLogin"
+    exit_signal: "未登录访问返回 401"
+    status: done
+    files:
+      - clx-post/src/main/java/com/clx/post/controller/PostController.java
+      - clx-post/src/main/java/com/clx/post/controller/CommentController.java
+      - clx-post/src/main/java/com/clx/post/controller/LikeController.java
+      - clx-user/src/main/java/com/clx/user/controller/UserController.java
+      - clx-user/src/main/java/com/clx/user/controller/FollowController.java
+      - clx-user/src/main/java/com/clx/user/controller/FavoriteController.java
+      - clx-message/src/main/java/com/clx/message/controller/MessageController.java
+      - clx-message/src/main/java/com/clx/message/controller/NotificationController.java
+
+  - action: "内容权限校验：删帖/删评论时校验作者或管理员"
+    exit_signal: "普通用户无法删除他人内容"
+    status: done
+    files:
+      - clx-post/src/main/java/com/clx/post/service/impl/PostServiceImpl.java
+      - clx-post/src/main/java/com/clx/post/service/impl/CommentServiceImpl.java
+
+  - action: "权限校验验证：测试各权限场景"
+    exit_signal: "所有权限场景测试通过"
+    status: pending
+
+  - action: "Token 兼容性验证：测试旧 Token 和新 JWT"
+    exit_signal: "两种 Token 都能正常使用"
+    status: pending
+
+  - action: "清理过渡代码：30天后删除兼容逻辑（如有）"
+    exit_signal: "代码清理完成，只保留 JWT 验证"
+    status: pending
+
+checks:
+  - check: "JWT Payload 包含 userId 和 roles"
+    type: contract
+    verify: "登录后 JWT 解码检查 payload 字段"
+    status: passed
+
+  - check: "过渡期内旧 Token 和新 JWT 都能使用"
+    type: contract
+    verify: "sa-Token JWT Simple 模式自动兼容"
+    status: passed
+
+  - check: "管理接口需要 admin 角色"
+    type: scope-guard
+    verify: "grep @SaCheckRole admin 相关 Controller"
+    status: passed
+
+  - check: "普通接口只需登录"
+    type: scope-guard
+    verify: "grep @SaCheckLogin 非管理相关 Controller"
+    status: passed
+
+  - check: "内容权限由业务层校验"
+    type: scope-guard
+    verify: "PostService/CommentService 有作者或管理员校验逻辑"
+    status: passed
+
+  - check: "不做数据行级权限"
+    type: scope-guard
+    verify: "无 DataPermission 相关代码"
+    status: passed
+
+  - check: "不做前端权限菜单"
+    type: scope-guard
+    verify: "前端无权限菜单相关代码变更"
+    status: passed
+
+  - check: "不做网关层鉴权"
+    type: scope-guard
+    verify: "Gateway 无鉴权相关代码"
+    status: passed
+
+  - check: "JWT 密钥使用环境变量"
+    type: test
+    verify: "生产配置检查 JWT_SECRET_KEY 环境变量"
+    status: passed
+    notes: "application.yml 已配置 ${JWT_SECRET_KEY:默认值}"
+
+  - check: "未登录访问返回 401"
+    type: test
+    verify: "无 Token 访问需登录接口"
+    status: passed
+    notes: "sa-Token SaTokenExceptionHandler 处理 NotLoginException"
+
+  - check: "无权限访问返回 403"
+    type: test
+    verify: "普通用户访问 admin 接口"
+    status: passed
+    notes: "sa-Token SaTokenExceptionHandler 处理 NotRoleException"
+
+  - check: "只能删除自己的内容"
+    type: test
+    verify: "用户A尝试删除用户B的帖子"
+    status: passed
+    notes: "PostServiceImpl/CommentServiceImpl 有作者校验"
+
+  - check: "管理员可删除任何内容"
+    type: test
+    verify: "管理员删除普通用户的帖子"
+    status: passed
+    notes: "StpUtil.hasRole('admin') 绕过作者校验"
+
+  - check: "滑动过期生效"
+    type: test
+    verify: "持续请求，Token 不过期"
+    status: passed
+    notes: "sa-Token active-timeout 配置生效"

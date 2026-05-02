@@ -1,5 +1,6 @@
 package com.clx.post.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
 import com.clx.common.core.domain.R;
 import com.clx.post.dto.CommentCreateRequest;
@@ -25,6 +26,7 @@ public class CommentController {
     private final CommentService commentService;
 
     /** 发表评论（支持回复，通过 parentId 指定父评论） */
+    @SaCheckLogin
     @Operation(summary = "创建评论")
     @PostMapping
     public R<Long> create(@PathVariable Long postId, @Valid @RequestBody CommentCreateRequest request) {
@@ -34,6 +36,7 @@ public class CommentController {
     }
 
     /** 删除评论（仅作者可操作） */
+    @SaCheckLogin
     @Operation(summary = "删除评论")
     @DeleteMapping("/{commentId}")
     public R<Void> delete(@PathVariable Long postId, @PathVariable Long commentId) {

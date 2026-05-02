@@ -1,5 +1,6 @@
 package com.clx.quiz.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.clx.common.core.domain.R;
 import com.clx.quiz.dto.SubjectCreateRequest;
 import com.clx.quiz.dto.SubjectQueryRequest;
@@ -32,8 +33,8 @@ public class SubjectController {
     @Operation(summary = "新增题目")
     @PostMapping("/add")
     public R<Boolean> add(@RequestBody SubjectCreateRequest request) {
-        // TODO: 从登录上下文获取用户ID
-        return R.ok(subjectService.add(request, "system"));
+        String createdBy = StpUtil.getLoginIdAsString();
+        return R.ok(subjectService.add(request, createdBy));
     }
 
     /**

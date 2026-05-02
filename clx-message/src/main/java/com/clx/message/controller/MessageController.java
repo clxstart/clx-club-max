@@ -1,5 +1,6 @@
 package com.clx.message.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
 import com.clx.common.core.domain.R;
 import com.clx.message.dto.SendMessageRequest;
@@ -24,6 +25,7 @@ public class MessageController {
     /**
      * 发送私信。
      */
+    @SaCheckLogin
     @Operation(summary = "发送私信")
     @PostMapping("/message/send")
     public R<Map<String, Object>> sendMessage(@RequestBody SendMessageRequest request) {
@@ -35,6 +37,7 @@ public class MessageController {
     /**
      * 获取会话列表。
      */
+    @SaCheckLogin
     @Operation(summary = "获取会话列表")
     @GetMapping("/message/sessions")
     public R<Map<String, Object>> getSessions(
@@ -48,6 +51,7 @@ public class MessageController {
     /**
      * 获取会话消息历史。
      */
+    @SaCheckLogin
     @Operation(summary = "获取会话消息历史")
     @GetMapping("/message/sessions/{sessionId}/messages")
     public R<Map<String, Object>> getMessages(
@@ -62,6 +66,7 @@ public class MessageController {
     /**
      * 标记会话已读。
      */
+    @SaCheckLogin
     @Operation(summary = "标记会话已读")
     @PutMapping("/message/sessions/{sessionId}/read")
     public R<Void> markRead(@PathVariable Long sessionId) {

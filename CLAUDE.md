@@ -114,33 +114,70 @@ clx/
 └── doc/sql/                       # 数据库脚本
 ```
 
-## 当前安全架构（最简版）
+## 当前安全架构（JWT + RBAC）
 
 - **Spring Security**：只做 CSRF 禁用和路径放行
-- **sa-Token**：核心模式，用户登录后生成 UUID Token，存 Redis
+- **sa-Token**：JWT Simple 模式，Token 格式为 JWT，会话数据存 Redis
+- **RBAC 权限控制**：基于角色的访问控制，支持 @SaCheckLogin / @SaCheckRole 注解
 
 **核心文件**：
-- `SimpleSecurityConfig.java` - Spring Security 放行所有请求
-- `StpInterfaceImpl.java` - sa-Token 权限接口（暂返回空）
+- `SaTokenJwtConfig.java` - JWT Simple 模式配置
+- `AuthStpInterfaceImpl.java` - sa-Token 权限接口（查询用户角色和权限）
+- `SaTokenExceptionHandler.java` - 权限异常处理（401/403）
+
+**权限注解使用**：
+- `@SaCheckLogin`：需要登录才能访问（用于 post、user、message 服务）
+- `@SaCheckRole("admin")`：需要管理员角色（用于 admin 服务）
+
+**JWT Payload 结构**：
+```json
+{
+  "loginId": 1,
+  "roles": ["admin"],
+  "loginType": "login"
+}
+```
+
+**滑动过期**：
+- Token 有效期：4 小时
+- 活跃超时：2 小时（每次请求自动续期）
 
 ## 登录接口
 
 ```bash
-# 登录
+# 登录（返回 JWT Token）
 curl -X POST http://localhost:9100/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","password":"admin123"}'
 
 # 返回
-{"code":200,"data":{"token":"xxx","tokenName":"Authorization"}}
+{"code":200,"data":{"tokenValue":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...","tokenName":"Authorization"}}
 
 # 获取当前用户
 curl http://localhost:9100/auth/me \
-  -H "Authorization: Bearer xxx"
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
 
 # 登出
 curl -X POST http://localhost:9100/auth/logout \
-  -H "Authorization: Bearer xxx"
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+```
+
+## 权限管理接口
+
+```bash
+# 获取角色列表（需要 admin 角色）
+curl http://localhost:9700/admin/role/list \
+  -H "Authorization: Bearer {jwt}"
+
+# 获取权限列表（需要 admin 角色）
+curl http://localhost:9700/admin/permission/list \
+  -H "Authorization: Bearer {jwt}"
+
+# 分配权限给角色
+curl -X PUT http://localhost:9700/admin/role/{roleId}/permissions \
+  -H "Authorization: Bearer {jwt}" \
+  -H "Content-Type: application/json" \
+  -d '[1, 2, 3]'
 ```
 
 ## 数据库
@@ -225,8 +262,8 @@ ES 索引定义：`doc/es/` 目录下
 ## 后续扩展路线图
 
 1. **阶段 1**：最简登录（sa-Token 核心模式） ✅
-2. **阶段 2**：添加 JWT 支持
-3. **阶段 3**：添加权限控制（@SaCheckPermission）
+2. **阶段 2**：添加 JWT 支持 ✅
+3. **阶段 3**：添加权限控制（@SaCheckRole / @SaCheckLogin） ✅
 4. **阶段 4**：实现 clx-user 服务 ✅
 5. **阶段 5**：启用 Gateway 路由
 6. **阶段 6**：启用 OAuth2 SSO（企业微信、钉钉）

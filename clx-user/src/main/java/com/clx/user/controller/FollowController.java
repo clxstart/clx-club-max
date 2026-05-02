@@ -1,5 +1,6 @@
 package com.clx.user.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
 import com.clx.common.core.domain.R;
 import com.clx.user.service.FollowService;
@@ -27,12 +28,10 @@ public class FollowController {
     /**
      * 关注用户。
      */
+    @SaCheckLogin
     @Operation(summary = "关注用户")
     @PostMapping("/follow/{userId}")
     public R<Map<String, Integer>> follow(@PathVariable Long userId) {
-        if (!StpUtil.isLogin()) {
-            return R.fail(401, "未登录");
-        }
         Long currentUserId = StpUtil.getLoginIdAsLong();
         int followCount = followService.follow(currentUserId, userId);
         Map<String, Integer> result = new HashMap<>();
@@ -43,12 +42,10 @@ public class FollowController {
     /**
      * 取消关注。
      */
+    @SaCheckLogin
     @Operation(summary = "取消关注")
     @DeleteMapping("/follow/{userId}")
     public R<Map<String, Integer>> unfollow(@PathVariable Long userId) {
-        if (!StpUtil.isLogin()) {
-            return R.fail(401, "未登录");
-        }
         Long currentUserId = StpUtil.getLoginIdAsLong();
         int followCount = followService.unfollow(currentUserId, userId);
         Map<String, Integer> result = new HashMap<>();

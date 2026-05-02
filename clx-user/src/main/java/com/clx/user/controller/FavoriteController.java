@@ -1,5 +1,6 @@
 package com.clx.user.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
 import com.clx.common.core.domain.R;
 import com.clx.user.service.FavoriteService;
@@ -27,12 +28,10 @@ public class FavoriteController {
     /**
      * 收藏帖子。
      */
+    @SaCheckLogin
     @Operation(summary = "收藏帖子")
     @PostMapping("/favorite/{postId}")
     public R<Void> addFavorite(@PathVariable Long postId) {
-        if (!StpUtil.isLogin()) {
-            return R.fail(401, "未登录");
-        }
         Long userId = StpUtil.getLoginIdAsLong();
         favoriteService.addFavorite(userId, postId);
         return R.ok();
@@ -41,12 +40,10 @@ public class FavoriteController {
     /**
      * 取消收藏。
      */
+    @SaCheckLogin
     @Operation(summary = "取消收藏")
     @DeleteMapping("/favorite/{postId}")
     public R<Void> removeFavorite(@PathVariable Long postId) {
-        if (!StpUtil.isLogin()) {
-            return R.fail(401, "未登录");
-        }
         Long userId = StpUtil.getLoginIdAsLong();
         favoriteService.removeFavorite(userId, postId);
         return R.ok();
@@ -55,14 +52,12 @@ public class FavoriteController {
     /**
      * 获取收藏夹。
      */
+    @SaCheckLogin
     @Operation(summary = "获取收藏夹")
     @GetMapping("/favorites")
     public R<Map<String, Object>> getFavorites(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size) {
-        if (!StpUtil.isLogin()) {
-            return R.fail(401, "未登录");
-        }
         Long userId = StpUtil.getLoginIdAsLong();
         List<FavoriteItemVO> list = favoriteService.getFavorites(userId, page, size);
         int total = favoriteService.countFavorites(userId);

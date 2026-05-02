@@ -6,6 +6,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * CORS 跨域配置。
+ * 允许前端从不同的域名/端口访问quiz服务的api
  */
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {

@@ -19,10 +19,10 @@ tags: [mq, redis, async, performance, like]
 | LikeMessage | MQ 消息实体，包含 postId、userId、action(like/unlike) |
 | LikeProducer | MQ 生产者，点赞时发送消息 |
 | LikeConsumer | MQ 消费者，消费消息并更新 DB |
-| LikeSyncService | 定时任务，校准 Redis 与 DB 计数 |
+| LikeSyncJob | 定时任务，校准 Redis 与 DB 计数 |
 | 死信队列 | DLQ，消息重试 3 次失败后进入 |
 
-**术语冲突检查**：grep 项目无 `LikeMessage`/`LikeProducer`/`LikeConsumer`/`LikeSyncService` 命中，无冲突。
+**术语冲突检查**：grep 项目无 `LikeMessage`/`LikeProducer`/`LikeConsumer`/`LikeSyncJob` 命中，无冲突。
 
 ---
 
@@ -160,7 +160,7 @@ Response 400（未点赞）:
 | `LikeProducer.java` | 新建 | 发送点赞消息到 MQ |
 | `LikeConsumer.java` | 新建 | 消费消息，更新 DB |
 | `LikeServiceImpl.java` | 改造 | likePost 用 Redis+MQ，unlike 保持同步 |
-| `LikeSyncService.java` | 新建 | 定时校准 Redis/DB |
+| `LikeSyncJob.java` | 新建 | 定时校准 Redis/DB |
 | `LikeController.java` | 改造 | unlike 时清除 Redis key |
 | `LikeServiceTest.java` | 扩展 | 新增异步流程测试 |
 
@@ -194,7 +194,7 @@ Response 400（未点赞）:
 - 验证：取消点赞后 Redis key 删除、DB 计数减少
 
 **Step 7：定时校准**
-- 新建：`LikeSyncService.java`
+- 新建：`LikeSyncJob.java`
 - 验证：手动修改 Redis 计数，5 分钟后 DB 被校准
 
 **Step 8：补充测试**

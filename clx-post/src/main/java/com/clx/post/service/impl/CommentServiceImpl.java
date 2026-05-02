@@ -1,5 +1,6 @@
 package com.clx.post.service.impl;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.clx.post.dto.CommentCreateRequest;
 import com.clx.post.entity.Comment;
 import com.clx.post.mapper.CommentMapper;
@@ -53,7 +54,8 @@ public class CommentServiceImpl implements CommentService {
         if (comment == null) {
             throw new RuntimeException("评论不存在");
         }
-        if (!comment.getAuthorId().equals(userId)) {
+        // 作者或管理员可删除
+        if (!comment.getAuthorId().equals(userId) && !StpUtil.hasRole("admin")) {
             throw new RuntimeException("无权删除此评论");
         }
 
