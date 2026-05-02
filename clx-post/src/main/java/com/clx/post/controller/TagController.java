@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * 标签控制器。
+ * 标签控制器 - 提供标签列表查询接口（发帖选择、标签云展示）。
  */
 @Tag(name = "标签管理", description = "标签相关接口")
 @RestController
@@ -23,9 +23,7 @@ public class TagController {
 
     private final TagService tagService;
 
-    /**
-     * 获取标签列表。
-     */
+    /** 获取所有标签列表 */
     @Operation(summary = "获取标签列表")
     @GetMapping("/list")
     public R<List<TagVO>> list() {

@@ -24,6 +24,7 @@
         <module>clx-message</module>
         <module>clx-quiz</module>
         <module>clx-admin</module>
+        <module>clx-analytics</module>
     </modules>
 
     <!-- 版本管理 -->

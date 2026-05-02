@@ -3,10 +3,11 @@ package com.clx.post.vo;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 评论VO。
+ * 评论VO - 树形结构展示多级评论。
  */
 @Data
 public class CommentVO {
@@ -20,6 +21,9 @@ public class CommentVO {
     /** 作者信息 */
     private AuthorVO author;
 
+    /** 回复目标（@某人） */
+    private ReplyToVO replyTo;
+
     /** 点赞数 */
     private Integer likeCount;
 
@@ -29,16 +33,22 @@ public class CommentVO {
     /** 创建时间 */
     private LocalDateTime createdAt;
 
-    /** 子评论列表 */
-    private List<CommentVO> children;
+    /** 子评论列表（递归） */
+    private List<CommentVO> children = new ArrayList<>();
 
-    /**
-     * 作者信息。
-     */
+    /** 作者信息 */
     @Data
     public static class AuthorVO {
         private Long id;
         private String name;
         private String avatar;
+    }
+
+    /** 回复目标信息 */
+    @Data
+    public static class ReplyToVO {
+        private Long commentId;
+        private Long authorId;
+        private String authorName;
     }
 }

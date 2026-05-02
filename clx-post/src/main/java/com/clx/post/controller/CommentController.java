@@ -14,19 +14,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 评论控制器。
+ * 评论控制器 - 提供评论的创建、删除、列表查询接口。
  */
 @Tag(name = "评论管理", description = "评论相关接口")
 @RestController
-@RequestMapping("/post/{postId}/comment")
+@RequestMapping("/post/{postId}/comment")  // 嵌套资源：评论属于帖子
 @RequiredArgsConstructor
 public class CommentController {
 
     private final CommentService commentService;
 
-    /**
-     * 创建评论。
-     */
+    /** 发表评论（支持回复，通过 parentId 指定父评论） */
     @Operation(summary = "创建评论")
     @PostMapping
     public R<Long> create(@PathVariable Long postId, @Valid @RequestBody CommentCreateRequest request) {
@@ -35,9 +33,7 @@ public class CommentController {
         return R.ok(commentId);
     }
 
-    /**
-     * 删除评论。
-     */
+    /** 删除评论（仅作者可操作） */
     @Operation(summary = "删除评论")
     @DeleteMapping("/{commentId}")
     public R<Void> delete(@PathVariable Long postId, @PathVariable Long commentId) {
@@ -46,9 +42,7 @@ public class CommentController {
         return R.ok();
     }
 
-    /**
-     * 获取评论列表。
-     */
+    /** 获取评论列表（树形结构，登录用户返回归属状态） */
     @Operation(summary = "获取评论列表")
     @GetMapping("s")  // 完整路径: /post/{postId}/comments
     public R<List<CommentVO>> list(@PathVariable Long postId) {

@@ -7,31 +7,26 @@ import lombok.NoArgsConstructor;
 import java.time.Instant;
 
 /**
- * 点赞 MQ 消息实体。
+ * 点赞 MQ 消息实体 - 用于异步写 DB。
+ *
+ * 字段说明：
+ * - postId/userId：业务核心数据
+ * - uuid：幂等保障（防止重复消费）
+ * - timestamp：便于问题排查
+ * - action：预留扩展（取消点赞目前不走 MQ）
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class LikeMessage {
 
-    /** 帖子ID */
-    private Long postId;
+    private Long postId;      // 帖子ID
+    private Long userId;      // 用户ID
+    private String action;    // 操作类型（固定 "like"）
+    private Long timestamp;   // 消息时间戳
+    private String uuid;      // 幂等标识 userId:postId:timestamp
 
-    /** 用户ID */
-    private Long userId;
-
-    /** 操作类型：固定为 "like"（unlike 不走 MQ） */
-    private String action;
-
-    /** 消息时间戳 */
-    private Long timestamp;
-
-    /** 幂等唯一标识（userId:postId:timestamp） */
-    private String uuid;
-
-    /**
-     * 创建点赞消息。
-     */
+    /** 创建点赞消息（自动生成 uuid） */
     public static LikeMessage of(Long postId, Long userId) {
         long ts = Instant.now().toEpochMilli();
         String uuid = userId + ":" + postId + ":" + ts;

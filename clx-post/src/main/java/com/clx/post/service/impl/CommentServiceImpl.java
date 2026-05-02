@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * 评论服务实现。
+ * 评论服务实现 - 支持递归多级评论。
  */
 @Service
 @RequiredArgsConstructor
@@ -63,59 +63,71 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<CommentVO> getList(Long postId, Long userId) {
-        // 查询所有一级和二级评论
+        // 一次性查询帖子所有评论
         List<Comment> comments = commentMapper.selectByPostId(postId, 0, 1000);
 
-        // 转换为VO
-        List<CommentVO> allVOs = comments.stream().map(comment -> {
-            CommentVO vo = new CommentVO();
-            vo.setId(comment.getId());
-            vo.setContent(comment.getContent());
-            vo.setLikeCount(comment.getLikeCount());
-            vo.setCreatedAt(comment.getCreateTime());
+        // 构建 parentId -> 子评论列表 的映射
+        Map<Long, List<Comment>> childrenMap = comments.stream()
+                .filter(c -> c.getParentId() != null && c.getParentId() > 0)
+                .collect(Collectors.groupingBy(Comment::getParentId));
 
-            // 检查是否点赞
-            boolean isLiked = false;
-            if (userId != null) {
-                isLiked = likeRecordMapper.exists(userId, "2", comment.getId());
+        // 构建评论ID -> 评论 的映射（用于查找 replyTo 目标）
+        Map<Long, Comment> commentMap = comments.stream()
+                .collect(Collectors.toMap(Comment::getId, c -> c));
+
+        // 找出所有一级评论，递归构建树
+        List<CommentVO> result = new ArrayList<>();
+        for (Comment comment : comments) {
+            if (comment.getParentId() == null || comment.getParentId() == 0) {
+                CommentVO vo = buildCommentVO(comment, userId, childrenMap, commentMap);
+                result.add(vo);
             }
-            vo.setIsLiked(isLiked);
+        }
 
-            // 作者信息
-            CommentVO.AuthorVO authorVO = new CommentVO.AuthorVO();
-            authorVO.setId(comment.getAuthorId());
-            authorVO.setName(comment.getAuthorName());
-            vo.setAuthor(authorVO);
+        return result;
+    }
 
-            return vo;
-        }).collect(Collectors.toList());
+    /**
+     * 递归构建评论VO（包含所有子评论）。
+     */
+    private CommentVO buildCommentVO(Comment comment, Long userId,
+                                      Map<Long, List<Comment>> childrenMap,
+                                      Map<Long, Comment> commentMap) {
+        CommentVO vo = new CommentVO();
+        vo.setId(comment.getId());
+        vo.setContent(comment.getContent());
+        vo.setLikeCount(comment.getLikeCount());
+        vo.setCreatedAt(comment.getCreateTime());
 
-        // 构建树形结构
-        Map<Long, List<CommentVO>> childrenMap = allVOs.stream()
-                .filter(vo -> {
-                    Comment c = comments.stream()
-                            .filter(cm -> cm.getId().equals(vo.getId()))
-                            .findFirst().orElse(null);
-                    return c != null && c.getParentId() != null && c.getParentId() > 0;
-                })
-                .collect(Collectors.groupingBy(vo -> {
-                    Comment c = comments.stream()
-                            .filter(cm -> cm.getId().equals(vo.getId()))
-                            .findFirst().orElse(null);
-                    return c != null ? c.getParentId() : 0L;
-                }));
+        // 点赞状态
+        boolean isLiked = userId != null && likeRecordMapper.exists(userId, "2", comment.getId());
+        vo.setIsLiked(isLiked);
 
-        List<CommentVO> rootVOs = allVOs.stream()
-                .filter(vo -> {
-                    Comment c = comments.stream()
-                            .filter(cm -> cm.getId().equals(vo.getId()))
-                            .findFirst().orElse(null);
-                    return c != null && (c.getParentId() == null || c.getParentId() == 0);
-                })
-                .collect(Collectors.toList());
+        // 作者信息
+        CommentVO.AuthorVO authorVO = new CommentVO.AuthorVO();
+        authorVO.setId(comment.getAuthorId());
+        authorVO.setName(comment.getAuthorName());
+        vo.setAuthor(authorVO);
 
-        rootVOs.forEach(vo -> vo.setChildren(childrenMap.getOrDefault(vo.getId(), new ArrayList<>())));
+        // 回复目标（@某人）
+        if (comment.getReplyToId() != null && comment.getReplyToId() > 0) {
+            Comment replyToComment = commentMap.get(comment.getReplyToId());
+            if (replyToComment != null) {
+                CommentVO.ReplyToVO replyToVO = new CommentVO.ReplyToVO();
+                replyToVO.setCommentId(replyToComment.getId());
+                replyToVO.setAuthorId(replyToComment.getAuthorId());
+                replyToVO.setAuthorName(replyToComment.getAuthorName());
+                vo.setReplyTo(replyToVO);
+            }
+        }
 
-        return rootVOs;
+        // 递归处理子评论
+        List<Comment> children = childrenMap.getOrDefault(comment.getId(), new ArrayList<>());
+        for (Comment child : children) {
+            CommentVO childVO = buildCommentVO(child, userId, childrenMap, commentMap);
+            vo.getChildren().add(childVO);
+        }
+
+        return vo;
     }
 }

@@ -1,0 +1,43 @@
+feature: 2026-04-29-user-behavior-analytics
+created: 2026-04-29
+
+steps:
+  - action: "创建数据库表"
+    exit_signal: "表创建成功，可插入测试数据"
+    status: done
+
+  - action: "搭建 Hadoop Docker 环境"
+    exit_signal: "HDFS 可访问，Hive 可执行 SQL"
+    status: done
+
+  - action: "新建 clx-analytics 模块"
+    exit_signal: "服务启动成功，健康检查通过"
+    status: done
+
+  - action: "实现行为日志写入接口"
+    exit_signal: "接口可调用，数据写入数据库"
+    status: done
+
+  - action: "实现数据同步脚本"
+    exit_signal: "脚本可导出数据到 HDFS"
+    status: done
+
+  - action: "实现 Hive ETL 脚本"
+    exit_signal: "Hive 可计算出指标并写入报表表"
+    status: done
+
+  - action: "配置定时任务"
+    exit_signal: "每日凌晨自动执行 ETL"
+    status: done
+
+  - action: "实现报表查询接口"
+    exit_signal: "API 返回正确数据"
+    status: done
+
+  - action: "新建前端报表页面"
+    exit_signal: "页面正常展示图表"
+    status: done
+
+  - action: "端到端验证"
+    exit_signal: "完整流程可跑通"
+    status: done

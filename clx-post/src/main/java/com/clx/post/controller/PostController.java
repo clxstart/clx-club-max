@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 帖子控制器。
+ * 帖子控制器 - 提供帖子的 CRUD、搜索、热门榜等接口。
  */
 @Tag(name = "帖子管理", description = "帖子CRUD相关接口")
 @RestController
@@ -28,20 +28,18 @@ public class PostController {
 
     private final PostService postService;
 
-    /**
-     * 创建帖子。
-     */
+    // ========== 写操作（需登录） ==========
+
+    /** 创建帖子 */
     @Operation(summary = "创建帖子")
     @PostMapping("/create")
     public R<Long> create(@Valid @RequestBody PostCreateRequest request) {
-        Long userId = StpUtil.getLoginIdAsLong();
+        Long userId = StpUtil.getLoginIdAsLong();  // 获取当前登录用户
         Long postId = postService.create(request, userId);
         return R.ok(postId);
     }
 
-    /**
-     * 更新帖子。
-     */
+    /** 更新帖子（仅作者可操作） */
     @Operation(summary = "更新帖子")
     @PutMapping("/{id}")
     public R<Void> update(@PathVariable Long id, @Valid @RequestBody PostUpdateRequest request) {
@@ -50,9 +48,7 @@ public class PostController {
         return R.ok();
     }
 
-    /**
-     * 删除帖子。
-     */
+    /** 删除帖子（仅作者可操作） */
     @Operation(summary = "删除帖子")
     @DeleteMapping("/{id}")
     public R<Void> delete(@PathVariable Long id) {
@@ -61,23 +57,21 @@ public class PostController {
         return R.ok();
     }
 
-    /**
-     * 获取帖子详情。
-     */
+    // ========== 读操作 ==========
+
+    /** 获取帖子详情（登录用户返回是否点赞/收藏状态） */
     @Operation(summary = "获取帖子详情")
     @GetMapping("/{id}")
     public R<PostDetailVO> getDetail(@PathVariable Long id) {
         Long userId = null;
         if (StpUtil.isLogin()) {
-            userId = StpUtil.getLoginIdAsLong();
+            userId = StpUtil.getLoginIdAsLong();  // 未登录也能查看
         }
         PostDetailVO detail = postService.getDetail(id, userId);
         return R.ok(detail);
     }
 
-    /**
-     * 获取帖子列表。
-     */
+    /** 获取帖子列表（支持分页、分类筛选） */
     @Operation(summary = "获取帖子列表")
     @GetMapping("/list")
     public R<PostListVO> getList(PostListRequest request) {
@@ -85,9 +79,7 @@ public class PostController {
         return R.ok(list);
     }
 
-    /**
-     * 搜索帖子。
-     */
+    /** 搜索帖子（按关键词） */
     @Operation(summary = "搜索帖子")
     @GetMapping("/search")
     public R<PostListVO> search(@RequestParam String keyword,
@@ -97,9 +89,7 @@ public class PostController {
         return R.ok(result);
     }
 
-    /**
-     * 获取热门帖子。
-     */
+    /** 获取热门帖子（按点赞/浏览排序） */
     @Operation(summary = "获取热门帖子")
     @GetMapping("/hot")
     public R<List<PostListItemVO>> getHot(@RequestParam(defaultValue = "10") Integer limit) {
@@ -107,9 +97,7 @@ public class PostController {
         return R.ok(posts);
     }
 
-    /**
-     * 按作者查询帖子。
-     */
+    /** 按作者查询帖子（用户主页） */
     @Operation(summary = "按作者查询帖子")
     @GetMapping("/user/{userId}")
     public R<PostListVO> getByAuthor(@PathVariable Long userId,

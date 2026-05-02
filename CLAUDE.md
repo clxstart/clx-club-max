@@ -39,6 +39,7 @@ mvn spring-boot:run -pl clx-auth -Dspring-boot.run.profiles=dev
 | clx-message | 9500 | 消息服务，私信、通知、在线状态 |
 | clx-quiz | 9600 | 刷题服务，题库管理、练习流程、错题本 |
 | clx-admin | 9700 | 后台管理服务，用户管理、角色分配 |
+| clx-analytics | 9800 | 数据分析服务，行为日志采集、报表查询 |
 | clx-gateway | 8080 | API 网关（暂未实现） |
 | clx-admin-web | 5174 | 后台管理前端（Vue 3 + Element Plus） |
 
@@ -92,6 +93,12 @@ clx/
 │   ├── service/                   # OperLogService（操作日志）
 │   ├── mapper/                    # OperLogMapper
 │   └── feign/                     # Feign 客户端（调用 clx-user/clx-auth）
+├── clx-analytics/                 # 数据分析服务（当前可用）
+│   ├── entity/                    # BehaviorLog、AnalyticsReport
+│   ├── mapper/                    # MyBatis Mapper
+│   ├── service/                   # 行为日志、报表查询服务
+│   ├── job/                       # ETL 定时任务
+│   └── controller/                # API 控制器
 ├── clx-gateway/                   # API 网关（暂未实现）
 ├── clx-web/                       # 前端（React + Vite + Tailwind + Neumorphism）
 │   ├── src/components/ui/         # Neumorphism 基础组件（NeuButton/NeuInput/NeuCard/Toast）

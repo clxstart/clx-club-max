@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * 分类控制器。
+ * 分类控制器 - 提供分类列表查询接口（单选，层级结构）。
  */
 @Tag(name = "分类管理", description = "分类相关接口")
 @RestController
@@ -23,9 +23,7 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    /**
-     * 获取分类列表。
-     */
+    /** 获取所有分类列表（树形结构） */
     @Operation(summary = "获取分类列表")
     @GetMapping("/list")
     public R<List<CategoryVO>> list() {
