@@ -44,6 +44,15 @@ public class ServiceException extends RuntimeException {
         this(ResponseCode.BAD_REQUEST, message);
     }
 
+    /**
+     * 构造函数（使用默认错误码 BAD_REQUEST）。
+     *
+     * <p>注意：此构造函数使用 400 作为错误码，适用于参数校验失败等场景。
+     * 对于其他业务错误，建议使用 {@link #ServiceException(ResponseCode)} 或 {@link #of(int, String)}。
+     *
+     * @param message 错误消息
+     * @param cause   原始异常
+     */
     public ServiceException(String message, Throwable cause) {
         super(message, cause);
         this.code = ResponseCode.BAD_REQUEST.getCode();

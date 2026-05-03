@@ -7,39 +7,121 @@ spring:
   profiles:
     active: dev
 
+  # Nacos 配置导入
+  config:
+    import:
+      - optional:nacos:common-redis.yaml?group=DEFAULT_GROUP
+
+  # Redis 配置
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: 2
+      lettuce:
+        pool:
+          max-active: 200
+          max-idle: 50
+          min-idle: 10
+
+  # Nacos 服务发现和配置中心
   cloud:
     nacos:
+      server-addr: ${NACOS_ADDR:localhost:8848}
+      username: ${NACOS_USERNAME:nacos}
+      password: ${NACOS_PASSWORD:nacos}
       discovery:
-        server-addr: localhost:8848
-        enabled: false
+        enabled: true
+        namespace: ${NACOS_NAMESPACE:}
+        group: DEFAULT_GROUP
       config:
-        server-addr: localhost:8848
-        enabled: false
+        enabled: true
+        namespace: ${NACOS_NAMESPACE:}
+        group: DEFAULT_GROUP
+        file-extension: yaml
 
+    # 路由配置（使用服务发现）
     gateway:
       discovery:
         locator:
           enabled: true
           lower-case-service-id: true
+
+      # 路由规则（使用 lb:// 服务名 方式）
       routes:
+        # ========== 认证服务 ==========
         - id: clx-auth
-          uri: http://localhost:9100
+          uri: lb://clx-auth
           predicates:
             - Path=/auth/**
+
+        # ========== 用户服务 ==========
         - id: clx-user
-          uri: http://localhost:9202
+          uri: lb://clx-user
           predicates:
             - Path=/user/**
+
+        # ========== 帖子服务 ==========
         - id: clx-post
-          uri: http://localhost:9300
+          uri: lb://clx-post
           predicates:
             - Path=/post/**,/category/**,/tag/**,/comment/**
+
+        # ========== 搜索服务 ==========
         - id: clx-search
-          uri: http://localhost:9400
+          uri: lb://clx-search
           predicates:
             - Path=/search/**
 
+        # ========== 消息服务 ==========
+        - id: clx-message
+          uri: lb://clx-message
+          predicates:
+            - Path=/message/**,/chat/**,/notification/**
+
+        # ========== 刷题服务 ==========
+        - id: clx-quiz
+          uri: lb://clx-quiz
+          predicates:
+            - Path=/quiz/**,/subject/**,/practice/**
+
+        # ========== 后台管理服务 ==========
+        - id: clx-admin
+          uri: lb://clx-admin
+          predicates:
+            - Path=/admin/**
+
+        # ========== 数据分析服务 ==========
+        - id: clx-analytics
+          uri: lb://clx-analytics
+          predicates:
+            - Path=/analytics/**
+
+# ========== sa-Token 配置 ==========
+sa-token:
+  # Token 名称
+  token-name: Authorization
+  # Token 前缀
+  token-prefix: Bearer
+  # JWT 密钥（与 clx-auth 保持一致）
+  jwt-secret-key: clx-jwt-secret-key-2026
+  # Token 有效期（秒），4 小时
+  timeout: 14400
+  # Token 活跃超时（秒），2 小时
+  active-timeout: 7200
+  # 是否允许同一账号多地同时登录
+  is-concurrent: true
+  # 多人登录同一账号时，是否共用一个 Token
+  is-share: false
+  # Token 风格
+  token-style: uuid
+  # 是否输出操作日志
+  is-log: false
+
+# ========== 日志配置 ==========
 logging:
   level:
     com.clx: debug
     org.springframework.cloud.gateway: info
+    cn.dev33.satoken: debug

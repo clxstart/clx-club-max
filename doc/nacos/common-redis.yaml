@@ -1,0 +1,19 @@
+# ============================================================
+# Nacos 配置中心 - 公共 Redis 配置
+# Data ID: common-redis.yaml
+# Group: DEFAULT_GROUP
+# ============================================================
+
+spring:
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: 2
+      lettuce:
+        pool:
+          max-active: 200
+          max-idle: 50
+          min-idle: 10
+          max-wait: 3000ms

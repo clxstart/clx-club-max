@@ -4,7 +4,7 @@ import com.clx.analytics.dto.DailyReportResponse;
 import com.clx.analytics.dto.HotPostResponse;
 import com.clx.analytics.dto.TrendResponse;
 import com.clx.analytics.service.AnalyticsService;
-import com.clx.common.core.result.R;
+import com.clx.common.core.domain.R;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

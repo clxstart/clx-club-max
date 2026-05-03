@@ -1,5 +1,6 @@
 package com.clx.post.service;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.clx.post.dto.CommentCreateRequest;
 import com.clx.post.entity.Comment;
 import com.clx.post.mapper.CommentMapper;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
@@ -136,9 +138,14 @@ class CommentServiceTest {
 
             when(commentMapper.selectById(10L)).thenReturn(comment);
 
-            RuntimeException ex = assertThrows(RuntimeException.class,
-                    () -> commentService.delete(10L, 200L));
-            assertEquals("无权删除此评论", ex.getMessage());
+            // Mock StpUtil.hasRole 返回 false（非管理员）
+            try (MockedStatic<StpUtil> mockedStpUtil = org.mockito.Mockito.mockStatic(StpUtil.class)) {
+                mockedStpUtil.when(() -> StpUtil.hasRole("admin")).thenReturn(false);
+
+                RuntimeException ex = assertThrows(RuntimeException.class,
+                        () -> commentService.delete(10L, 200L));
+                assertEquals("无权删除此评论", ex.getMessage());
+            }
         }
     }
 

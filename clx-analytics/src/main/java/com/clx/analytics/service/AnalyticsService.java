@@ -2,6 +2,7 @@ package com.clx.analytics.service;
 
 import com.clx.analytics.dto.DailyReportResponse;
 import com.clx.analytics.dto.HotPostResponse;
+import com.clx.analytics.dto.TrendResponse;
 
 import java.time.LocalDate;
 import java.util.List;

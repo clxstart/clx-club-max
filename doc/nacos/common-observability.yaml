@@ -1,0 +1,48 @@
+# ============================================================
+# Nacos 配置中心 - 公共可观测性配置
+# Data ID: common-observability.yaml
+# Group: DEFAULT_GROUP
+# ============================================================
+
+# ========== 链路追踪（Zipkin） ==========
+management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0  # 采样率 100%（生产环境可降低）
+  zipkin:
+    tracing:
+      endpoint: http://${ZIPKIN_HOST:localhost}:9411/api/v2/spans
+
+# ========== Sentinel 熔断降级 ==========
+spring:
+  cloud:
+    sentinel:
+      enabled: true
+      transport:
+        dashboard: ${SENTINEL_HOST:localhost}:8858
+        port: 8719  # 与 Dashboard 通信端口
+      # 熔断规则（默认配置）
+      datasource:
+        # 可从 Nacos 读取规则，后续配置
+      eager: true  # 服务启动时立即连接 Dashboard
+
+# ========== Feign Sentinel 整合 ==========
+feign:
+  sentinel:
+    enabled: true
+
+# ========== Actuator 端点 ==========
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+    prometheus:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}

@@ -2,17 +2,9 @@ spring:
   application:
     name: clx-auth
 
-  # 默认启用dev环境配置（包含数据库和Redis）
+  # 默认启用dev环境配置
   profiles:
     active: dev
-
-  # Nacos服务发现和配置（当前禁用，使用本地配置）
-  cloud:
-    nacos:
-      discovery:
-        enabled: false
-      config:
-        enabled: false
 
   # 数据库配置（基础配置，具体参数在application-dev.yml中）
   datasource:

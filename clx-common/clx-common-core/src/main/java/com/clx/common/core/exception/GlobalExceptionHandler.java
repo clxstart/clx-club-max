@@ -21,13 +21,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthException.class)
     public ResponseEntity<R<Void>> handleAuthException(AuthException e) {
-        log.warn("认证异常: {}", e.getMessage());
+        log.warn("[AuthException] {}", e.getMessage());
         return fail(e.getCode(), e.getMessage());
     }
 
     @ExceptionHandler(ServiceException.class)
     public ResponseEntity<R<Void>> handleServiceException(ServiceException e) {
-        log.warn("业务异常: {}", e.getMessage());
+        log.warn("[ServiceException] {}", e.getMessage());
         return fail(e.getCode(), e.getMessage());
     }
 
@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
         String message = e.getBindingResult().getFieldErrors().stream()
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.joining(", "));
-        log.warn("参数校验失败: {}", message);
+        log.warn("[ValidationException] {}", message);
         return fail(400, message);
     }
 
@@ -45,19 +45,19 @@ public class GlobalExceptionHandler {
         String message = e.getFieldErrors().stream()
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.joining(", "));
-        log.warn("参数绑定失败: {}", message);
+        log.warn("[BindException] {}", message);
         return fail(400, message);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<R<Void>> handleIllegalArgumentException(IllegalArgumentException e) {
-        log.warn("非法参数: {}", e.getMessage());
+        log.warn("[IllegalArgumentException] {}", e.getMessage());
         return fail(400, e.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<R<Void>> handleException(Exception e) {
-        log.error("系统异常: ", e);
+        log.error("[SystemException] ", e);
         return fail(500, "系统繁忙，请稍后重试");
     }
 

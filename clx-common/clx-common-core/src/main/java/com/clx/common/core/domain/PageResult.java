@@ -37,7 +37,8 @@ public class PageResult<T> implements Serializable {
         this.pageNum = pageNum;
         this.pageSize = pageSize;
         this.total = total;
-        this.pages = (total + pageSize - 1) / pageSize;
+        // 安全计算总页数，避免溢出
+        this.pages = total == 0 ? 0 : (total - 1) / pageSize + 1;
         this.list = list;
     }
 

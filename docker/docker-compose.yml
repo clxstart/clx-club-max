@@ -1,4 +1,12 @@
+# CLX 社区平台 - 完整中间件环境
+# 一键启动：docker-compose up -d
+
 services:
+  # ========================================
+  # 基础设施（MySQL + Redis + Nacos）
+  # ========================================
+
+  # MySQL 8.0
   mysql:
     image: mysql:8.0
     container_name: clx-mysql
@@ -16,7 +24,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - clx-network
 
+  # Redis 7
   redis:
     image: redis:7-alpine
     container_name: clx-redis
@@ -29,7 +40,123 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - clx-network
+
+  # Nacos（服务注册中心，当前项目已禁用，可选启动）
+  nacos:
+    image: nacos/nacos-server:v2.3.0
+    container_name: clx-nacos
+    environment:
+      - MODE=standalone
+      - PREFER_HOST_MODE=hostname
+      - SPRING_DATASOURCE_PLATFORM=mysql
+      - MYSQL_SERVICE_HOST=mysql
+      - MYSQL_SERVICE_PORT=3306
+      - MYSQL_SERVICE_DB_NAME=nacos
+      - MYSQL_SERVICE_USER=root
+      - MYSQL_SERVICE_PASSWORD=root123
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - clx-network
+
+  # ========================================
+  # 搜索与消息（Elasticsearch + RabbitMQ）
+  # ========================================
+
+  # Elasticsearch 8.11
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: clx-es
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9201:9200"
+      - "9301:9300"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - clx-network
+
+  # RabbitMQ（消息队列）
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: clx-rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=clx
+      - RABBITMQ_DEFAULT_PASSWORD=clx123
+    ports:
+      - "5672:5672"    # AMQP
+      - "15672:15672"  # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmqctl status || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - clx-network
+
+  # ========================================
+  # 可选：Kibana（ES 可视化）
+  # ========================================
+  # kibana:
+  #   image: docker.elastic.co/kibana/kibana:8.11.0
+  #   container_name: clx-kibana
+  #   environment:
+  #     - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+  #   ports:
+  #     - "5601:5601"
+  #   depends_on:
+  #     elasticsearch:
+  #       condition: service_healthy
+  #   networks:
+  #     - clx-network
+
+  # ========================================
+  # 可观测性（Zipkin 链路追踪、Sentinel Dashboard）
+  # ========================================
+
+  # Zipkin（链路追踪）
+  zipkin:
+    image: openzipkin/zipkin:3
+    container_name: clx-zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - clx-network
+
+  # Sentinel Dashboard（熔断降级控制台）
+  sentinel:
+    image: bladex/sentinel-dashboard:1.8.6
+    container_name: clx-sentinel
+    ports:
+      - "8858:8858"
+    environment:
+      - AUTH_USERNAME=sentinel
+      - AUTH_PASSWORD=sentinel
+    networks:
+      - clx-network
 
 volumes:
   mysql_data:
   redis_data:
+  es_data:
+  rabbitmq_data:
+
+networks:
+  clx-network:
+    driver: bridge

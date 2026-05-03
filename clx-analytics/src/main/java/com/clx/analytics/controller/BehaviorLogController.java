@@ -2,7 +2,7 @@ package com.clx.analytics.controller;
 
 import com.clx.analytics.dto.BehaviorLogRequest;
 import com.clx.analytics.service.BehaviorLogService;
-import com.clx.common.core.result.R;
+import com.clx.common.core.domain.R;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;

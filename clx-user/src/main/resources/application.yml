@@ -7,12 +7,27 @@ spring:
   profiles:
     active: dev
 
+  # Nacos 配置导入
+  config:
+    import:
+      - optional:nacos:common-redis.yaml?group=DEFAULT_GROUP
+      - optional:nacos:common-mysql.yaml?group=DEFAULT_GROUP
+
+  # Nacos 服务发现和配置中心
   cloud:
     nacos:
+      server-addr: ${NACOS_ADDR:localhost:8848}
+      username: ${NACOS_USERNAME:nacos}
+      password: ${NACOS_PASSWORD:nacos}
       discovery:
         enabled: false
+        namespace: ${NACOS_NAMESPACE:}
+        group: DEFAULT_GROUP
       config:
         enabled: false
+        namespace: ${NACOS_NAMESPACE:}
+        group: DEFAULT_GROUP
+        file-extension: yaml
 
 # MyBatis-Plus配置
 mybatis-plus:

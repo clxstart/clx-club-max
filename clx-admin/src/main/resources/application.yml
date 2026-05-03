@@ -4,15 +4,28 @@ server:
 spring:
   application:
     name: clx-admin
-  datasource:
-    url: jdbc:mysql://localhost:3308/clx_auth?useUnicode=true&characterEncoding=utf8mb4&serverTimezone=Asia/Shanghai
-    username: root
-    password: root123
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  data:
-    redis:
-      host: localhost
-      port: 6379
+
+  # Nacos 配置导入
+  config:
+    import:
+      - optional:nacos:common-redis.yaml?group=DEFAULT_GROUP
+      - optional:nacos:common-mysql.yaml?group=DEFAULT_GROUP
+
+  # Nacos 服务发现和配置中心
+  cloud:
+    nacos:
+      server-addr: ${NACOS_ADDR:localhost:8848}
+      username: ${NACOS_USERNAME:nacos}
+      password: ${NACOS_PASSWORD:nacos}
+      discovery:
+        enabled: true
+        namespace: ${NACOS_NAMESPACE:}
+        group: DEFAULT_GROUP
+      config:
+        enabled: true
+        namespace: ${NACOS_NAMESPACE:}
+        group: DEFAULT_GROUP
+        file-extension: yaml
 
 # sa-Token 配置（共享 Redis）
 sa-token:
@@ -45,17 +58,13 @@ management:
     health:
       show-details: always
 
-# Feign 配置
+# Feign 配置（使用服务发现）
 feign:
   client:
     config:
       default:
         connectTimeout: 5000
         readTimeout: 10000
-      clx-user:
-        url: http://localhost:9201
-      clx-auth:
-        url: http://localhost:9100
 
 # 日志配置
 logging:

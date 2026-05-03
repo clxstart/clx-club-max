@@ -35,7 +35,13 @@ public class R<T> implements Serializable {
     @Schema(description = "数据")
     private T data;
 
-    /** 时间戳 */
+    /**
+     * 时间戳。
+     *
+     * <p>在对象创建时自动设置为当前时间。
+     * 注意：如果 R 对象被序列化后反序列化，时间戳不会重新生成。
+     * 对于需要精确时间戳的场景，建议在构造时显式设置。
+     */
     @Schema(description = "时间戳")
     private long timestamp = System.currentTimeMillis();
 

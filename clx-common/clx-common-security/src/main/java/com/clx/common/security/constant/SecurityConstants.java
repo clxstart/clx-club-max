@@ -1,7 +1,9 @@
-package com.clx.common.core.constant;
+package com.clx.common.security.constant;
 
 /**
- * 安全相关常量
+ * 安全相关常量。
+ *
+ * <p>定义认证、授权、请求头等安全相关的常量值。
  */
 public final class SecurityConstants {
 
@@ -32,7 +34,19 @@ public final class SecurityConstants {
     /** 超级管理员角色 */
     public static final String ADMIN_ROLE = "admin";
 
-    /** 默认密码（新增用户） */
+    /**
+     * 默认密码（新增用户）。
+     *
+     * <p><b>安全警告</b>：此值为开发环境默认值。
+     * 生产环境应通过配置文件覆盖，并强制要求用户首次登录修改密码。
+     *
+     * <p>配置方式：
+     * <pre>
+     * # application-prod.yml
+     * security:
+     *   default-password: ${DEFAULT_PASSWORD:随机生成的复杂密码}
+     * </pre>
+     */
     public static final String DEFAULT_PASSWORD = "123456";
 
     /** BCrypt密码编码ID */

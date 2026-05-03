@@ -1,5 +1,8 @@
 package com.clx.common.core.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * 雪花算法 ID 生成器
  *
@@ -12,6 +15,8 @@ package com.clx.common.core.util;
  * @since 2026-04-25
  */
 public class SnowflakeIdWorker {
+
+    private static final Logger log = LoggerFactory.getLogger(SnowflakeIdWorker.class);
 
     /** 起始时间戳 (2026-01-01) */
     private static final long TW_EPOCH = 1735689600000L;
@@ -43,6 +48,9 @@ public class SnowflakeIdWorker {
     /** 时间戳左移位数 */
     private static final long TIMESTAMP_SHIFT = SEQUENCE_BITS + WORKER_ID_BITS + DATACENTER_ID_BITS;
 
+    /** 时钟回拨容忍阈值（毫秒）- 超过此阈值抛出异常 */
+    private static final long CLOCK_BACKWARDS_TOLERANCE = 5L;
+
     private final long workerId;
     private final long datacenterId;
     private long sequence = 0L;
@@ -73,7 +81,27 @@ public class SnowflakeIdWorker {
 
         // 时钟回拨检测
         if (timestamp < lastTimestamp) {
-            throw new RuntimeException("Clock moved backwards, refusing to generate id");
+            long offset = lastTimestamp - timestamp;
+
+            // 小幅回拨，等待追上
+            if (offset <= CLOCK_BACKWARDS_TOLERANCE) {
+                log.warn("时钟小幅回拨 {}ms，等待恢复", offset);
+                try {
+                    Thread.sleep(offset);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Thread interrupted during clock backwards wait", e);
+                }
+                timestamp = System.currentTimeMillis();
+                if (timestamp < lastTimestamp) {
+                    // 等待后仍然回拨
+                    throw new RuntimeException("Clock moved backwards, refusing to generate id");
+                }
+            } else {
+                // 大幅回拨，拒绝生成
+                log.error("时钟大幅回拨 {}ms，拒绝生成ID", offset);
+                throw new RuntimeException("Clock moved backwards " + offset + "ms, refusing to generate id");
+            }
         }
 
         // 同一毫秒内
