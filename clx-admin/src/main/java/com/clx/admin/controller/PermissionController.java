@@ -2,11 +2,11 @@ package com.clx.admin.controller;
 
 import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.stp.StpUtil;
-import com.clx.admin.service.OperLogService;
-import com.clx.api.auth.dto.PermissionVO;
-import com.clx.api.auth.feign.AuthFeignClient;
-import com.clx.common.core.domain.R;
 import com.alibaba.fastjson2.JSON;
+import com.clx.admin.feign.AuthFeignClient;
+import com.clx.admin.service.OperLogService;
+import com.clx.admin.vo.PermissionVO;
+import com.clx.common.core.domain.R;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -24,18 +24,14 @@ public class PermissionController {
     private final AuthFeignClient authFeignClient;
     private final OperLogService operLogService;
 
-    /**
-     * 获取权限列表。
-     */
+    /** 获取权限列表 */
     @SaCheckRole("admin")
     @GetMapping("/list")
     public R<List<PermissionVO>> getPermissionList() {
         return authFeignClient.getPermissionList();
     }
 
-    /**
-     * 新增权限。
-     */
+    /** 新增权限 */
     @SaCheckRole("admin")
     @PostMapping
     public R<Void> addPermission(@RequestBody PermissionVO permission, HttpServletRequest request) {
@@ -48,9 +44,7 @@ public class PermissionController {
         return result;
     }
 
-    /**
-     * 更新权限。
-     */
+    /** 更新权限 */
     @SaCheckRole("admin")
     @PutMapping
     public R<Void> updatePermission(@RequestBody PermissionVO permission, HttpServletRequest request) {
@@ -63,9 +57,7 @@ public class PermissionController {
         return result;
     }
 
-    /**
-     * 删除权限。
-     */
+    /** 删除权限 */
     @SaCheckRole("admin")
     @DeleteMapping("/{permissionId}")
     public R<Void> deletePermission(@PathVariable Long permissionId, HttpServletRequest request) {

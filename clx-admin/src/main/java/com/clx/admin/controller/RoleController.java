@@ -2,11 +2,11 @@ package com.clx.admin.controller;
 
 import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.stp.StpUtil;
-import com.clx.admin.service.OperLogService;
-import com.clx.api.auth.dto.RoleVO;
-import com.clx.api.auth.feign.AuthFeignClient;
-import com.clx.common.core.domain.R;
 import com.alibaba.fastjson2.JSON;
+import com.clx.admin.feign.AuthFeignClient;
+import com.clx.admin.service.OperLogService;
+import com.clx.admin.vo.RoleVO;
+import com.clx.common.core.domain.R;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -24,18 +24,14 @@ public class RoleController {
     private final AuthFeignClient authFeignClient;
     private final OperLogService operLogService;
 
-    /**
-     * 获取角色列表。
-     */
+    /** 获取角色列表 */
     @SaCheckRole("admin")
     @GetMapping("/list")
     public R<List<RoleVO>> getRoleList() {
         return authFeignClient.getRoleList();
     }
 
-    /**
-     * 新增角色。
-     */
+    /** 新增角色 */
     @SaCheckRole("admin")
     @PostMapping
     public R<Void> addRole(@RequestBody RoleVO role, HttpServletRequest request) {
@@ -48,9 +44,7 @@ public class RoleController {
         return result;
     }
 
-    /**
-     * 更新角色。
-     */
+    /** 更新角色 */
     @SaCheckRole("admin")
     @PutMapping
     public R<Void> updateRole(@RequestBody RoleVO role, HttpServletRequest request) {
@@ -63,9 +57,7 @@ public class RoleController {
         return result;
     }
 
-    /**
-     * 删除角色。
-     */
+    /** 删除角色 */
     @SaCheckRole("admin")
     @DeleteMapping("/{roleId}")
     public R<Void> deleteRole(@PathVariable Long roleId, HttpServletRequest request) {
@@ -78,18 +70,14 @@ public class RoleController {
         return result;
     }
 
-    /**
-     * 获取角色的权限ID列表。
-     */
+    /** 获取角色的权限ID列表 */
     @SaCheckRole("admin")
     @GetMapping("/{roleId}/permissions")
     public R<List<Long>> getRolePermissions(@PathVariable Long roleId) {
         return authFeignClient.getRolePermissions(roleId);
     }
 
-    /**
-     * 分配权限给角色。
-     */
+    /** 分配权限给角色 */
     @SaCheckRole("admin")
     @PutMapping("/{roleId}/permissions")
     public R<Void> assignPermissions(@PathVariable Long roleId, @RequestBody List<Long> permissionIds,
