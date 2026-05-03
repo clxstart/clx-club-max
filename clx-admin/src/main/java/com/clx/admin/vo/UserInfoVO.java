@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * 当前用户信息。
+ * 当前用户信息 VO（仅 admin 服务使用）。
  */
 @Data
 public class UserInfoVO {

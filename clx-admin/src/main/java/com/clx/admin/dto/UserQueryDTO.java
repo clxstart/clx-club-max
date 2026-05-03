@@ -2,8 +2,6 @@ package com.clx.admin.dto;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 /**
  * 用户分页查询条件。
  */

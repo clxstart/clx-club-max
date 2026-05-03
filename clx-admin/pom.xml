@@ -29,16 +29,6 @@
             <artifactId>clx-common-redis</artifactId>
         </dependency>
 
-        <!-- API 模块 -->
-        <dependency>
-            <groupId>com.clx</groupId>
-            <artifactId>clx-api-user</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.clx</groupId>
-            <artifactId>clx-api-auth</artifactId>
-        </dependency>
-
         <!-- Spring Boot Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
