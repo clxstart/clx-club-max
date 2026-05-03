@@ -3,6 +3,7 @@ package com.clx.auth;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 /**
  * 认证中心启动类。
@@ -15,6 +16,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication(scanBasePackages = "com.clx")
 @MapperScan("com.clx.auth.mapper")
+@EnableDiscoveryClient
 public class ClxAuthApplication {
 
     public static void main(String[] args) {

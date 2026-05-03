@@ -65,7 +65,7 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Nacos 服务注册/配置（暂时注释，后续启用）
+        <!-- Nacos 服务注册/配置 -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
@@ -74,7 +74,12 @@
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
-        -->
+
+        <!-- Bootstrap（支持 bootstrap.yml） -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bootstrap</artifactId>
+        </dependency>
 
         <!-- OpenFeign -->
         <dependency>

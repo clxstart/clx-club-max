@@ -155,11 +155,22 @@ class SearchFacadeTest {
     }
 
     @Test
-    @DisplayName("单类型搜索数据源不存在")
-    void testSearchSingle_DataSourceNotFound() {
-        doReturn(null).when(registry).getDataSource("nonexistent");
-
+    @DisplayName("单类型搜索 - 无效类型")
+    void testSearchSingle_InvalidType() {
         SearchVO.SearchResult result = searchFacade.searchSingle("nonexistent", "test", 1, 10);
+
+        assertNotNull(result, "结果不应为空");
+        assertNotNull(result.getError(), "应有错误信息");
+        assertTrue(result.getError().contains("无效的搜索类型"), "错误信息应包含'无效的搜索类型'");
+    }
+
+    @Test
+    @DisplayName("单类型搜索 - 数据源不存在")
+    void testSearchSingle_DataSourceNotFound() {
+        // "post" 是有效类型，但 registry 返回 null 表示数据源未注册
+        doReturn(null).when(registry).getDataSource("post");
+
+        SearchVO.SearchResult result = searchFacade.searchSingle("post", "test", 1, 10);
 
         assertNotNull(result, "结果不应为空");
         assertNotNull(result.getError(), "应有错误信息");

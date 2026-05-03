@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: clx-message
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      # 服务注册
+      discovery:
+        server-addr: ${NACOS_HOST:localhost}:${NACOS_PORT:8848}
+        namespace: ${NACOS_NAMESPACE:}
+        group: DEFAULT_GROUP
+        enabled: true
+      # 配置中心（禁用）
+      config:
+        enabled: false
+        import-check:
+          enabled: false

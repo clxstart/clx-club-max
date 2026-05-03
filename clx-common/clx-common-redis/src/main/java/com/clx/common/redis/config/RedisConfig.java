@@ -10,6 +10,9 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
  * Redis 配置。
+ *
+ * <p>配置 RedisTemplate 的序列化策略：Key 用 String，Value 用 JSON。
+ * <p>启用 @Cacheable 等缓存注解支持。
  */
 @Configuration
 @EnableCaching

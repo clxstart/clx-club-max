@@ -40,7 +40,7 @@
             <artifactId>spring-cloud-starter-loadbalancer</artifactId>
         </dependency>
 
-        <!-- Nacos（当前禁用，后续启用服务发现） -->
+        <!-- Nacos（服务发现） -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
@@ -50,6 +50,12 @@
                     <artifactId>spring-boot-starter-web</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <!-- Bootstrap（支持 bootstrap.yml） -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bootstrap</artifactId>
         </dependency>
 
         <!-- ========== sa-Token 权限认证（Reactive 版本） ========== -->
