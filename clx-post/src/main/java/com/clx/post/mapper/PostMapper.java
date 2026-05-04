@@ -106,4 +106,22 @@ public interface PostMapper {
      * 按作者统计帖子数。
      */
     int countByAuthor(@Param("authorId") Long authorId);
+
+    // ========== 后台管理接口 ==========
+
+    /**
+     * 分页查询帖子（后台管理）。
+     */
+    List<Post> selectAdminPage(@Param("title") String title,
+                               @Param("status") Integer status,
+                               @Param("authorId") Long authorId,
+                               @Param("offset") Integer offset,
+                               @Param("size") Integer size);
+
+    /**
+     * 统计帖子数量（后台管理）。
+     */
+    int selectAdminPageCount(@Param("title") String title,
+                             @Param("status") Integer status,
+                             @Param("authorId") Long authorId);
 }

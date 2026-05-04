@@ -132,4 +132,30 @@ public class CommentServiceImpl implements CommentService {
 
         return vo;
     }
+
+    // ========== 后台管理接口实现 ==========
+
+    @Override
+    public Comment getById(Long commentId) {
+        return commentMapper.selectById(commentId);
+    }
+
+    @Override
+    public void deleteById(Long commentId) {
+        Comment comment = commentMapper.selectById(commentId);
+        if (comment != null) {
+            commentMapper.deleteById(commentId);
+            postMapper.decrementCommentCount(comment.getPostId());
+        }
+    }
+
+    @Override
+    public List<Comment> getCommentPage(String content, Long postId, int offset, int pageSize) {
+        return commentMapper.selectAdminPage(content, postId, offset, pageSize);
+    }
+
+    @Override
+    public int getCommentPageCount(String content, Long postId) {
+        return commentMapper.selectAdminPageCount(content, postId);
+    }
 }

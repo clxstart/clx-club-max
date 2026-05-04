@@ -98,6 +98,21 @@ spring:
           predicates:
             - Path=/analytics/**
 
+        # ========== 内部 API（服务间调用，不对外暴露）==========
+        - id: clx-post-internal
+          uri: lb://clx-post
+          predicates:
+            - Path=/internal/post/**,/internal/comment/**
+          filters:
+            - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+
+        - id: clx-analytics-internal
+          uri: lb://clx-analytics
+          predicates:
+            - Path=/internal/analytics/**
+          filters:
+            - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+
 # ========== sa-Token 配置 ==========
 sa-token:
   # Token 名称

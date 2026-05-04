@@ -50,4 +50,20 @@ public interface CommentMapper {
      * 减少点赞数。
      */
     int decrementLikeCount(@Param("id") Long id);
+
+    // ========== 后台管理接口 ==========
+
+    /**
+     * 分页查询评论（后台管理）。
+     */
+    List<Comment> selectAdminPage(@Param("content") String content,
+                                  @Param("postId") Long postId,
+                                  @Param("offset") Integer offset,
+                                  @Param("size") Integer size);
+
+    /**
+     * 统计评论数量（后台管理）。
+     */
+    int selectAdminPageCount(@Param("content") String content,
+                             @Param("postId") Long postId);
 }

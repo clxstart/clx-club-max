@@ -1,6 +1,7 @@
 package com.clx.post.service;
 
 import com.clx.post.dto.CommentCreateRequest;
+import com.clx.post.entity.Comment;
 import com.clx.post.vo.CommentVO;
 
 import java.util.List;
@@ -24,4 +25,18 @@ public interface CommentService {
      * 获取帖子的评论列表。
      */
     List<CommentVO> getList(Long postId, Long userId);
+
+    // ========== 后台管理接口 ==========
+
+    /** 根据ID获取评论 */
+    Comment getById(Long commentId);
+
+    /** 删除评论（后台管理，不验证用户） */
+    void deleteById(Long commentId);
+
+    /** 分页查询评论（后台管理） */
+    List<Comment> getCommentPage(String content, Long postId, int offset, int pageSize);
+
+    /** 统计评论数量（后台管理） */
+    int getCommentPageCount(String content, Long postId);
 }

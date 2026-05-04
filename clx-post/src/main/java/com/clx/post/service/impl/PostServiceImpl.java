@@ -313,4 +313,31 @@ public class PostServiceImpl implements PostService {
 
         return vo;
     }
+
+    // ========== 后台管理接口实现 ==========
+
+    @Override
+    public Post getById(Long postId) {
+        return postMapper.selectById(postId);
+    }
+
+    @Override
+    public void update(Post post) {
+        postMapper.update(post);
+    }
+
+    @Override
+    public void deleteById(Long postId) {
+        postMapper.deleteById(postId);
+    }
+
+    @Override
+    public List<Post> getPostPage(String title, Integer status, Long authorId, int offset, int pageSize) {
+        return postMapper.selectAdminPage(title, status, authorId, offset, pageSize);
+    }
+
+    @Override
+    public int getPostPageCount(String title, Integer status, Long authorId) {
+        return postMapper.selectAdminPageCount(title, status, authorId);
+    }
 }

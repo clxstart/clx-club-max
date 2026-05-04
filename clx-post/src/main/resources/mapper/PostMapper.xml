@@ -149,4 +149,38 @@
         WHERE is_deleted = 0 AND status = '0' AND author_id = #{authorId}
     </select>
 
+    <!-- ========== 后台管理接口 ========== -->
+
+    <select id="selectAdminPage" resultMap="PostResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM post
+        WHERE is_deleted = 0
+        <if test="title != null and title != ''">
+            AND title LIKE CONCAT('%', #{title}, '%')
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        <if test="authorId != null">
+            AND author_id = #{authorId}
+        </if>
+        ORDER BY create_time DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="selectAdminPageCount" resultType="int">
+        SELECT COUNT(*)
+        FROM post
+        WHERE is_deleted = 0
+        <if test="title != null and title != ''">
+            AND title LIKE CONCAT('%', #{title}, '%')
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        <if test="authorId != null">
+            AND author_id = #{authorId}
+        </if>
+    </select>
+
 </mapper>

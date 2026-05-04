@@ -1,8 +1,5 @@
 package com.clx.post.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.clx.common.core.domain.R;
 import com.clx.post.entity.Comment;
 import com.clx.post.entity.Post;
@@ -31,29 +28,19 @@ public class InternalController {
     /** 分页查询帖子列表 */
     @PostMapping("/post/page")
     public R<Map<String, Object>> getPostPage(@RequestBody Map<String, Object> query) {
-        int pageNo = query.get("pageNo") != null ? (int) query.get("pageNo") : 1;
-        int pageSize = query.get("pageSize") != null ? (int) query.get("pageSize") : 20;
+        int pageNo = query.get("pageNo") != null ? ((Number) query.get("pageNo")).intValue() : 1;
+        int pageSize = query.get("pageSize") != null ? ((Number) query.get("pageSize")).intValue() : 20;
         String title = query.get("title") != null ? (String) query.get("title") : null;
-        Integer status = query.get("status") != null ? (Integer) query.get("status") : null;
-        Long authorId = query.get("authorId") != null ? Long.valueOf(query.get("authorId").toString()) : null;
+        Integer status = query.get("status") != null ? ((Number) query.get("status")).intValue() : null;
+        Long authorId = query.get("authorId") != null ? ((Number) query.get("authorId")).longValue() : null;
 
-        LambdaQueryWrapper<Post> wrapper = new LambdaQueryWrapper<>();
-        if (title != null && !title.isEmpty()) {
-            wrapper.like(Post::getTitle, title);
-        }
-        if (status != null) {
-            wrapper.eq(Post::getStatus, status);
-        }
-        if (authorId != null) {
-            wrapper.eq(Post::getAuthorId, authorId);
-        }
-        wrapper.orderByDesc(Post::getCreatedAt);
-
-        IPage<Post> page = postService.page(new Page<>(pageNo, pageSize), wrapper);
+        int offset = (pageNo - 1) * pageSize;
+        List<Post> list = postService.getPostPage(title, status, authorId, offset, pageSize);
+        int total = postService.getPostPageCount(title, status, authorId);
 
         Map<String, Object> result = new HashMap<>();
-        result.put("total", page.getTotal());
-        result.put("list", page.getRecords());
+        result.put("total", total);
+        result.put("list", list);
         return R.ok(result);
     }
 
@@ -74,15 +61,15 @@ public class InternalController {
         if (post == null) {
             return R.fail(404, "帖子不存在");
         }
-        post.setStatus(status);
-        postService.updateById(post);
+        post.setStatus(String.valueOf(status));
+        postService.update(post);
         return R.ok();
     }
 
     /** 删除帖子 */
     @DeleteMapping("/post/{postId}")
     public R<Void> deletePost(@PathVariable Long postId) {
-        postService.removeById(postId);
+        postService.deleteById(postId);
         return R.ok();
     }
 
@@ -91,32 +78,25 @@ public class InternalController {
     /** 分页查询评论列表 */
     @PostMapping("/comment/page")
     public R<Map<String, Object>> getCommentPage(@RequestBody Map<String, Object> query) {
-        int pageNo = query.get("pageNo") != null ? (int) query.get("pageNo") : 1;
-        int pageSize = query.get("pageSize") != null ? (int) query.get("pageSize") : 20;
+        int pageNo = query.get("pageNo") != null ? ((Number) query.get("pageNo")).intValue() : 1;
+        int pageSize = query.get("pageSize") != null ? ((Number) query.get("pageSize")).intValue() : 20;
         String content = query.get("content") != null ? (String) query.get("content") : null;
-        Long postId = query.get("postId") != null ? Long.valueOf(query.get("postId").toString()) : null;
+        Long postId = query.get("postId") != null ? ((Number) query.get("postId")).longValue() : null;
 
-        LambdaQueryWrapper<Comment> wrapper = new LambdaQueryWrapper<>();
-        if (content != null && !content.isEmpty()) {
-            wrapper.like(Comment::getContent, content);
-        }
-        if (postId != null) {
-            wrapper.eq(Comment::getPostId, postId);
-        }
-        wrapper.orderByDesc(Comment::getCreatedAt);
-
-        IPage<Comment> page = commentService.page(new Page<>(pageNo, pageSize), wrapper);
+        int offset = (pageNo - 1) * pageSize;
+        List<Comment> list = commentService.getCommentPage(content, postId, offset, pageSize);
+        int total = commentService.getCommentPageCount(content, postId);
 
         Map<String, Object> result = new HashMap<>();
-        result.put("total", page.getTotal());
-        result.put("list", page.getRecords());
+        result.put("total", total);
+        result.put("list", list);
         return R.ok(result);
     }
 
     /** 删除评论 */
     @DeleteMapping("/comment/{commentId}")
     public R<Void> deleteComment(@PathVariable Long commentId) {
-        commentService.removeById(commentId);
+        commentService.deleteById(commentId);
         return R.ok();
     }
 
@@ -131,7 +111,7 @@ public class InternalController {
         map.put("viewCount", post.getViewCount());
         map.put("likeCount", post.getLikeCount());
         map.put("commentCount", post.getCommentCount());
-        map.put("createdAt", post.getCreatedAt());
+        map.put("createdAt", post.getCreateTime());
         return map;
     }
 }

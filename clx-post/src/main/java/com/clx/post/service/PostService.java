@@ -3,6 +3,7 @@ package com.clx.post.service;
 import com.clx.post.dto.PostCreateRequest;
 import com.clx.post.dto.PostListRequest;
 import com.clx.post.dto.PostUpdateRequest;
+import com.clx.post.entity.Post;
 import com.clx.post.vo.PostDetailVO;
 import com.clx.post.vo.PostListVO;
 import com.clx.post.vo.PostListItemVO;
@@ -84,4 +85,21 @@ public interface PostService {
      * @return 帖子列表
      */
     PostListVO getByAuthor(Long authorId, Integer page, Integer size);
+
+    // ========== 后台管理接口 ==========
+
+    /** 根据ID获取帖子实体 */
+    Post getById(Long postId);
+
+    /** 更新帖子实体 */
+    void update(Post post);
+
+    /** 删除帖子 */
+    void deleteById(Long postId);
+
+    /** 分页查询帖子（后台管理） */
+    List<Post> getPostPage(String title, Integer status, Long authorId, int offset, int pageSize);
+
+    /** 统计帖子数量（后台管理） */
+    int getPostPageCount(String title, Integer status, Long authorId);
 }
