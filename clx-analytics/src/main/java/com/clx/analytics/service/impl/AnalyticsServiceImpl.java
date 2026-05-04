@@ -56,13 +56,17 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         LambdaQueryWrapper<AnalyticsReport> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(AnalyticsReport::getReportDate, date)
                 .eq(AnalyticsReport::getReportType, "hot_posts")
-                .eq(AnalyticsReport::getDimension, "{\"rank_type\":\"" + type + "\"}")
+                .likeRight(AnalyticsReport::getDimension, "{\"rank_type\":\"" + type + "\"")
                 .last("LIMIT " + limit);
 
         List<AnalyticsReport> reports = reportMapper.selectList(wrapper);
         for (AnalyticsReport report : reports) {
             HotPostResponse post = new HotPostResponse();
-            post.setPostId(Long.parseLong(report.getMetricName()));
+            // metricName 格式为 post_101，提取数字部分
+            String postIdStr = report.getMetricName().replace("post_", "");
+            post.setPostId(Long.parseLong(postIdStr));
+            // metricValue 是浏览数
+            post.setViewCount(report.getMetricValue() != null ? report.getMetricValue().longValue() : 0L);
             // 从 dimension 字段解析详细信息
             parsePostDimension(report.getDimension(), post);
             result.add(post);
@@ -125,12 +129,23 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     /** 解析帖子维度信息 */
     private void parsePostDimension(String dimension, HotPostResponse post) {
         try {
-            if (dimension != null) {
-                // 简单解析，实际可用 Jackson
-                // {"title":"xxx","authorName":"xxx","viewCount":100,...}
+            if (dimension != null && !dimension.isEmpty()) {
+                // 解析 {"rank_type":"view","title":"xxx"} 格式
+                var map = objectMapper.readValue(dimension, java.util.Map.class);
+                post.setTitle((String) map.get("title"));
+                post.setAuthorName((String) map.get("authorName"));
+                if (map.get("viewCount") != null) {
+                    post.setViewCount(((Number) map.get("viewCount")).longValue());
+                }
+                if (map.get("likeCount") != null) {
+                    post.setLikeCount(((Number) map.get("likeCount")).longValue());
+                }
+                if (map.get("commentCount") != null) {
+                    post.setCommentCount(((Number) map.get("commentCount")).longValue());
+                }
             }
-        } catch (Exception e) {
-            log.warn("解析维度信息失败: {}", dimension);
+        } catch (JsonProcessingException e) {
+            log.warn("解析维度信息失败: {}", dimension, e);
         }
     }
 }
