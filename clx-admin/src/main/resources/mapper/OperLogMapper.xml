@@ -14,4 +14,58 @@
         )
     </insert>
 
+    <select id="selectPage" resultType="com.clx.admin.vo.OperLogVO">
+        SELECT
+            id, user_id, username, module, action,
+            request_url, request_method, request_params, response_result,
+            status, error_msg, cost_time, oper_ip, oper_time
+        FROM sys_oper_log
+        <where>
+            <if test="query.module != null and query.module != ''">
+                AND module LIKE CONCAT('%', #{query.module}, '%')
+            </if>
+            <if test="query.action != null and query.action != ''">
+                AND action LIKE CONCAT('%', #{query.action}, '%')
+            </if>
+            <if test="query.username != null and query.username != ''">
+                AND username LIKE CONCAT('%', #{query.username}, '%')
+            </if>
+            <if test="query.status != null and query.status != ''">
+                AND status = #{query.status}
+            </if>
+            <if test="query.startTime != null and query.startTime != ''">
+                AND oper_time &gt;= #{query.startTime}
+            </if>
+            <if test="query.endTime != null and query.endTime != ''">
+                AND oper_time &lt;= #{query.endTime}
+            </if>
+        </where>
+        ORDER BY oper_time DESC
+        LIMIT #{query.size} OFFSET #{query.size} * (#{query.page} - 1)
+    </select>
+
+    <select id="selectCount" resultType="long">
+        SELECT COUNT(*) FROM sys_oper_log
+        <where>
+            <if test="query.module != null and query.module != ''">
+                AND module LIKE CONCAT('%', #{query.module}, '%')
+            </if>
+            <if test="query.action != null and query.action != ''">
+                AND action LIKE CONCAT('%', #{query.action}, '%')
+            </if>
+            <if test="query.username != null and query.username != ''">
+                AND username LIKE CONCAT('%', #{query.username}, '%')
+            </if>
+            <if test="query.status != null and query.status != ''">
+                AND status = #{query.status}
+            </if>
+            <if test="query.startTime != null and query.startTime != ''">
+                AND oper_time &gt;= #{query.startTime}
+            </if>
+            <if test="query.endTime != null and query.endTime != ''">
+                AND oper_time &lt;= #{query.endTime}
+            </if>
+        </where>
+    </select>
+
 </mapper>

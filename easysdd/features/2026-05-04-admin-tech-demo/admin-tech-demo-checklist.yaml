@@ -1,0 +1,104 @@
+name: admin-tech-demo
+feature: admin-tech-demo
+doc_type: feature-checklist
+status: completed
+created: 2026-05-04
+updated: 2026-05-04
+
+steps:
+  - id: step-1
+    desc: 新建 @OperLog 注解定义
+    status: done
+    files:
+      - clx-admin/src/main/java/com/clx/admin/annotation/OperLog.java
+    verify: 编译通过
+
+  - id: step-2
+    desc: 新建 OperLogAspect 切面实现
+    status: done
+    files:
+      - clx-admin/src/main/java/com/clx/admin/aspect/OperLogAspect.java
+    verify: 单元测试通过
+
+  - id: step-3
+    desc: 新建日志查询接口
+    status: done
+    files:
+      - clx-admin/src/main/java/com/clx/admin/controller/OperLogController.java
+      - clx-admin/src/main/java/com/clx/admin/vo/OperLogVO.java
+      - clx-admin/src/main/java/com/clx/admin/dto/LogQueryDTO.java
+    verify: 接口测试通过
+
+  - id: step-4
+    desc: 新建 @DataScope 注解定义
+    status: done
+    files:
+      - clx-admin/src/main/java/com/clx/admin/annotation/DataScope.java
+    verify: 编译通过
+
+  - id: step-5
+    desc: 新建 DataScopeInterceptor 拦截器
+    status: done
+    files:
+      - clx-admin/src/main/java/com/clx/admin/interceptor/DataScopeInterceptor.java
+    verify: 单元测试通过
+
+  - id: step-6
+    desc: 注册拦截器到 MyBatis
+    status: done
+    files:
+      - clx-admin/src/main/java/com/clx/admin/config/MybatisConfig.java
+    verify: 拦截器生效
+
+  - id: step-7
+    desc: UserController 改造演示
+    status: done
+    files:
+      - clx-admin/src/main/java/com/clx/admin/controller/UserController.java
+    verify: 功能正常
+
+  - id: step-8
+    desc: 端到端验证
+    status: done
+    verify: 完整流程可操作
+
+checks:
+  - id: check-1
+    desc: '@OperLog 注解能正常记录操作日志'
+    type: test
+    status: passed
+
+  - id: check-2
+    desc: '@OperLog 异常时 status=1'
+    type: test
+    status: passed
+
+  - id: check-3
+    desc: '@DataScope 正确拼接 SQL 条件'
+    type: test
+    status: passed
+
+  - id: check-4
+    desc: 日志分页查询接口正常
+    type: test
+    status: passed
+
+  - id: check-5
+    desc: 无注解方法不受影响
+    type: test
+    status: passed
+
+  - id: check-6
+    desc: 明确不做批量操作
+    type: scope-guard
+    status: passed
+
+  - id: check-7
+    desc: 明确不做数据权限管理界面
+    type: scope-guard
+    status: passed
+
+  - id: check-8
+    desc: 明确不做多租户隔离
+    type: scope-guard
+    status: passed
