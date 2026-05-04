@@ -41,7 +41,12 @@ import type {
   UserSimpleVO,
   ProfileUpdateRequest,
   FavoriteItemVO,
-  ActiveUserVO
+  ActiveUserVO,
+  ChatSessionVO,
+  ChatMessageVO,
+  SendMessageRequest,
+  NotificationVO,
+  UnreadCountVO
 } from './types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
@@ -203,4 +208,26 @@ export const userApi = {
 
   // 活跃用户排行
   active: (limit = 5) => get<ActiveUserVO[]>('/user/active', { limit })
+};
+
+export const messageApi = {
+  // ========== 私信 ==========
+  /** 获取会话列表 */
+  sessions: (page = 1, size = 20) => get<{ total: number; list: ChatSessionVO[] }>('/message/sessions', { page, size }),
+  /** 获取会话消息历史 */
+  messages: (sessionId: number, cursor?: number, size = 20) => get<{ total: number; list: ChatMessageVO[]; hasMore: boolean }>(`/message/sessions/${sessionId}/messages`, { cursor, size }),
+  /** 发送私信 */
+  send: (body: SendMessageRequest) => post<{ messageId: number; createdAt: string }>('/message/send', body),
+  /** 标记会话已读 */
+  markRead: (sessionId: number) => put<void>(`/message/sessions/${sessionId}/read`),
+
+  // ========== 通知 ==========
+  /** 获取通知列表 */
+  notifications: (type?: string, page = 1, size = 20) => get<{ total: number; list: NotificationVO[] }>('/notification/list', { type, page, size }),
+  /** 获取未读数 */
+  unreadCount: () => get<UnreadCountVO>('/notification/unread-count'),
+  /** 标记单条通知已读 */
+  markNotificationRead: (id: number) => put<void>(`/notification/read/${id}`),
+  /** 标记全部已读 */
+  markAllRead: (type?: string) => put<void>('/notification/read-all', { type })
 };

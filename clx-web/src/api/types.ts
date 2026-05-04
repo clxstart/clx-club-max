@@ -341,3 +341,48 @@ export type FavoriteItemVO = {
   createdAt?: string;
   favoritedAt?: string;
 };
+
+// ========== Message Types ==========
+
+export type ChatSessionVO = {
+  sessionId: number;
+  targetUserId: number;
+  targetNickname: string;
+  targetAvatar?: string;
+  lastMessage?: string;
+  lastTime?: number;  // timestamp in milliseconds
+  unreadCount: number;
+};
+
+export type ChatMessageVO = {
+  messageId: number;
+  fromUserId: number;
+  content: string;
+  timestamp?: number;  // timestamp in milliseconds
+  direction: 'sent' | 'received';
+  isSelf: boolean;  // computed by frontend
+};
+
+export type SendMessageRequest = {
+  toUserId: number;
+  content: string;
+};
+
+export type NotificationVO = {
+  id: number;
+  type: string;
+  title: string;
+  content: string;
+  isRead: boolean;
+  createTime?: number;  // timestamp in milliseconds
+  aggregateCount?: number;
+};
+
+export type UnreadCountVO = {
+  chat?: number;
+  comment?: number;
+  like?: number;
+  follow?: number;
+  system?: number;
+  total?: number;
+};
