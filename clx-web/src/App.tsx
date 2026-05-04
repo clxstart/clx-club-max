@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
-import { Home, Search, BookOpen, Edit, UserRound, LogOut, Plus } from 'lucide-react';
+import { Home, Search, BookOpen, Edit, UserRound, LogOut, Plus, MessageCircle } from 'lucide-react';
 import { TopNavBar } from './components/layout/TopNavBar';
 import { HomePage } from './pages/HomePage';
 import { PostDetailPage } from './pages/PostDetailPage';
@@ -10,13 +10,14 @@ import { QuizPage } from './pages/QuizPage';
 import { AccountPage } from './pages/AccountPage';
 import { AuthPage } from './pages/AuthPage';
 import { UserProfilePage } from './pages/UserProfilePage';
+import { MessagePage } from './pages/MessagePage';
 import { HotPosts } from './components/aside/HotPosts';
 import { ActiveRank } from './components/aside/ActiveRank';
 import { authApi, clearToken, getStoredToken, postApi, searchApi, taxonomyApi, userApi } from './api';
 import type { CategoryVO, PostListItemVO, TagVO, UserInfoVO, ActiveUserVO } from './api/types';
 
 type Message = { text: string; error?: boolean };
-type NavTab = 'home' | 'search' | 'quiz' | 'compose' | 'account';
+type NavTab = 'home' | 'search' | 'quiz' | 'compose' | 'message' | 'account';
 
 // 主应用容器（带路由）
 function AppContent() {
@@ -97,6 +98,7 @@ function AppContent() {
       '/search': 'search',
       '/quiz': 'quiz',
       '/compose': 'compose',
+      '/message': 'message',
       '/account': 'account'
     };
     const currentPath = location.pathname;
@@ -121,6 +123,7 @@ function AppContent() {
       search: '/search',
       quiz: '/quiz',
       compose: '/compose',
+      message: '/message',
       account: '/account'
     };
     navigate(pathMap[newTab]);
@@ -147,6 +150,7 @@ function AppContent() {
     { key: 'search', label: '搜索', icon: <Search size={18} /> },
     { key: 'quiz', label: '刷题', icon: <BookOpen size={18} /> },
     { key: 'compose', label: '发帖', icon: <Plus size={18} /> },
+    { key: 'message', label: '消息', icon: <MessageCircle size={18} /> },
     { key: 'account', label: '账号', icon: <UserRound size={18} /> },
   ];
 
@@ -213,6 +217,7 @@ function AppContent() {
             <Route path="/compose" element={<ComposePage categories={categories} tags={tags} run={run} onCreated={() => { setTab('home'); navigate('/'); }} />} />
             <Route path="/search" element={<SearchPage hotKeywords={hotKeywords} setHotKeywords={setHotKeywords} setMessage={setMessage} run={run} />} />
             <Route path="/quiz" element={<QuizPage run={run} setMessage={setMessage} />} />
+            <Route path="/message" element={<MessagePage />} />
             <Route path="/account" element={<AccountPage user={user} bindings={bindings} setBindings={setBindings} run={run} setMessage={setMessage} onLogout={handleLogout} />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

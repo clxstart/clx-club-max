@@ -1,0 +1,97 @@
+name: full-frontend-checklist
+feature: 2026-05-04-full-frontend
+created: 2026-05-04
+
+steps:
+  # 阶段 1：前台核心功能补全
+  - id: s1
+    desc: 评论组件开发（CommentList、CommentInput、CommentItem）
+    status: completed
+  - id: s2
+    desc: 消息页面开发（MessagePage、ChatWindow、NotificationList）
+    status: completed
+  - id: s3
+    desc: 发帖编辑器优化（Markdown 支持）
+    status: completed
+
+  # 阶段 2：后台管理端搭建
+  - id: s4
+    desc: 创建 clx-admin-web 项目（Vue 3 + Element Plus）
+    status: completed
+  - id: s5
+    desc: 登录页面 + 布局框架（AdminLayout、Sidebar、Header）
+    status: completed
+  - id: s6
+    desc: 用户管理模块（UserListView）
+    status: completed
+  - id: s7
+    desc: 帖子管理模块（PostListView）
+    status: completed
+  - id: s8
+    desc: 评论管理模块（CommentListView）
+    status: completed
+  - id: s9
+    desc: 数据统计模块（DashboardView）
+    status: completed
+  - id: s10
+    desc: 角色权限模块（RoleListView）
+    status: completed
+
+  # 阶段 3：联调与优化
+  - id: s11
+    desc: Gateway 路由配置
+    status: pending
+  - id: s12
+    desc: 响应式适配优化
+    status: pending
+  - id: s13
+    desc: 错误处理统一
+    status: pending
+
+checks:
+  # 范围守护
+  - id: c1
+    desc: 不引入 SSR/SEO 相关代码
+    type: grep_negative
+    pattern: "next\\.js|nuxt|SSR|getServerSideProps"
+  - id: c2
+    desc: 不引入 PWA 相关代码
+    type: grep_negative
+    pattern: "serviceWorker|PWA|manifest\\.json"
+  - id: c3
+    desc: 不引入国际化相关代码
+    type: grep_negative
+    pattern: "i18n|react-intl|vue-i18n"
+  - id: c4
+    desc: 不引入深色模式相关代码
+    type: grep_negative
+    pattern: "darkMode|dark-theme|prefers-color-scheme"
+
+  # 接口一致性
+  - id: c5
+    desc: 前台 API 请求携带 Authorization Header
+    type: grep_positive
+    pattern: "Authorization.*Bearer"
+    path: "clx-web/src/api"
+  - id: c6
+    desc: 后台 API 请求携带 Authorization Header
+    type: grep_positive
+    pattern: "Authorization.*Bearer"
+    path: "clx-admin-web/src/api"
+
+  # 测试验证
+  - id: c7
+    desc: 评论组件可在帖子详情页发表评论
+    type: manual_browser
+  - id: c8
+    desc: 消息页面可查看私信和通知
+    type: manual_browser
+  - id: c9
+    desc: 后台登录页 admin 可登录成功
+    type: manual_browser
+  - id: c10
+    desc: 后台用户管理可封禁/解封用户
+    type: manual_browser
+  - id: c11
+    desc: 后台帖子管理可隐藏/删除帖子
+    type: manual_browser
