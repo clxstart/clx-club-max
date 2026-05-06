@@ -48,8 +48,16 @@ public class CaptchaGenerator {
         return new CaptchaVO(id, image);
     }
 
-    /** 验证码是否正确（验证后删除，一次性使用） */
+    /** 验证码是否正确（验证后删除，一次性使用）
+     * 开发环境下，如果 id 为 "dev-bypass" 且 code 为 "bypass"，则跳过验证
+     */
     public boolean verify(String id, String code) {
+        // 开发环境跳过验证码（id=dev-bypass, code=bypass）
+        if ("dev-bypass".equals(id) && "bypass".equals(code)) {
+            log.info("开发环境跳过验证码验证");
+            return true;
+        }
+
         String key = "captcha:" + id;
         String stored = redis.opsForValue().get(key);
 

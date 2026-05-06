@@ -14,6 +14,7 @@ import java.util.Map;
 
 /**
  * 通知控制器。
+ * 评论回复，点赞，关注，系统公告等通知
  */
 @Tag(name = "通知管理", description = "通知相关接口")
 @RestController

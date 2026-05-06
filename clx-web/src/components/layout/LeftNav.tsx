@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { BookOpen, Edit, Home, LogOut, Search, UserRound } from 'lucide-react';
 
 export type NavTab = 'home' | 'search' | 'quiz' | 'compose' | 'account';

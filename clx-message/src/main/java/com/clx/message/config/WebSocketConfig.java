@@ -18,14 +18,16 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketConfigurer {
 
+    // 消息处理器
     private final MessageWebSocketHandler messageWebSocketHandler;
+    // 握手拦截器
     private final WsHandshakeInterceptor wsHandshakeInterceptor;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(messageWebSocketHandler, "/ws/message")
-                .addInterceptors(wsHandshakeInterceptor)
-                .setAllowedOrigins("*");
+        registry.addHandler(messageWebSocketHandler, "/ws/message") // 注册处理器
+                .addInterceptors(wsHandshakeInterceptor) // 添加栏截器
+                .setAllowedOrigins("*"); // 允许跨域
     }
 
 }

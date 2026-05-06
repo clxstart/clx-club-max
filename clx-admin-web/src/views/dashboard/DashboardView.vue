@@ -1,72 +1,38 @@
 <template>
-  <div class="dashboard">
+  <div class="dashboard app-shell">
     <!-- 统计卡片 -->
     <el-row :gutter="24" class="stat-cards">
-      <el-col :span="6">
-        <el-card shadow="hover" class="stat-card">
-          <div class="stat-icon dau">
-            <el-icon><User /></el-icon>
+      <el-col :span="6" v-for="(stat, index) in statList" :key="index">
+        <div class="card neu-stat-card">
+          <div class="neu-stat-icon" :class="stat.class">
+            <el-icon :size="28"><component :is="stat.icon" /></el-icon>
           </div>
-          <div class="stat-content">
-            <div class="stat-value">{{ stats.dau }}</div>
-            <div class="stat-label">今日活跃用户</div>
+          <div class="neu-stat-content">
+            <div class="neu-stat-value">{{ stats[stat.key] }}</div>
+            <div class="neu-stat-label muted">{{ stat.label }}</div>
           </div>
-        </el-card>
-      </el-col>
-      <el-col :span="6">
-        <el-card shadow="hover" class="stat-card">
-          <div class="stat-icon mau">
-            <el-icon><Users /></el-icon>
-          </div>
-          <div class="stat-content">
-            <div class="stat-value">{{ stats.mau }}</div>
-            <div class="stat-label">月活跃用户</div>
-          </div>
-        </el-card>
-      </el-col>
-      <el-col :span="6">
-        <el-card shadow="hover" class="stat-card">
-          <div class="stat-icon new-users">
-            <el-icon><Plus /></el-icon>
-          </div>
-          <div class="stat-content">
-            <div class="stat-value">{{ stats.newUsers }}</div>
-            <div class="stat-label">新增用户</div>
-          </div>
-        </el-card>
-      </el-col>
-      <el-col :span="6">
-        <el-card shadow="hover" class="stat-card">
-          <div class="stat-icon new-posts">
-            <el-icon><Document /></el-icon>
-          </div>
-          <div class="stat-content">
-            <div class="stat-value">{{ stats.newPosts }}</div>
-            <div class="stat-label">新增帖子</div>
-          </div>
-        </el-card>
+        </div>
       </el-col>
     </el-row>
 
     <!-- 趋势图 -->
-    <el-card class="trend-card">
-      <template #header>
-        <div class="card-header">
-          <span>数据趋势（近 7 天）</span>
-          <el-radio-group v-model="trendType" size="small">
-            <el-radio-button label="dau">活跃用户</el-radio-button>
-            <el-radio-button label="posts">新增帖子</el-radio-button>
-            <el-radio-button label="comments">新增评论</el-radio-button>
-          </el-radio-group>
-        </div>
-      </template>
+    <div class="card trend-card">
+      <div class="card-header">
+        <h3>数据趋势（近 7 天）</h3>
+        <el-radio-group v-model="trendType" size="small">
+          <el-radio-button label="dau">活跃用户</el-radio-button>
+          <el-radio-button label="posts">新增帖子</el-radio-button>
+          <el-radio-button label="comments">新增评论</el-radio-button>
+        </el-radio-group>
+      </div>
       <div ref="chartRef" class="chart-container"></div>
-    </el-card>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted, watch, markRaw } from 'vue'
+import { User, Users, Plus, Document } from '@element-plus/icons-vue'
 import { statsAdminApi, type StatsOverview, type StatsTrend } from '@/api/stats'
 import * as echarts from 'echarts'
 
@@ -84,6 +50,13 @@ const trend = ref<StatsTrend>({
   posts: [],
   comments: []
 })
+
+const statList = reactive([
+  { key: 'dau', label: '今日活跃用户', icon: markRaw(User), class: 'dau' },
+  { key: 'mau', label: '月活跃用户', icon: markRaw(Users), class: 'mau' },
+  { key: 'newUsers', label: '新增用户', icon: markRaw(Plus), class: 'new-users' },
+  { key: 'newPosts', label: '新增帖子', icon: markRaw(Document), class: 'new-posts' }
+])
 
 const trendType = ref<'dau' | 'posts' | 'comments'>('dau')
 const chartRef = ref<HTMLElement>()
@@ -119,19 +92,43 @@ function updateChart() {
   }
 
   chart.setOption({
-    tooltip: { trigger: 'axis' },
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: 'var(--clx-surface)',
+      borderColor: '#b8bcc2',
+      borderWidth: 1,
+      textStyle: { color: 'var(--clx-text)' }
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      containLabel: true
+    },
     xAxis: {
       type: 'category',
-      data: trend.value.dates
+      data: trend.value.dates,
+      axisLine: { lineStyle: { color: '#b8bcc2' } },
+      axisLabel: { color: 'var(--clx-muted)' }
     },
-    yAxis: { type: 'value' },
+    yAxis: {
+      type: 'value',
+      splitLine: { lineStyle: { color: 'rgba(0,0,0,0.05)' } },
+      axisLabel: { color: 'var(--clx-muted)' }
+    },
     series: [
       {
         name: nameMap[trendType.value],
         type: 'line',
         smooth: true,
         data: dataMap[trendType.value],
-        areaStyle: { opacity: 0.3 },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(108, 99, 255, 0.3)' },
+            { offset: 1, color: 'rgba(108, 99, 255, 0.05)' }
+          ])
+        },
+        lineStyle: { color: '#6c63ff', width: 3 },
         itemStyle: { color: '#6c63ff' }
       }
     ]
@@ -156,57 +153,76 @@ onMounted(() => {
   margin-bottom: 0;
 }
 
-.stat-card {
+.neu-stat-card {
+  padding: 24px;
   display: flex;
   align-items: center;
-  padding: 20px;
+  gap: 20px;
+  transition: all 0.3s ease;
 }
 
-.stat-card :deep(.el-card__body) {
-  display: flex;
-  align-items: center;
-  width: 100%;
+.neu-stat-card:hover {
+  transform: translateY(-4px);
 }
 
-.stat-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
+.neu-stat-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
   display: grid;
   place-items: center;
-  font-size: 24px;
-  margin-right: 16px;
+  background: var(--clx-surface);
+  box-shadow: 4px 4px 8px #b8bcc2, -4px -4px 8px #ffffff;
 }
 
-.stat-icon.dau { background: #e8f5e9; color: #4caf50; }
-.stat-icon.mau { background: #e3f2fd; color: #2196f3; }
-.stat-icon.new-users { background: #fff3e0; color: #ff9800; }
-.stat-icon.new-posts { background: #f3e5f5; color: #9c27b0; }
+.neu-stat-icon.dau { color: #4caf50; }
+.neu-stat-icon.mau { color: #2196f3; }
+.neu-stat-icon.new-users { color: #ff9800; }
+.neu-stat-icon.new-posts { color: #9c27b0; }
 
-.stat-content {
+.neu-stat-content {
   flex: 1;
 }
 
-.stat-value {
-  font-size: 28px;
+.neu-stat-value {
+  font-size: 32px;
   font-weight: 700;
-  color: #333;
+  color: var(--clx-text);
 }
 
-.stat-label {
+.neu-stat-label {
   font-size: 14px;
-  color: #999;
   margin-top: 4px;
 }
 
 .trend-card {
-  min-height: 400px;
+  min-height: 420px;
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 20px;
+}
+
+.card-header h3 {
+  margin: 0;
+}
+
+.card-header :deep(.el-radio-button__inner) {
+  background: var(--clx-surface);
+  border: none;
+  box-shadow: 2px 2px 4px #b8bcc2, -2px -2px 4px #ffffff;
+  color: var(--clx-muted);
+  padding: 8px 16px;
+  border-radius: 999px;
+}
+
+.card-header :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
+  background: var(--clx-accent);
+  color: #fff;
+  box-shadow: var(--clx-inset);
 }
 
 .chart-container {

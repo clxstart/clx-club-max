@@ -15,11 +15,8 @@ public record LoginRequest(
         @Size(max = 128, message = "密码长度不能超过128个字符")
         String password,
 
-        @NotBlank(message = "图形验证码ID不能为空")
         String captchaId,
 
-        @NotBlank(message = "图形验证码不能为空")
-        @Size(min = 4, max = 4, message = "图形验证码必须是4位")
         String captchaCode,
 
         Boolean rememberMe

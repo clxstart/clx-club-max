@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
-import { Home, Search, BookOpen, Edit, UserRound, LogOut, Plus, MessageCircle } from 'lucide-react';
+import { Home, Search, BookOpen, UserRound, LogOut, Plus, MessageCircle } from 'lucide-react';
 import { TopNavBar } from './components/layout/TopNavBar';
 import { HomePage } from './pages/HomePage';
 import { PostDetailPage } from './pages/PostDetailPage';

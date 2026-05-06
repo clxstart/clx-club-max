@@ -85,13 +85,13 @@ public class UserServiceImpl implements UserService {
     public PageResultDTO<UserPageVO> getUserPage(UserQueryDTO query) {
         // 参数校验
         if (query.getPage() == null || query.getPage() < 1) {
-            query.setPage(1);
+            query.setPage(1L);
         }
         if (query.getSize() == null || query.getSize() < 1) {
-            query.setSize(10);
+            query.setSize(10L);
         }
         if (query.getSize() > 100) {
-            query.setSize(100);
+            query.setSize(100L);
         }
 
         List<UserPageVO> records = userMapper.selectUserPage(query);

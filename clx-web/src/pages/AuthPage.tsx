@@ -1,5 +1,5 @@
 import { FormEvent, useState, useEffect } from 'react';
-import { Globe2, Layers, LockKeyhole, Mail, ShieldCheck, UserRound } from 'lucide-react';
+import { Globe2, Layers, LockKeyhole, Mail, ShieldCheck, UserRound, Eye, EyeOff } from 'lucide-react';
 import { authApi, saveToken } from '../api';
 import type { CaptchaResult, LoginVO } from '../api/types';
 
@@ -20,6 +20,9 @@ export function AuthPage({ run, setMessage, onLoginSuccess }: AuthPageProps) {
   const [login, setLogin] = useState({ username: '', password: '', captchaCode: '', rememberMe: true });
   const [register, setRegister] = useState({ username: '', password: '', confirmPassword: '', nickname: '', email: '', emailCode: '' });
   const [phone, setPhone] = useState({ phone: '', smsCode: '', captchaCode: '' });
+  const [showLoginPwd, setShowLoginPwd] = useState(false);
+  const [showRegPwd, setShowRegPwd] = useState(false);
+  const [showRegConfirmPwd, setShowRegConfirmPwd] = useState(false);
 
   useEffect(() => {
     refreshCaptcha();
@@ -81,7 +84,10 @@ export function AuthPage({ run, setMessage, onLoginSuccess }: AuthPageProps) {
               <label className="auth-field-label">密码</label>
               <div className="auth-input">
                 <LockKeyhole size={20} />
-                <input className="field" placeholder="请输入密码" type="password" value={login.password} onChange={(e) => setLogin({ ...login, password: e.target.value })} />
+                <input className="field" placeholder="请输入密码" type={showLoginPwd ? 'text' : 'password'} value={login.password} onChange={(e) => setLogin({ ...login, password: e.target.value })} />
+                <button type="button" className="pwd-toggle" onClick={() => setShowLoginPwd(!showLoginPwd)}>
+                  {showLoginPwd ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
               <label className="auth-field-label">图形验证码</label>
               <div className="captcha-row">
@@ -151,11 +157,17 @@ export function AuthPage({ run, setMessage, onLoginSuccess }: AuthPageProps) {
               <input className="field" placeholder="请输入邮箱验证码" value={register.emailCode} onChange={(e) => setRegister({ ...register, emailCode: e.target.value })} />
               <div className="auth-input">
                 <LockKeyhole size={20} />
-                <input className="field" placeholder="请输入密码" type="password" value={register.password} onChange={(e) => setRegister({ ...register, password: e.target.value })} />
+                <input className="field" placeholder="请输入密码" type={showRegPwd ? 'text' : 'password'} value={register.password} onChange={(e) => setRegister({ ...register, password: e.target.value })} />
+                <button type="button" className="pwd-toggle" onClick={() => setShowRegPwd(!showRegPwd)}>
+                  {showRegPwd ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
               <div className="auth-input">
                 <LockKeyhole size={20} />
-                <input className="field" placeholder="请确认密码" type="password" value={register.confirmPassword} onChange={(e) => setRegister({ ...register, confirmPassword: e.target.value })} />
+                <input className="field" placeholder="请确认密码" type={showRegConfirmPwd ? 'text' : 'password'} value={register.confirmPassword} onChange={(e) => setRegister({ ...register, confirmPassword: e.target.value })} />
+                <button type="button" className="pwd-toggle" onClick={() => setShowRegConfirmPwd(!showRegConfirmPwd)}>
+                  {showRegConfirmPwd ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
               <button className="soft-btn primary">注册</button>
             </form>

@@ -1,7 +1,7 @@
 <template>
-  <div class="user-list">
+  <div class="user-list app-shell">
     <!-- 搜索栏 -->
-    <el-card class="search-card">
+    <div class="card search-card">
       <el-form :inline="true" :model="searchForm">
         <el-form-item label="用户名">
           <el-input v-model="searchForm.username" placeholder="搜索用户名" clearable />
@@ -23,10 +23,10 @@
           </el-button>
         </el-form-item>
       </el-form>
-    </el-card>
+    </div>
 
     <!-- 用户表格 -->
-    <el-card class="table-card">
+    <div class="card table-card">
       <el-table :data="users" v-loading="loading" stripe>
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="username" label="用户名" width="120" />
@@ -34,16 +34,16 @@
         <el-table-column prop="email" label="邮箱" width="180" />
         <el-table-column prop="roleNames" label="角色" width="120">
           <template #default="{ row }">
-            <el-tag v-for="role in row.roleNames" :key="role" size="small" type="success">
+            <el-tag v-for="role in row.roleNames" :key="role" size="small">
               {{ role }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
-            <el-tag :type="row.status === 0 ? 'success' : 'danger'" size="small" class="status-tag">
+            <span :class="row.status === 0 ? 'tag success' : 'tag danger'">
               {{ row.status === 0 ? '正常' : '封禁' }}
-            </el-tag>
+            </span>
           </template>
         </el-table-column>
         <el-table-column prop="createdAt" label="注册时间" width="180" />
@@ -86,7 +86,7 @@
           @current-change="loadUsers"
         />
       </div>
-    </el-card>
+    </div>
 
     <!-- 编辑弹窗 -->
     <el-dialog v-model="editVisible" title="编辑用户" width="500px">
@@ -231,19 +231,41 @@ onMounted(() => {
 <style scoped>
 .user-list {
   display: grid;
-  gap: 16px;
+  gap: 20px;
 }
 
 .search-card {
-  padding: 16px;
+  padding: 20px 24px;
 }
 
 .table-card {
-  padding: 0;
+  padding: 24px;
+  overflow: hidden;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.tag.success {
+  color: #4caf50;
+  background: var(--clx-surface);
+  box-shadow: inset 2px 2px 5px #b8bcc2, inset -2px -2px 5px #ffffff;
+}
+
+.tag.danger {
+  color: var(--clx-danger);
+  background: var(--clx-surface);
+  box-shadow: inset 2px 2px 5px #b8bcc2, inset -2px -2px 5px #ffffff;
 }
 
 .pagination {
-  padding: 16px;
+  padding: 20px 0 0;
   display: flex;
   justify-content: flex-end;
 }

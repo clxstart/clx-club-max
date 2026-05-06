@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 /**
  * 在线状态控制器。
+ * 批量获取用户在线/离线状态
  */
 @Tag(name = "在线状态", description = "用户在线状态查询接口")
 @RestController
@@ -43,6 +44,12 @@ public class OnlineStatusController {
         return R.ok(result);
     }
 
+    /**
+     * 解析逗号分隔的用户ID字符串。
+     *
+     * @param userIds 逗号分隔的用户ID字符串，如 "1,5,10"
+     * @return 用户ID列表，如 [1L, 5L, 10L]
+     */
     private List<Long> parseUserIds(String userIds) {
         return java.util.Arrays.stream(userIds.split(","))
                 .map(Long::parseLong)
